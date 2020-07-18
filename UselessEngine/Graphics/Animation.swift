@@ -7,7 +7,7 @@
 //
 
 import SpriteKit
-import Common
+import UselessCommon
 
 public typealias AnimationData = (textures: [SKTexture], rates: [UInt8], repeats: Bool)
 

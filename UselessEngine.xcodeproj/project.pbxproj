@@ -50,7 +50,18 @@
 		1A32FC7624C1E36700CE3B0F /* PhysicsEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC4B24C1E36700CE3B0F /* PhysicsEvent.swift */; };
 		1A32FC7724C1E36700CE3B0F /* Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC4C24C1E36700CE3B0F /* Position.swift */; };
 		1A32FC7824C1E36700CE3B0F /* GameObjectPhysicsComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC4D24C1E36700CE3B0F /* GameObjectPhysicsComponent.swift */; };
+		1A4AE29924C28DAF001E7A00 /* UselessCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A4AE29824C28D9C001E7A00 /* UselessCommon.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1A4AE29724C28D9C001E7A00 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1A4AE29324C28D9C001E7A00 /* UselessCommon.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1A04E86024C1D82700081D46;
+			remoteInfo = UselessCommon;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		1A32FC1824C1E33800CE3B0F /* UselessEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = UselessEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -98,6 +109,7 @@
 		1A32FC4B24C1E36700CE3B0F /* PhysicsEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhysicsEvent.swift; sourceTree = "<group>"; };
 		1A32FC4C24C1E36700CE3B0F /* Position.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Position.swift; sourceTree = "<group>"; };
 		1A32FC4D24C1E36700CE3B0F /* GameObjectPhysicsComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameObjectPhysicsComponent.swift; sourceTree = "<group>"; };
+		1A4AE29324C28D9C001E7A00 /* UselessCommon.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = UselessCommon.xcodeproj; path = ../UselessCommon/UselessCommon.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +117,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1A4AE29924C28DAF001E7A00 /* UselessCommon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,6 +129,7 @@
 			children = (
 				1A32FC1A24C1E33800CE3B0F /* UselessEngine */,
 				1A32FC1924C1E33800CE3B0F /* Products */,
+				1A4AE29224C28D9C001E7A00 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -194,6 +208,22 @@
 			path = Physics;
 			sourceTree = "<group>";
 		};
+		1A4AE29224C28D9C001E7A00 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1A4AE29324C28D9C001E7A00 /* UselessCommon.xcodeproj */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		1A4AE29424C28D9C001E7A00 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1A4AE29824C28D9C001E7A00 /* UselessCommon.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -252,12 +282,28 @@
 			mainGroup = 1A32FC0E24C1E33800CE3B0F;
 			productRefGroup = 1A32FC1924C1E33800CE3B0F /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 1A4AE29424C28D9C001E7A00 /* Products */;
+					ProjectRef = 1A4AE29324C28D9C001E7A00 /* UselessCommon.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				1A32FC1724C1E33800CE3B0F /* UselessEngine */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		1A4AE29824C28D9C001E7A00 /* UselessCommon.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = UselessCommon.framework;
+			remoteRef = 1A4AE29724C28D9C001E7A00 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		1A32FC1624C1E33800CE3B0F /* Resources */ = {

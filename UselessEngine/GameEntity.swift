@@ -6,7 +6,7 @@
 //  Copyright © 2018 Useless Robot. All rights reserved.
 //
 
-import Common
+import UselessCommon
 
 public protocol GameEntity: class, Updateable {
     var graphics: GameEntityGraphicsComponent? { get }

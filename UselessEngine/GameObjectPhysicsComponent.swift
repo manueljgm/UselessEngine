@@ -12,10 +12,11 @@ public protocol GameObjectPhysicsComponent: GameObjectComponent {
     
     var mass: Float { get } // in kg
     var thrust: Vector { get set }
-    var boost: Vector { get set } // in meters per second
+    var boost: Boost? { get set }
     
     /// Indicates whether the game object is touching the tile underfoot.
     var touchingGround: Bool { get }
+
     /// Determines whether the game object should be handled as airborne despite being in contact with the ground.
     var simulateAir: Bool { get set }
     

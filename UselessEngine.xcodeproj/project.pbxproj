@@ -51,6 +51,7 @@
 		1A32FC7724C1E36700CE3B0F /* Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC4C24C1E36700CE3B0F /* Position.swift */; };
 		1A32FC7824C1E36700CE3B0F /* GameObjectPhysicsComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC4D24C1E36700CE3B0F /* GameObjectPhysicsComponent.swift */; };
 		1A4AE29924C28DAF001E7A00 /* UselessCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A4AE29824C28D9C001E7A00 /* UselessCommon.framework */; };
+		1AC6463124CBC4CE007D8C21 /* Boost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC6463024CBC4CE007D8C21 /* Boost.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -110,6 +111,7 @@
 		1A32FC4C24C1E36700CE3B0F /* Position.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Position.swift; sourceTree = "<group>"; };
 		1A32FC4D24C1E36700CE3B0F /* GameObjectPhysicsComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameObjectPhysicsComponent.swift; sourceTree = "<group>"; };
 		1A4AE29324C28D9C001E7A00 /* UselessCommon.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = UselessCommon.xcodeproj; path = ../UselessCommon/UselessCommon.xcodeproj; sourceTree = "<group>"; };
+		1AC6463024CBC4CE007D8C21 /* Boost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Boost.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -196,6 +198,7 @@
 				1A32FC4A24C1E36700CE3B0F /* UnitPosition.swift */,
 				1A32FC3124C1E36500CE3B0F /* Vector.swift */,
 				1A32FC3B24C1E36500CE3B0F /* Vector2d.swift */,
+				1AC6463024CBC4CE007D8C21 /* Boost.swift */,
 				1A32FC3624C1E36500CE3B0F /* PointMass.swift */,
 				1A32FC3224C1E36500CE3B0F /* PointMassSpringJoint.swift */,
 				1A32FC2624C1E36400CE3B0F /* AABB.swift */,
@@ -358,6 +361,7 @@
 				1A32FC6524C1E36700CE3B0F /* ObserverNode.swift in Sources */,
 				1A32FC6824C1E36700CE3B0F /* Observers.swift in Sources */,
 				1A32FC5724C1E36700CE3B0F /* GameEntityGraphicsComponent.swift in Sources */,
+				1AC6463124CBC4CE007D8C21 /* Boost.swift in Sources */,
 				1A32FC6224C1E36700CE3B0F /* GameObjectStateWithGraphicsBehavior.swift in Sources */,
 				1A32FC5624C1E36700CE3B0F /* Subject.swift in Sources */,
 				1A32FC5424C1E36700CE3B0F /* GameObjectInputComponent.swift in Sources */,

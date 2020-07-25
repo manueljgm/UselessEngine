@@ -11,13 +11,27 @@ struct Settings {
         struct graphics {
             static internal var animationFrameRate: UInt8 = 10
         }
+        struct physics {
+            static internal var minimumBoostDecayValue: Float = 0.1
+        }
     }
 }
 
 public struct UselessEngine {
-    public struct settings {
-        public static func setDefault(animationFrameRate newFrameRate: UInt8) {
-            Settings.defaults.graphics.animationFrameRate = newFrameRate
+    public struct settings
+    {
+        public static func setDefault(animationFrameRate newValue: UInt8)
+        {
+            Settings.defaults.graphics.animationFrameRate = newValue
+        }
+        
+        public static func setDefault(minimumBoostDecayValue newValue: Float)
+        {
+            guard newValue > 0.0 else {
+                return
+            }
+
+            Settings.defaults.physics.minimumBoostDecayValue = newValue
         }
     }
 }

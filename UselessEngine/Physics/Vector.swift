@@ -44,13 +44,7 @@ public struct Vector { // TODO: PlaneVector
         self.dy = dy
         self.dz = dz
     }
-    
-    public init(pointA: Position, pointB: Position) {
-        self.dx = pointB.x - pointA.x
-        self.dy = pointB.y - pointA.y
-        self.dz = pointB.z - pointA.z
-    }
-    
+  
     public init(angle0: Float, angleZ: Float, magnitude: Float) {
         self.dx = cos(angle0) * sin(angleZ) * magnitude
         self.dy = sin(angle0) * sin(angleZ) * magnitude
@@ -69,8 +63,13 @@ public struct Vector { // TODO: PlaneVector
         dz += b.dz * scale
     }
 
-    public mutating func scale(_ scale: Float) {
+    public mutating func scale(_ scale: Float)
+    {
         let m = magnitude
+        guard !m.isZero else {
+            return
+        }
+        
         let newLength = m * scale
         let resizeFactor = newLength / m
         dx = dx * resizeFactor
@@ -78,11 +77,22 @@ public struct Vector { // TODO: PlaneVector
         dz = dz * resizeFactor
     }
     
-    public func scaled(by scale: Float) -> Vector {
+    public func scaled(by scale: Float) -> Vector
+    {
         let m = magnitude
+        guard !m.isZero else {
+            return .zero
+        }
+        
         let newLength = m * scale
         let resizeFactor = newLength / m
         return Vector(dx: dx * resizeFactor, dy: dy * resizeFactor, dz: dz * resizeFactor)
+    }
+    
+    public static func from(_ pointA: Position, to pointB: Position) -> Vector {
+        return Vector(dx: pointB.x - pointA.x,
+                      dy: pointB.y - pointA.y,
+                      dz: pointB.z - pointA.z)
     }
     
 }

@@ -11,25 +11,33 @@ open class GameObject: GameEntity {
     // MARK: - Properties
     
     public var state: GameObjectState?
-    // TODO: private(set) var otherState: GameObjectState? // e.g. equipment, invincibility
-    
+
     public let graphics: GameEntityGraphicsComponent?
     public let physics: GameObjectPhysicsComponent?
     public let input: GameObjectInputComponent?
     
+    /// The object's position.
     public var position: Position {
         didSet {
-            if (self.position != oldValue) {
+            if (position != oldValue) {
                 positionDidChange(from: oldValue)
             }
         }
     }
     
+    /// The object's velocity without added boost.
     public var velocity: Vector {
         didSet {
-            if (self.velocity != oldValue) {
+            if (velocity != oldValue) {
                 velocityDidChange(from: oldValue)
             }
+        }
+    }
+    
+    /// The object's velocity plus any added boost.
+    public var totalVelocity: Vector {
+        get {
+            return velocity + (physics?.boost?.velocity ?? .zero)
         }
     }
     

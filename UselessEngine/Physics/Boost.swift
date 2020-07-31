@@ -34,7 +34,7 @@ public class Boost: Updateable {
         if timeout < dt {
             // decay any boost if boost timeout has elapsed
             let velocityMagnitude = velocity.magnitude
-            if velocityMagnitude > 0.0 {
+            if velocityMagnitude > decay {
                 let reductionFactor = (velocityMagnitude - decay) / velocityMagnitude
                 velocity.dx *= reductionFactor
                 velocity.dy *= reductionFactor

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1A04E9D924DAF08500B1EC9D /* UselessCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A4AE29824C28D9C001E7A00 /* UselessCommon.framework */; };
+		1A04E9DA24DAF08500B1EC9D /* UselessCommon.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1A4AE29824C28D9C001E7A00 /* UselessCommon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1A32FC1D24C1E33800CE3B0F /* UselessEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A32FC1B24C1E33800CE3B0F /* UselessEngine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1A32FC4E24C1E36700CE3B0F /* PhysicsCoefficients.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC2324C1E36400CE3B0F /* PhysicsCoefficients.swift */; };
 		1A32FC4F24C1E36700CE3B0F /* GameWorldCollisionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC2424C1E36400CE3B0F /* GameWorldCollisionHandler.swift */; };
@@ -50,7 +52,7 @@
 		1A32FC7624C1E36700CE3B0F /* PhysicsEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC4B24C1E36700CE3B0F /* PhysicsEvent.swift */; };
 		1A32FC7724C1E36700CE3B0F /* Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC4C24C1E36700CE3B0F /* Position.swift */; };
 		1A32FC7824C1E36700CE3B0F /* GameObjectPhysicsComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC4D24C1E36700CE3B0F /* GameObjectPhysicsComponent.swift */; };
-		1A4AE29924C28DAF001E7A00 /* UselessCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A4AE29824C28D9C001E7A00 /* UselessCommon.framework */; };
+		1A5FB9EF24DAE3AE0025BE93 /* AnimationFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5FB9EE24DAE3AE0025BE93 /* AnimationFrame.swift */; };
 		1AC6463124CBC4CE007D8C21 /* Boost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC6463024CBC4CE007D8C21 /* Boost.swift */; };
 /* End PBXBuildFile section */
 
@@ -63,6 +65,20 @@
 			remoteInfo = UselessCommon;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1A04E9DB24DAF08500B1EC9D /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				1A04E9DA24DAF08500B1EC9D /* UselessCommon.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1A32FC1824C1E33800CE3B0F /* UselessEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = UselessEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -111,6 +127,7 @@
 		1A32FC4C24C1E36700CE3B0F /* Position.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Position.swift; sourceTree = "<group>"; };
 		1A32FC4D24C1E36700CE3B0F /* GameObjectPhysicsComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameObjectPhysicsComponent.swift; sourceTree = "<group>"; };
 		1A4AE29324C28D9C001E7A00 /* UselessCommon.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = UselessCommon.xcodeproj; path = ../UselessCommon/UselessCommon.xcodeproj; sourceTree = "<group>"; };
+		1A5FB9EE24DAE3AE0025BE93 /* AnimationFrame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimationFrame.swift; sourceTree = "<group>"; };
 		1AC6463024CBC4CE007D8C21 /* Boost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Boost.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -119,7 +136,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1A4AE29924C28DAF001E7A00 /* UselessCommon.framework in Frameworks */,
+				1A04E9D924DAF08500B1EC9D /* UselessCommon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -184,6 +201,7 @@
 		1A32FC7924C1E38500CE3B0F /* Graphics */ = {
 			isa = PBXGroup;
 			children = (
+				1A5FB9EE24DAE3AE0025BE93 /* AnimationFrame.swift */,
 				1A32FC2724C1E36400CE3B0F /* Animation.swift */,
 			);
 			path = Graphics;
@@ -249,6 +267,7 @@
 				1A32FC1424C1E33800CE3B0F /* Sources */,
 				1A32FC1524C1E33800CE3B0F /* Frameworks */,
 				1A32FC1624C1E33800CE3B0F /* Resources */,
+				1A04E9DB24DAF08500B1EC9D /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -361,6 +380,7 @@
 				1A32FC6524C1E36700CE3B0F /* ObserverNode.swift in Sources */,
 				1A32FC6824C1E36700CE3B0F /* Observers.swift in Sources */,
 				1A32FC5724C1E36700CE3B0F /* GameEntityGraphicsComponent.swift in Sources */,
+				1A5FB9EF24DAE3AE0025BE93 /* AnimationFrame.swift in Sources */,
 				1AC6463124CBC4CE007D8C21 /* Boost.swift in Sources */,
 				1A32FC6224C1E36700CE3B0F /* GameObjectStateWithGraphicsBehavior.swift in Sources */,
 				1A32FC5624C1E36700CE3B0F /* Subject.swift in Sources */,

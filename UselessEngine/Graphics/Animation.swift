@@ -9,8 +9,6 @@
 import SpriteKit
 import UselessCommon
 
-public typealias AnimationData = (textures: [SKTexture], rates: [UInt8], repeats: Bool)
-
 public class Animation {
     
     public private(set) var positionIndex: Int {
@@ -45,52 +43,35 @@ public class Animation {
     
     private static var inited = 0
     
-    public init(targetSprite: SKSpriteNode, headFrame: (texture: SKTexture, rate: UInt8), repeats: Bool) {
+    public init(targetSprite: SKSpriteNode, frames: [AnimationFrame], repeats: Bool)
+    {
+        let frames = frames.count > 0 ? frames : [AnimationFrame(texture: SKTexture())]
+        
         positionIndex = 0
         elapsed = 0.0
         self.repeats = repeats
 
         self.targetSprite = targetSprite
-        textures = [headFrame.texture]
-        rates = [Float(headFrame.rate)]
-        
-        renderFrame()
-        
-        Animation.inited += 1
-    }
-    
-    public init(targetSprite: SKSpriteNode, textures: [SKTexture], rates: [UInt8], repeats: Bool) {
-        positionIndex = 0
-        elapsed = 0.0
-        self.repeats = repeats
-
-        self.targetSprite = targetSprite
-        self.textures = textures.count > 0 ? textures : [SKTexture()]
-        
-        // init frame rates array to length of frames array
-        self.rates = Array(repeating: Float(Settings.defaults.graphics.animationFrameRate), count: textures.count)
-        if rates.count > 0 {
-            for i in 0...min(rates.count, textures.count)-1 {
-                // overwrite frame rate values with provided frame rate values
-                self.rates[i] = Float(rates[i])
-            }
-        }
+        textures = frames.map { $0.texture }
+        rates = frames.map { Float($0.rate) }
 
         renderFrame()
 
         Animation.inited += 1
-    }
-    
-    public convenience init(targetSprite: SKSpriteNode, headFrameTexture: SKTexture, repeats: Bool) {
-        self.init(targetSprite: targetSprite, headFrame: (texture: headFrameTexture, rate: Settings.defaults.graphics.animationFrameRate), repeats: repeats)
     }
     
     public convenience init(targetSprite: SKSpriteNode, textures: [SKTexture], repeats: Bool) {
-        self.init(targetSprite: targetSprite, textures: textures, rates: [], repeats: repeats)
+        let frames = textures.map { AnimationFrame(texture: $0) }
+        self.init(targetSprite: targetSprite, frames: frames, repeats: repeats)
     }
     
-    public convenience init(targetSprite: SKSpriteNode, frames: AnimationData) {
-        self.init(targetSprite: targetSprite, textures: frames.textures, rates: frames.rates, repeats: frames.repeats)
+    public convenience init(targetSprite: SKSpriteNode, headFrame: AnimationFrame, repeats: Bool)
+    {
+        self.init(targetSprite: targetSprite, frames: [headFrame], repeats: repeats)
+    }
+    
+    public convenience init(targetSprite: SKSpriteNode, headFrameTexture: SKTexture, repeats: Bool) {
+        self.init(targetSprite: targetSprite, headFrame: AnimationFrame(texture: headFrameTexture, rate: Settings.defaults.graphics.animationFrameRate), repeats: repeats)
     }
     
     deinit {

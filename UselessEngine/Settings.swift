@@ -6,19 +6,19 @@
 //  Copyright © 2018 Useless Robot. All rights reserved.
 //
 
-struct Settings {
-    struct defaults {
-        struct graphics {
+enum Settings {
+    enum defaults {
+        enum graphics {
             static internal var animationFrameRate: UInt8 = 10
         }
-        struct physics {
+        enum physics {
             static internal var minimumBoostDecayValue: Float = 0.1
         }
     }
 }
 
-public struct UselessEngine {
-    public struct settings
+public enum UselessEngine {
+    public enum settings
     {
         public static func setDefault(animationFrameRate newValue: UInt8)
         {

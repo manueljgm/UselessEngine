@@ -6,16 +6,17 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
-import Foundation
-
-public enum GameObjectCommandPriority: UInt8 {
-    case high   = 1
-    case medium = 2
-    case low    = 3
+public enum GameObjectCommandPriority: Comparable
+{
+    case low
+    case medium
+    case high
+    case urgent
 }
 
-public class GameObjectCommand {
-    
+public struct GameObjectCommand: Identifiable
+{
+    public let id: UUID = UUID()
     public let priority: GameObjectCommandPriority
     
     private var action: ((GameObject) -> Void)? = nil
@@ -24,29 +25,21 @@ public class GameObjectCommand {
         self.priority = priority
     }
 
-    public convenience init(priority: GameObjectCommandPriority, action: @escaping (GameObject) -> Void) {
+    public init(priority: GameObjectCommandPriority, action: @escaping (GameObject) -> Void) {
         self.init(priority: priority)
         self.action = action
     }
     
     public func doBundledAction(toGameObject gameObject: GameObject) {
-        if let action = self.action {
+        if let action = action {
             action(gameObject)
         }
     }
-    
-//    func undo() {
-//        
-//    }
-    
 }
 
-extension GameObjectCommand: Equatable {}
-
-public func ==(lhs: GameObjectCommand, rhs: GameObjectCommand) -> Bool {
-    return lhs === rhs
-}
-
-public func !=(lhs: GameObjectCommand, rhs: GameObjectCommand) -> Bool {
-    return lhs !== rhs
+extension GameObjectCommand: Equatable
+{
+    public static func == (lhs: GameObjectCommand, rhs: GameObjectCommand) -> Bool {
+        return lhs.id == rhs.id
+    }
 }

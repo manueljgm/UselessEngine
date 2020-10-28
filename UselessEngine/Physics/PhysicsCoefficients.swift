@@ -6,8 +6,6 @@
 //  Copyright © 2015 Useless Robot. All rights reserved.
 //
 
-import Foundation
-
 public struct PhysicsCoefficients {
 
     /// Coefficient of friction

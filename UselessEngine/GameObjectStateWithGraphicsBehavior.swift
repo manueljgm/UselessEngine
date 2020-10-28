@@ -6,23 +6,29 @@
 //  Copyright © 2015 Useless Robot. All rights reserved.
 //
 
-open class GameObjectStateWithGraphicsBehavior<TGraphicsComponent: GameObjectStateGraphicsComponent>: Observer {
-    
+open class GameObjectStateWithGraphicsBehavior<TGraphicsComponent: GameObjectStateGraphicsComponent>: Observer
+{
     public var fallbackState: GameObjectState?
     
     public private(set) var graphics: TGraphicsComponent?
     
     public init() {
-        
+        #if DEBUG_VERBOSE
+        print("GameObjectStateWithGraphicsBehavior:init")
+        #endif
     }
     
     deinit {
-        print("StateWithGraphicsBehavior:deinit")
+        #if DEBUG_VERBOSE
+        print("GameObjectStateWithGraphicsBehavior:deinit")
+        #endif
     }
     
-    public final func enter(with gameObject: GameObject) {
-        
-        print("StateWithGraphicsBehavior:enter")
+    public final func enter(with gameObject: GameObject)
+    {
+        #if DEBUG_VERBOSE
+        print("GameObjectStateWithGraphicsBehavior:enter")
+        #endif
 
         if
             let ownerState = self as? GameObjectState,
@@ -65,12 +71,12 @@ open class GameObjectStateWithGraphicsBehavior<TGraphicsComponent: GameObjectSta
         gameObject.state?.reset(with: gameObject)
     }
     
-    public final func receive(_ event: Event, from sender: AnyObject, payload: Any? = nil) {
+    public final func receive(_ event: EngineEvent, from sender: AnyObject, payload: Any? = nil) {
         graphics?.receive(event, from: sender, payload: payload)
         didReceive(event, from: sender, payload: payload)
     }
     
-    open func didReceive(_ event: Event, from sender: AnyObject, payload: Any? = nil) {
+    open func didReceive(_ event: EngineEvent, from sender: AnyObject, payload: Any? = nil) {
         
     }
 }

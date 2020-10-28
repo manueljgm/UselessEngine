@@ -1,33 +1,34 @@
 //
-//  GameObjectCommandComponent.swift
+//  GameObjectCommandQueueingComponent.swift
 //  UselessEngine
 //
 //  Created by Manny Martins on 10/20/15.
 //  Copyright © 2015 Useless Robot. All rights reserved.
 //
 
-open class GameObjectCommandComponent: GameObjectInputComponent { // TODO: Consider renaming this class to a name more reflective of the function
-    
+open class GameObjectCommandQueueingComponent: GameObjectInputComponent
+{
     private var commandQueue: [GameObjectCommand] = []
     
     public init() {
         
     }
     
-    public final func queue(command: GameObjectCommand) {
-        if (command.priority == .high) {
+    public final func queue(command: GameObjectCommand)
+    {
+        if (command.priority == .urgent) {
             // override all commands
-            self.commandQueue.removeAll(keepingCapacity: true)
+            commandQueue.removeAll(keepingCapacity: true)
         } else {
             // override commands with same or lower priority than this command
-            for i in stride(from: (self.commandQueue.count - 1), through: 0, by: -1) {
-                if self.commandQueue[i].priority.rawValue >= command.priority.rawValue {
+            for i in stride(from: (commandQueue.count - 1), through: 0, by: -1) {
+                if commandQueue[i].priority <= command.priority {
                     commandQueue.remove(at: i)
                 }
             }
         }
         
-        self.commandQueue.insert(command, at: 0)
+        commandQueue.insert(command, at: 0)
     }
     
     open func update(with gameObject: GameObject, dt: Float) {
@@ -39,5 +40,4 @@ open class GameObjectCommandComponent: GameObjectInputComponent { // TODO: Consi
             gameObject.state?.handle(command: command, for: gameObject)
         }
     }
-    
 }

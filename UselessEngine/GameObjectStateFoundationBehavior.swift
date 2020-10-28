@@ -6,8 +6,8 @@
 //  Copyright © 2015 Useless Robot. All rights reserved.
 //
 
-open class GameObjectStateFoundationBehavior: Observer {
-    
+open class GameObjectStateFoundationBehavior: Observer
+{
     public var fallbackState: GameObjectState?
     
     public init() {
@@ -39,5 +39,4 @@ open class GameObjectStateFoundationBehavior: Observer {
         gameObject.state = fallbackState
         gameObject.state?.reset(with: gameObject)
     }
-    
 }

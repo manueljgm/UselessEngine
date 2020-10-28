@@ -6,9 +6,11 @@
 //  Copyright (c) 2014 Useless Robot. All rights reserved.
 //
 
-open class GameObject: GameEntity {
-    
+open class GameObject: GameEntity, Identifiable
+{
     // MARK: - Properties
+    
+    public let id: UUID = UUID()
     
     public var state: GameObjectState?
 
@@ -73,23 +75,16 @@ open class GameObject: GameEntity {
     private func positionDidChange(from previousPosition: Position) {
         graphics?.positionDidUpdate(from: previousPosition, for: self)
         physics?.positionDidChange(from: previousPosition, for: self)
-        state?.receive(PhysicsEvent.positionDidChange, from: self, payload: previousPosition)
+        state?.receive(.positionChange, from: self, payload: previousPosition)
     }
     
     private func velocityDidChange(from previousVelocity: Vector) {
-        state?.receive(PhysicsEvent.velocityDidChange, from: self, payload: previousVelocity)
+        state?.receive(.velocityChange, from: self, payload: previousVelocity)
     }
-    
 }
 
-// MARK: - GameObject: Subject
-
-//extension GameObject: Subject {
-//
-//    func broadcast<TPayload>(event: Event, payload: TPayload) {
-//
-//        self.observers.receive(event: event, from: self, payload: payload)
-//
-//    }
-//
-//}
+extension GameObject: Equatable {
+    public static func == (lhs: GameObject, rhs: GameObject) -> Bool {
+        return lhs.id == rhs.id
+    }
+}

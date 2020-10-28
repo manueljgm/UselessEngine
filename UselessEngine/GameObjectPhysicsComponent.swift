@@ -6,10 +6,8 @@
 //  Copyright (c) 2014 Useless Robot. All rights reserved.
 //
 
-import Foundation
-
-public protocol GameObjectPhysicsComponent: GameObjectComponent {
-    
+public protocol GameObjectPhysicsComponent: GameObjectComponent
+{
     var mass: Float { get } // in kg
     var thrust: Vector { get set }
     var boost: Boost? { get set }
@@ -24,5 +22,4 @@ public protocol GameObjectPhysicsComponent: GameObjectComponent {
     var collisionDelegate: PhysicsCollisionDelegate? { get set }
     
     func positionDidChange(from previousPosition: Position, for owner: GameObject)
-    
 }

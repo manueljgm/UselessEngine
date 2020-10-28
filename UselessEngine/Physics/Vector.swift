@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
-public struct Vector { // TODO: PlaneVector
+public struct Vector {
     
     public static let zero: Vector = Vector(dx: 0.0, dy: 0.0, dz: 0.0)
     

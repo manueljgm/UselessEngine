@@ -6,7 +6,8 @@
 //  Copyright © 2018 Useless Robot. All rights reserved.
 //
 
-enum Settings {
+enum Settings
+{
     enum defaults {
         enum graphics {
             static internal var animationFrameRate: UInt8 = 10
@@ -17,7 +18,8 @@ enum Settings {
     }
 }
 
-public enum UselessEngine {
+public enum UselessEngine
+{
     public enum settings
     {
         public static func setDefault(animationFrameRate newValue: UInt8)

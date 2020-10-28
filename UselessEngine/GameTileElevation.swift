@@ -6,8 +6,6 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
-import Foundation
-
 public protocol GameTileElevation {
     func getElevation(atPoint point: PlaneCoordinate) -> Float 
 }

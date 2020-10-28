@@ -6,7 +6,9 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
-public class GameTile: GameEntity {
+public class GameTile: GameEntity, Identifiable
+{
+    public let id: UUID = UUID()
     
     public let graphics: GameEntityGraphicsComponent?
     
@@ -32,19 +34,23 @@ public class GameTile: GameEntity {
 
     private static var inited: Int = 0
     
-    public init(graphics graphicsComponent: GameEntityGraphicsComponent, elevation: GameTileElevation) {
+    public init(graphics graphicsComponent: GameEntityGraphicsComponent, elevation: GameTileElevation)
+    {
         self.graphics = graphicsComponent
         self.position = .zero
         self.elevation = elevation
         self.objects = []
 
         GameTile.inited += 1
+        #if DEBUG_VERBOSE
+        print("GameTile:init")
+        #endif
     }
     
     deinit {
         GameTile.inited -= 1
         #if DEBUG_VERBOSE
-        print(Unmanaged.passUnretained(self).toOpaque(), String(format: "TileObject:deinit; %d remain", GameTile.inited))
+        print(String(format: "GameTile:deinit; %d remain", GameTile.inited))
         #endif
     }
     
@@ -52,7 +58,8 @@ public class GameTile: GameEntity {
         
     }
     
-    public func executeOnObjectsAndNeighbors(work: (GameObject) -> Void ) {
+    public func executeOnObjectsAndNeighbors(work: (GameObject) -> Void )
+    {
         objects.forEach { work($0) }
         u?.objects.forEach { work($0) }
         u?.r?.objects.forEach { work($0) }
@@ -64,24 +71,33 @@ public class GameTile: GameEntity {
         l?.u?.objects.forEach { work($0) }
     }
     
-    public func add(gameObject: GameObject) -> Bool{
-        if !objects.contains(where: { $0 === gameObject }) {
+    public func add(gameObject: GameObject) -> Bool
+    {
+        if !objects.contains(where: { $0 == gameObject }) {
             objects.append(gameObject)
             return true
         }
         return false
     }
     
-    public func remove(gameObject: GameObject) {
-        if let i = objects.firstIndex(where: { $0 === gameObject }) {
+    public func remove(gameObject: GameObject)
+    {
+        if let i = objects.firstIndex(where: { $0 == gameObject }) {
             objects.remove(at: i)
         }
     }
     
     // MARK: - Events
     
-    private func positionDidUpdate(from previousPosition: Position) {
+    private func positionDidUpdate(from previousPosition: Position)
+    {
         graphics?.positionDidUpdate(from: previousPosition, for: self)
     }
     
+}
+
+extension GameTile: Equatable {
+    public static func == (lhs: GameTile, rhs: GameTile) -> Bool {
+        return lhs.id == rhs.id
+    }
 }

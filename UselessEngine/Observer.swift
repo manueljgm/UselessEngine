@@ -6,12 +6,10 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
-import Foundation
-
 public protocol Observer: class {
-    func receive(_ event: Event, from sender: AnyObject, payload: Any?)
+    func receive(_ event: EngineEvent, from sender: AnyObject, payload: Any?)
 }
 
 extension Observer {
-    public func receive(_ event: Event, from sender: AnyObject, payload: Any? = nil) { }
+    public func receive(_ event: EngineEvent, from sender: AnyObject, payload: Any? = nil) { }
 }

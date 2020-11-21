@@ -13,7 +13,7 @@ public protocol GameObjectPhysicsComponent: GameObjectComponent
     var boost: Boost? { get set }
     
     /// Indicates whether the game object is touching the tile underfoot.
-    var touchingGround: Bool { get }
+    var touchingGround: Bool { get set }
 
     /// Determines whether the game object should be handled as airborne despite being in contact with the ground.
     var simulateAir: Bool { get set }
@@ -21,5 +21,5 @@ public protocol GameObjectPhysicsComponent: GameObjectComponent
     /// Reference to collision delegate that manages contact and collision behavior for this object.
     var collisionDelegate: PhysicsCollisionDelegate? { get set }
     
-    func positionDidChange(from previousPosition: Position, for owner: GameObject)
+    func receive(event: EngineEvent, from owner: GameObject)
 }

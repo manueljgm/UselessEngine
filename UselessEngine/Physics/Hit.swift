@@ -7,7 +7,6 @@
 //
 
 public struct Hit {
-    public let delta: Vector2d
-    public let normal: Vector2d
-    public let position: Position2d
+    public var delta: Vector2d
+    public var normal: Vector2d
 }

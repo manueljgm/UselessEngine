@@ -12,7 +12,7 @@ public protocol PhysicsCollisionDelegate: class {
     var contactBitmask: PhysicsCollisionCategories { get }
     var collisionBitmask: PhysicsCollisionCategories { get }
     
-    var contactAABB: AABB { get }
+    var contactAABB: AABB { get set }
  
     func testContact(against otherGameObject: GameObject) -> Bool
     func handleContact(of gameObject: GameObject, against otherGameObject: GameObject)
@@ -32,7 +32,7 @@ extension PhysicsCollisionDelegate {
         let isContactable =
             (categoryBitmask.rawValue & otherCollisionDelegate.contactBitmask.rawValue > 0) ||
             (contactBitmask.rawValue & otherCollisionDelegate.categoryBitmask.rawValue > 0)
-        return isContactable ? (contactAABB.intersects(with: otherCollisionDelegate.contactAABB) != nil) : false
+        return isContactable ? (contactAABB.intersect(otherCollisionDelegate.contactAABB, withTolerance: 0.1) != nil) : false
     }
     
     public func handleContact(of gameObject: GameObject, against otherGameObject: GameObject) {
@@ -46,7 +46,7 @@ extension PhysicsCollisionDelegate {
         let isCollideable =
             (categoryBitmask.rawValue & otherCollisionDelegate.collisionBitmask.rawValue > 0) ||
             (collisionBitmask.rawValue & otherCollisionDelegate.categoryBitmask.rawValue > 0)
-        return isCollideable ? contactAABB.intersects(with: otherCollisionDelegate.contactAABB) : nil
+        return isCollideable ? contactAABB.intersect(otherCollisionDelegate.contactAABB, withTolerance: 0.1) : nil
     }
     
     public func handleCollisionEvent(on gameObject: GameObject, withCorrectionOffsetOf correctionOffset: Vector) {

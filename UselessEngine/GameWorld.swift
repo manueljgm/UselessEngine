@@ -12,29 +12,36 @@ public class GameWorld
     public let gridSpacing: Vector2d
     public let gravity: Float // meters per second per second
 
-    public private(set) var tiles: [UnitPosition: GameTile]
-    public private(set) var objects: ContiguousArray<GameEntity>
+    public private(set) var allObjects: ContiguousArray<GameEntity>
+    public private(set) var tilesByGridPosition: [UnitPosition: GameTile]
+    public private(set) var contactingObjectsByGridPosition: [UnitPosition: [GameObject]]
+    public private(set) var contactedCornersByGameObject: [UUID: (bottomLeft: UnitPosition, topRight: UnitPosition)]
     
-    private var homeless = [GameObject]()
-    
-    private let collisionHandler: GameWorldCollisionHandler
+    private let collisionDelegate: GameWorldCollisionDelegate
     
     // MARK: - Init
     
-    // Initializes a game world.
+    /// Initializes a game world.
     public init(gridDimensions: (width: Int, height: Int),
                 gridSpacing: Vector2d,
                 gravity: Float,
-                collisionHandler: GameWorldCollisionHandler)
+                collisionDelegate: GameWorldCollisionDelegate)
     {
         self.gridDimensions = gridDimensions
         self.gridSpacing = gridSpacing
         self.gravity = gravity
 
-        self.tiles = [:]
-        self.objects = []
+        self.allObjects = []
+        self.tilesByGridPosition = [:]
+        self.contactingObjectsByGridPosition = [:]
+        for y in 0...gridDimensions.height-1 {
+            for x in 0...gridDimensions.width-1 {
+                self.contactingObjectsByGridPosition[UnitPosition(x: x, y: y)] = []
+            }
+        }
+        self.contactedCornersByGameObject = [:]
         
-        self.collisionHandler = collisionHandler
+        self.collisionDelegate = collisionDelegate
         
         #if DEBUG_VERBOSE
         print("GameWorld:init")
@@ -51,70 +58,36 @@ public class GameWorld
     
     public func add(tile gameTile: GameTile)
     {
-        let gridPosition = UnitPosition(x: Int(gameTile.position.x / gridSpacing.dx), y: Int(gameTile.position.y / gridSpacing.dy))
+        let gridX = Int(floor(gameTile.position.x / gridSpacing.dx))
+        let gridY = Int(floor(gameTile.position.y / gridSpacing.dy))
+        let gridPosition = UnitPosition(x: gridX, y: gridY)
         
-        let u = tile(atGridPosition: UnitPosition(x: gridPosition.x, y: gridPosition.y+1))
-        let d = tile(atGridPosition: UnitPosition(x: gridPosition.x, y: gridPosition.y-1))
-        let l = tile(atGridPosition: UnitPosition(x: gridPosition.x-1, y: gridPosition.y))
-        let r = tile(atGridPosition: UnitPosition(x: gridPosition.x+1, y: gridPosition.y))
+        allObjects.append(gameTile)
         
-        u?.d = gameTile
-        d?.u = gameTile
-        l?.r = gameTile
-        r?.l = gameTile
+        // associate tile to grid position
+        tilesByGridPosition[gridPosition] = gameTile
         
-        gameTile.u = u
-        gameTile.d = d
-        gameTile.l = l
-        gameTile.r = r
-        
-        tiles[gridPosition] = gameTile
-
-        objects.append(gameTile)
-        
-        let pendingGameObjects = homeless
-        pendingGameObjects.forEach { gameObject in
-            if let tileAtPosition = tile(atPosition: gameObject.position) {
-                if tileAtPosition.add(gameObject: gameObject) {
-                    print("GameObject added to GameWorld after the fact.")
-                    homeless.removeAll(where: { $0 == gameObject })
-                }
-            }
-        }
+        #if DEBUG_VERBOSE
+        print("GameTile added to GameWorld.")
+        #endif
     }
     
     public func add(gameObject: GameObject)
     {
-        if !objects.contains(where: {
-                                if let comparable = $0 as? GameObject {
-                                    return gameObject == comparable
-                                } else {
-                                    return false
-                                } })
-        {
-            // If not found, add game object to objects array.
-            objects.append(gameObject)
-        }
-        
-        if let tileAtPosition = tile(atPosition: gameObject.position) {
-            if tileAtPosition.add(gameObject: gameObject) {
-                print("GameObject added to GameWorld.")
-            }
-        } else {
-            homeless.append(gameObject)
-        }
-    }
+        allObjects.append(gameObject)
 
-    public func tile(atGridPosition gridPosition: UnitPosition) -> GameTile? {
-        return tiles[gridPosition]
+        // associate game object to touched grid positions
+        updateContactedCorners(for: gameObject)
+        
+        #if DEBUG_VERBOSE
+        print("GameObject added to GameWorld.")
+        #endif
     }
     
-    public func tile(atPosition position: PlaneCoordinate) -> GameTile?
+    public func gridPosition(from position: Position) -> UnitPosition
     {
-        let gridPosition = UnitPosition(x: Int(position.x / gridSpacing.dx),
-                                        y: Int(position.y / gridSpacing.dy))
-        
-        return tile(atGridPosition: gridPosition)
+        return UnitPosition(x: Int(floor(position.x / gridSpacing.dx)),
+                            y: Int(floor(position.y / gridSpacing.dy)))
     }
     
     public func elevation(atPosition position: PlaneCoordinate) -> Float
@@ -130,33 +103,111 @@ public class GameWorld
 
     public func update(_ dt: Float)
     {
-        objects.forEach {
-            if let gameObject = $0 as? GameObject {
-                let previousPosition = gameObject.position
-                gameObject.update(dt)
-                collisionHandler.resolveCollisions(onGameObject: gameObject, in: self)
-                if gameObject.position != previousPosition {
-                    positionDidChange(for: gameObject, from: previousPosition)
+        // update all world objects
+        allObjects.forEach { worldObject in
+            // update world object
+            let observedChanges = worldObject.update(dt)
+            if observedChanges.contains(.position) {
+                if let gameObject = worldObject as? GameObject
+                {
+                    // keep game object within the world's boundaries
+                    collisionDelegate.resolveBoundaries(on: gameObject, in: self)
+                    
+                    // update game object's contact position
+                    updateContactedCorners(for: gameObject)
                 }
-            } else {
-                $0.update(dt)
+            }
+        }
+        
+        // resolve any collisions
+        contactingObjectsByGridPosition.values.forEach { gameObjects in
+            guard gameObjects.count > 1 else {
+                return
+            }
+
+            gameObjects.forEach { gameObject in
+                let hitObjects = collisionDelegate.resolveCollisions(on: gameObject, in: self)
+                hitObjects.forEach {
+                    updateContactedCorners(for: $0)
+                }
             }
         }
     }
     
-    // MARK: - Event Handlers
+    // MARK: - Helper Functions
     
-    private func positionDidChange(for gameObject: GameObject, from previousPosition: Position)
-    {
-        let tileAtPreviousPosition = tile(atPosition: previousPosition)
-        collisionHandler.resolveBounds(onGameObject: gameObject, previouslyAt: previousPosition, in: self)
-        let tileAtCurrentPosition = tile(atPosition: gameObject.position)
-        if tileAtCurrentPosition == tileAtPreviousPosition {
-            return
-        } else {
-            tileAtPreviousPosition?.remove(gameObject: gameObject)
-            let _ = tileAtCurrentPosition?.add(gameObject: gameObject)
-        }
+    private func tile(atGridPosition gridPosition: UnitPosition) -> GameTile? {
+        return tilesByGridPosition[gridPosition]
     }
     
+    private func tile(atGridPositionX x: Int, Y y: Int) -> GameTile? {
+        return tilesByGridPosition[UnitPosition(x: x, y: y)]
+    }
+    
+    private func tile(atPosition position: PlaneCoordinate) -> GameTile?
+    {
+        let gridPosition = UnitPosition(x: Int(position.x / gridSpacing.dx),
+                                        y: Int(position.y / gridSpacing.dy))
+        
+        return tile(atGridPosition: gridPosition)
+    }
+    
+    private func gridCorners(containing boundingBox: AABB, withMarginFactor marginFactor: Float) -> (bottomLeft: UnitPosition, topRight: UnitPosition)
+    {
+        // calculate bottom left grid corner contain with padding
+        let bottomLeftX = ((boundingBox.centerPosition.x - boundingBox.halfwidths.dx) / gridSpacing.dx) - marginFactor
+        let bottomLeftY = ((boundingBox.centerPosition.y - boundingBox.halfwidths.dy) / gridSpacing.dy) - marginFactor
+        let bottomLeftCorner = UnitPosition(x: Int(floor(bottomLeftX)), y: Int(floor(bottomLeftY)))
+
+        // calculate top right contacted grid corner with padding
+        let topRightX = ((boundingBox.centerPosition.x + boundingBox.halfwidths.dx) / gridSpacing.dx) + marginFactor
+        let topRightY = ((boundingBox.centerPosition.y + boundingBox.halfwidths.dy) / gridSpacing.dy) + marginFactor
+        let topRightCorner = UnitPosition(x: Int(floor(topRightX)), y: Int(floor(topRightY)))
+
+        return (bottomLeftCorner, topRightCorner)
+    }
+    
+    private func gridPositionList(from bottomLeft: UnitPosition, to topRight: UnitPosition) -> [UnitPosition] {
+        guard bottomLeft.x <= topRight.x && bottomLeft.y <= topRight.y else {
+            return []
+        }
+        
+        var gridPositions: [UnitPosition] = []
+        (bottomLeft.y...topRight.y).forEach { y in
+            (bottomLeft.x...topRight.x).forEach { x in
+                gridPositions.append(UnitPosition(x: x, y: y))
+            }
+        }
+        
+        return gridPositions
+    }
+    
+    private func updateContactedCorners(for gameObject: GameObject)
+    {
+        guard let gameObjectCollisionDelegate = gameObject.physics?.collisionDelegate else {
+            return
+        }
+        
+        let previouslyContactedCorners = contactedCornersByGameObject[gameObject.id] ?? (.zero, .zero)
+        let contactingCorners = gridCorners(containing: gameObjectCollisionDelegate.contactAABB, withMarginFactor: 0.5)
+        if previouslyContactedCorners == contactingCorners {
+            return
+        }
+
+        // update indication of game object's contact with these grid positions
+        let removals = gridPositionList(from: previouslyContactedCorners.bottomLeft, to: previouslyContactedCorners.topRight)
+        removals.forEach { gridPosition in
+            contactingObjectsByGridPosition[gridPosition] = contactingObjectsByGridPosition[gridPosition]?.filter { $0 != gameObject} ?? []
+        }
+        let additions = gridPositionList(from: contactingCorners.bottomLeft, to: contactingCorners.topRight)
+        additions.forEach { gridPosition in
+            if contactingObjectsByGridPosition[gridPosition]?.first(where: { $0 == gameObject }) == nil {
+                contactingObjectsByGridPosition[gridPosition]?.append(gameObject)
+            }
+        }
+        
+        // update contacted corners
+        contactedCornersByGameObject[gameObject.id] = contactingCorners
+    }
+        
 }

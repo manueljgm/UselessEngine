@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
-public class AABB {
+public struct AABB {
     
     /// AABB position
     public var position: Position {
@@ -42,40 +42,34 @@ public class AABB {
             updateCenterPosition()
     }
     
-    public func intersects(with otherAABB: AABB) -> Hit? {
+    public func intersect(_ otherAABB: AABB, withTolerance tolerance: Float = 0.0) -> Hit? {
         let dx = otherAABB.centerPosition.x - self.centerPosition.x
         let px = (self.halfwidths.dx + otherAABB.halfwidths.dx) - abs(dx)
-        if px <= 0.0 {
+        if px < tolerance {
             return nil
         }
         
         let dy = otherAABB.centerPosition.y - self.centerPosition.y
         let py = (self.halfwidths.dy + otherAABB.halfwidths.dy) - abs(dy)
-        if py <= 0.0 {
+        if py < tolerance {
             return nil
         }
         
         let dz = otherAABB.centerPosition.z - self.centerPosition.z
         let pz = (self.halfwidths.dz + otherAABB.halfwidths.dz) - abs(dz)
-        if pz <= 0.0 {
+        if pz < tolerance {
             return nil
         }
         
-        if px < py {
-            let sx: Float = dx < 0 ? -1 : 1
-            return Hit(delta: Vector2d(dx: px * sx, dy: 0.0),
-                       normal: Vector2d(dx: sx, dy: 0.0),
-                       position: Position2d(x: self.centerPosition.x + (self.halfwidths.dx * sx), y: otherAABB.centerPosition.y))
-        } else {
-            let sy: Float = dy < 0 ? -1 : 1
-            return Hit(delta: Vector2d(dx: 0, dy: py * sy),
-                       normal: Vector2d(dx: 0, dy: sy),
-                       position: Position2d(x: otherAABB.centerPosition.x, y: self.centerPosition.y + (self.halfwidths.dy * sy)))
-        }
+        let sx: Float = dx < 0 ? -1 : 1
+        let sy: Float = dy < 0 ? -1 : 1
+        let hit = Hit(delta: Vector2d(dx: px * sx, dy: py * sy),
+                      normal: Vector2d(dx: sy, dy: sy))
+        return hit
     }
     
-    private func updateCenterPosition() {
-        self.centerPosition = Position(
+    private mutating func updateCenterPosition() {
+        centerPosition = Position(
             x: self.position.x + (2.0 * (0.5 - self.anchorPosition.dx) * self.halfwidths.dx),
             y: self.position.y + (2.0 * (0.5 - self.anchorPosition.dy) * self.halfwidths.dy),
             z: self.position.z + (2.0 * (0.5 - self.anchorPosition.dz) * self.halfwidths.dz)

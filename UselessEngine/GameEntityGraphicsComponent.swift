@@ -10,5 +10,5 @@ import SpriteKit
 
 public protocol GameEntityGraphicsComponent: GameEntityComponent {
     var sprite: SKSpriteNode { get }
-    func positionDidUpdate(from previousPosition: Position, for owner: GameEntity)
+    func receive(event: EngineEvent, from owner: GameEntity)
 }

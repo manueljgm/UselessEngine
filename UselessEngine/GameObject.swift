@@ -29,19 +29,10 @@ open class GameObject: GameEntity, Identifiable
         }
     }
     
-    /// The object's velocity without added boost.
+    /// The object's velocity.
     public var velocity: Vector {
         didSet {
             if (velocity != oldValue) {
-                state?.receive(.velocityChange, from: self, payload: oldValue)
-            }
-        }
-    }
-    
-    /// The object's velocity plus any added boost.
-    public var totalVelocity: Vector {
-        didSet {
-            if (totalVelocity != oldValue) {
                 state?.receive(.velocityChange, from: self, payload: oldValue)
             }
         }
@@ -59,7 +50,6 @@ open class GameObject: GameEntity, Identifiable
         input = inputComponent
         position = .zero
         velocity = .zero
-        totalVelocity = .zero
         
         GameObject.inited += 1
         #if DEBUG_VERBOSE

@@ -7,16 +7,21 @@
 //
 
 public protocol GameObjectState: Observer {
+    var isOutOfAction: Bool { get }
     var fallbackState: GameObjectState? { get set }
     func enter(with gameObject: GameObject)
     func handle(command: GameObjectCommand, for gameObject: GameObject)
     func update(with gameObject: GameObject, dt: Float)
-    func push(gameObject: GameObject, to newState: GameObjectState)
     func reset(with gameObject: GameObject)
-    func exit(for gameObject: GameObject)
 }
 
-extension GameObjectState {
-    public func handle(command: GameObjectCommand, for gameObject: GameObject) { }
-    public func reset(with gameObject: GameObject) { }
+extension GameObjectState
+{
+    public func handle(command: GameObjectCommand, for gameObject: GameObject) {
+        
+    }
+    
+    public func reset(with gameObject: GameObject) {
+        
+    }
 }

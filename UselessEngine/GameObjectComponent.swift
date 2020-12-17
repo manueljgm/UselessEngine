@@ -7,5 +7,6 @@
 //
 
 public protocol GameObjectComponent: class {
+    var id: UUID { get }
     func update(with owner: GameObject, dt: Float)
 }

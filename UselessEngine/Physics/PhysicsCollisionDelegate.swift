@@ -6,25 +6,26 @@
 //  Copyright © 2015 Useless Robot. All rights reserved.
 //
 
-public protocol PhysicsCollisionDelegate: class {
-
+public protocol PhysicsCollisionDelegate: class
+{
     var categoryBitmask: PhysicsCollisionCategories { get }
     var contactBitmask: PhysicsCollisionCategories { get }
     var collisionBitmask: PhysicsCollisionCategories { get }
     
     var contactAABB: AABB { get set }
+    var contactWithConsequences: Bool { get set }
  
     func testContact(against otherGameObject: GameObject) -> Bool
-    func handleContact(of gameObject: GameObject, against otherGameObject: GameObject)
+    func handleContact(between gameObject: GameObject, and otherGameObject: GameObject)
     
     func testCollision(against otherGameObject: GameObject) -> Hit?
-    func handleCollisionEvent(on gameObject: GameObject, withCorrectionOffsetOf correctionOffset: Vector)
-    
+    func handleCollision(between gameObject: GameObject, and otherGameObject: GameObject, withCorrection correctionOffset: Vector)
 }
 
-extension PhysicsCollisionDelegate {
-    
-    public func testContact(against otherGameObject: GameObject) -> Bool {
+extension PhysicsCollisionDelegate
+{
+    public func testContact(against otherGameObject: GameObject) -> Bool
+    {
         guard let otherCollisionDelegate = otherGameObject.physics?.collisionDelegate else {
             return false
         }
@@ -35,10 +36,12 @@ extension PhysicsCollisionDelegate {
         return isContactable ? (contactAABB.intersect(otherCollisionDelegate.contactAABB, withTolerance: 0.1) != nil) : false
     }
     
-    public func handleContact(of gameObject: GameObject, against otherGameObject: GameObject) {
+    public func handleContact(between gameObject: GameObject, and otherGameObject: GameObject) {
+        
     }
     
-    public func testCollision(against otherGameObject: GameObject) -> Hit? {
+    public func testCollision(against otherGameObject: GameObject) -> Hit?
+    {
         guard let otherCollisionDelegate = otherGameObject.physics?.collisionDelegate else {
             return nil
         }
@@ -49,7 +52,8 @@ extension PhysicsCollisionDelegate {
         return isCollideable ? contactAABB.intersect(otherCollisionDelegate.contactAABB, withTolerance: 0.1) : nil
     }
     
-    public func handleCollisionEvent(on gameObject: GameObject, withCorrectionOffsetOf correctionOffset: Vector) {
+    public func handleCollision(between gameObject: GameObject, and otherGameObject: GameObject, withCorrection correctionOffset: Vector) {
+        
     }
-    
+
 }

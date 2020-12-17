@@ -8,7 +8,7 @@
 
 import UselessCommon
 
-public class Boost: Updateable {
+public class Boost {
     
     /// Represents boost velocity in m/s.
     public private(set) var velocity: Vector

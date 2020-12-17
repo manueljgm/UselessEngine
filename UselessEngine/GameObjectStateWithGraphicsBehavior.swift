@@ -6,10 +6,9 @@
 //  Copyright © 2015 Useless Robot. All rights reserved.
 //
 
-open class GameObjectStateWithGraphicsBehavior<TGraphicsComponent: GameObjectStateGraphicsComponent>: Observer
-{
-    public var fallbackState: GameObjectState?
+open class GameObjectStateWithGraphicsBehavior<TGraphicsComponent: GameObjectStateGraphicsComponent>: Observer {
     
+    public var fallbackState: GameObjectState?
     public private(set) var graphics: TGraphicsComponent?
     
     public init() {
@@ -52,31 +51,9 @@ open class GameObjectStateWithGraphicsBehavior<TGraphicsComponent: GameObjectSta
     open func didUpdate(with gameObject: GameObject, dt: Float) {
         
     }
-    
-    public func push(gameObject: GameObject, to newState: GameObjectState) {
-        guard let state = self as? GameObjectState else {
-            return
-        }
-        newState.fallbackState = state
-        gameObject.enter(state: newState)
-    }
-    
-    open func willExit(for gameObject: GameObject) {
 
-    }
-    
-    public final func exit(for gameObject: GameObject) {
-        willExit(for: gameObject)
-        gameObject.state = fallbackState
-        gameObject.state?.reset(with: gameObject)
-    }
-    
     public final func receive(_ event: EngineEvent, from sender: AnyObject, payload: Any? = nil) {
         graphics?.receive(event, from: sender, payload: payload)
-        didReceive(event, from: sender, payload: payload)
     }
     
-    open func didReceive(_ event: EngineEvent, from sender: AnyObject, payload: Any? = nil) {
-        
-    }
 }

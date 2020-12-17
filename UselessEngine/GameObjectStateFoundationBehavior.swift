@@ -21,22 +21,5 @@ open class GameObjectStateFoundationBehavior: Observer
     open func didEnter(with gameObject: GameObject) {
         
     }
-    
-    public func push(gameObject: GameObject, to newState: GameObjectState) {
-        guard let state = self as? GameObjectState else {
-            return
-        }
-        newState.fallbackState = state
-        gameObject.enter(state: newState)
-    }
-    
-    open func willExit(for gameObject: GameObject) {
 
-    }
-    
-    public final func exit(for gameObject: GameObject) {
-        willExit(for: gameObject)
-        gameObject.state = fallbackState
-        gameObject.state?.reset(with: gameObject)
-    }
 }

@@ -14,7 +14,9 @@ public protocol GameObjectStateGraphicsComponent: GameObjectComponent, Observer 
 }
 
 extension GameObjectStateGraphicsComponent {
+    
     public func update(with gameObject: GameObject, dt: Float) {
         animation.update(dt)
     }
+    
 }

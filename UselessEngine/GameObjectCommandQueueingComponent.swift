@@ -6,14 +6,17 @@
 //  Copyright © 2015 Useless Robot. All rights reserved.
 //
 
-open class GameObjectCommandQueueingComponent: GameObjectInputComponent
+public class GameObjectCommandQueueingComponent: GameObjectInputComponent
 {
+    public let id: UUID = UUID()
+    
+    /// Queued input commands.
     private var commandQueue: [GameObjectCommand] = []
     
     public init() {
-        
+
     }
-    
+
     public final func queue(command: GameObjectCommand)
     {
         if (command.priority == .urgent) {
@@ -31,7 +34,7 @@ open class GameObjectCommandQueueingComponent: GameObjectInputComponent
         commandQueue.insert(command, at: 0)
     }
     
-    open func update(with gameObject: GameObject, dt: Float) {
+    public func update(with gameObject: GameObject, dt: Float) {
         dequeueAndDoCommand(with: gameObject)
     }
     

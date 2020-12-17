@@ -6,13 +6,13 @@
 //  Copyright (c) 2014 Useless Robot. All rights reserved.
 //
 
-open class GameObject: GameEntity, Identifiable
+public class GameObject: GameEntity, Identifiable
 {
     // MARK: - Properties
     
     public let id: UUID = UUID()
     
-    public var state: GameObjectState?
+    public private(set) var state: GameObjectState?
 
     public let graphics: GameEntityGraphicsComponent?
     public let physics: GameObjectPhysicsComponent?
@@ -42,7 +42,9 @@ open class GameObject: GameEntity, Identifiable
     
     // MARK: Init
     
-    public init(graphics graphicsComponent: GameEntityGraphicsComponent? = nil, physics physicsComponent: GameObjectPhysicsComponent? = nil, input inputComponent: GameObjectInputComponent? = nil)
+    public init(graphics graphicsComponent: GameEntityGraphicsComponent? = nil,
+                physics physicsComponent: GameObjectPhysicsComponent? = nil,
+                input inputComponent: GameObjectInputComponent? = nil)
     {
         state = nil
         graphics = graphicsComponent
@@ -93,7 +95,16 @@ open class GameObject: GameEntity, Identifiable
         state = newState
         state?.enter(with: self)
     }
-
+    
+    public func push(state newState: GameObjectState) {
+        newState.fallbackState = state
+        enter(state: newState)
+    }
+    
+    public func exitState() {
+        state = state?.fallbackState
+        state?.reset(with: self)
+    }
 }
 
 extension GameObject: Equatable {

@@ -11,7 +11,7 @@ public protocol GameObjectState: Observer {
     var fallbackState: GameObjectState? { get set }
     func enter(with gameObject: GameObject)
     func handle(command: GameObjectCommand, for gameObject: GameObject)
-    func update(with gameObject: GameObject, dt: Float)
+    func update(with gameObject: GameObject, in world: GameWorld, dt: Float)
     func reset(with gameObject: GameObject)
 }
 

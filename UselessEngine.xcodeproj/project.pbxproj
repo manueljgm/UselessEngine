@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		1A04E9D924DAF08500B1EC9D /* UselessCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A4AE29824C28D9C001E7A00 /* UselessCommon.framework */; };
-		1A04E9DA24DAF08500B1EC9D /* UselessCommon.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1A4AE29824C28D9C001E7A00 /* UselessCommon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1A32FC1D24C1E33800CE3B0F /* UselessEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A32FC1B24C1E33800CE3B0F /* UselessEngine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1A32FC4E24C1E36700CE3B0F /* PhysicsCoefficients.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC2324C1E36400CE3B0F /* PhysicsCoefficients.swift */; };
 		1A32FC4F24C1E36700CE3B0F /* GameWorldCollisionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC2424C1E36400CE3B0F /* GameWorldCollisionDelegate.swift */; };
@@ -44,8 +43,11 @@
 		1A32FC7524C1E36700CE3B0F /* UnitPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC4A24C1E36700CE3B0F /* UnitPosition.swift */; };
 		1A32FC7724C1E36700CE3B0F /* Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC4C24C1E36700CE3B0F /* Position.swift */; };
 		1A32FC7824C1E36700CE3B0F /* GameObjectPhysicsComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC4D24C1E36700CE3B0F /* GameObjectPhysicsComponent.swift */; };
+		1A5993D02592E7DB006E4AC4 /* GameWorldGridNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5993CF2592E7DB006E4AC4 /* GameWorldGridNode.swift */; };
 		1A5FB9EF24DAE3AE0025BE93 /* AnimationFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5FB9EE24DAE3AE0025BE93 /* AnimationFrame.swift */; };
 		1AC6463124CBC4CE007D8C21 /* Boost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC6463024CBC4CE007D8C21 /* Boost.swift */; };
+		1AD99B63259AC8E1005A008D /* GameWorldPathfindingDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AD99B62259AC8E1005A008D /* GameWorldPathfindingDelegate.swift */; };
+		1AD99B77259ADF1B005A008D /* GameWorldDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AD99B76259ADF1B005A008D /* GameWorldDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,20 +59,6 @@
 			remoteInfo = UselessCommon;
 		};
 /* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		1A04E9DB24DAF08500B1EC9D /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				1A04E9DA24DAF08500B1EC9D /* UselessCommon.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1A32FC1824C1E33800CE3B0F /* UselessEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = UselessEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -111,8 +99,11 @@
 		1A32FC4C24C1E36700CE3B0F /* Position.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Position.swift; sourceTree = "<group>"; };
 		1A32FC4D24C1E36700CE3B0F /* GameObjectPhysicsComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameObjectPhysicsComponent.swift; sourceTree = "<group>"; };
 		1A4AE29324C28D9C001E7A00 /* UselessCommon.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = UselessCommon.xcodeproj; path = ../UselessCommon/UselessCommon.xcodeproj; sourceTree = "<group>"; };
+		1A5993CF2592E7DB006E4AC4 /* GameWorldGridNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldGridNode.swift; sourceTree = "<group>"; };
 		1A5FB9EE24DAE3AE0025BE93 /* AnimationFrame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimationFrame.swift; sourceTree = "<group>"; };
 		1AC6463024CBC4CE007D8C21 /* Boost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Boost.swift; sourceTree = "<group>"; };
+		1AD99B62259AC8E1005A008D /* GameWorldPathfindingDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldPathfindingDelegate.swift; sourceTree = "<group>"; };
+		1AD99B76259ADF1B005A008D /* GameWorldDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,7 +159,10 @@
 				1A32FC4924C1E36700CE3B0F /* GameObject.swift */,
 				1A32FC3524C1E36500CE3B0F /* GameTileElevation.swift */,
 				1A32FC2E24C1E36500CE3B0F /* GameTile.swift */,
+				1A5993CF2592E7DB006E4AC4 /* GameWorldGridNode.swift */,
+				1AD99B76259ADF1B005A008D /* GameWorldDelegate.swift */,
 				1A32FC2424C1E36400CE3B0F /* GameWorldCollisionDelegate.swift */,
+				1AD99B62259AC8E1005A008D /* GameWorldPathfindingDelegate.swift */,
 				1A32FC3424C1E36500CE3B0F /* GameWorld.swift */,
 				1A32FC4324C1E36600CE3B0F /* Settings.swift */,
 			);
@@ -243,7 +237,6 @@
 				1A32FC1424C1E33800CE3B0F /* Sources */,
 				1A32FC1524C1E33800CE3B0F /* Frameworks */,
 				1A32FC1624C1E33800CE3B0F /* Resources */,
-				1A04E9DB24DAF08500B1EC9D /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -327,9 +320,12 @@
 				1A32FC5824C1E36700CE3B0F /* GameObjectComponent.swift in Sources */,
 				1A32FC7324C1E36700CE3B0F /* GameObjectCommandQueueingComponent.swift in Sources */,
 				1A32FC5A24C1E36700CE3B0F /* GameObjectStateFoundationBehavior.swift in Sources */,
+				1AD99B77259ADF1B005A008D /* GameWorldDelegate.swift in Sources */,
 				1A32FC4E24C1E36700CE3B0F /* PhysicsCoefficients.swift in Sources */,
 				1A32FC6D24C1E36700CE3B0F /* PlaneCoordinate.swift in Sources */,
 				1A32FC6E24C1E36700CE3B0F /* Settings.swift in Sources */,
+				1AD99B63259AC8E1005A008D /* GameWorldPathfindingDelegate.swift in Sources */,
+				1A5993D02592E7DB006E4AC4 /* GameWorldGridNode.swift in Sources */,
 				1A32FC7724C1E36700CE3B0F /* Position.swift in Sources */,
 				1A32FC5524C1E36700CE3B0F /* GameObjectState.swift in Sources */,
 				1A32FC7824C1E36700CE3B0F /* GameObjectPhysicsComponent.swift in Sources */,

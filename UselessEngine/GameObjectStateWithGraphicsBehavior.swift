@@ -43,12 +43,12 @@ open class GameObjectStateWithGraphicsBehavior<TGraphicsComponent: GameObjectSta
         
     }
     
-    public final func update(with gameObject: GameObject, dt: Float) {
+    public final func update(with gameObject: GameObject, in world: GameWorld, dt: Float) {
         graphics?.update(with: gameObject, dt: dt)
-        didUpdate(with: gameObject, dt: dt)
+        didUpdate(with: gameObject, in: world, dt: dt)
     }
     
-    open func didUpdate(with gameObject: GameObject, dt: Float) {
+    open func didUpdate(with gameObject: GameObject, in world: GameWorld, dt: Float) {
         
     }
 

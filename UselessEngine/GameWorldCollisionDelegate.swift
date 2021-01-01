@@ -7,6 +7,8 @@
 //
 
 public protocol GameWorldCollisionDelegate {
-    func resolveBoundaries(on gameObject: GameObject, in gameWorld: GameWorld)
-    func resolveCollisions(on gameObject: GameObject, in gameWorld: GameWorld) -> [GameObject]
+
+    func resolveBoundaries(on gameObject: GameObject, in world: GameWorld)
+    func resolveCollisions(on gameObject: GameObject, in world: GameWorld) -> [GameObject]
+
 }

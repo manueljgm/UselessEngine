@@ -20,6 +20,6 @@ public struct GameEntityChanges: OptionSet {
 public protocol GameEntity: class {
     var graphics: GameEntityGraphicsComponent? { get }
     var position: Position { get set }
-    func update(_ dt: Float) -> GameEntityChanges
+    func update(_ dt: Float, in world: GameWorld) -> GameEntityChanges
 }
 

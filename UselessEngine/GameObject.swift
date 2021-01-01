@@ -68,13 +68,13 @@ public class GameObject: GameEntity, Identifiable
     
     // MARK: Update
     
-    public func update(_ dt: Float) -> GameEntityChanges
+    public func update(_ dt: Float, in world: GameWorld) -> GameEntityChanges
     {
         let previousPosition = position
         let previousVelocity = velocity
         
         input?.update(with: self, dt: dt)
-        state?.update(with: self, dt: dt)
+        state?.update(with: self, in: world, dt: dt)
         physics?.update(with: self, dt: dt)
         graphics?.update(with: self, dt: dt)
         

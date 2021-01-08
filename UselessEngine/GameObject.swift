@@ -16,7 +16,7 @@ public class GameObject: GameEntity, Identifiable
 
     public let graphics: GameEntityGraphicsComponent?
     public let physics: GameObjectPhysicsComponent?
-    public let input: GameObjectInputComponent?
+    public var input: GameObjectInputComponent?
     
     /// The object's position.
     public var position: Position {

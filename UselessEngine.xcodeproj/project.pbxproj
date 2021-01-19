@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1A04E9D924DAF08500B1EC9D /* UselessCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A4AE29824C28D9C001E7A00 /* UselessCommon.framework */; };
+		1A2010CD25B377DA00776B52 /* GameWorldCollisionGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A2010CC25B377DA00776B52 /* GameWorldCollisionGrid.swift */; };
 		1A32FC1D24C1E33800CE3B0F /* UselessEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A32FC1B24C1E33800CE3B0F /* UselessEngine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1A32FC4E24C1E36700CE3B0F /* PhysicsCoefficients.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC2324C1E36400CE3B0F /* PhysicsCoefficients.swift */; };
 		1A32FC4F24C1E36700CE3B0F /* GameWorldCollisionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC2424C1E36400CE3B0F /* GameWorldCollisionDelegate.swift */; };
@@ -61,6 +62,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1A2010CC25B377DA00776B52 /* GameWorldCollisionGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldCollisionGrid.swift; sourceTree = "<group>"; };
 		1A32FC1824C1E33800CE3B0F /* UselessEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = UselessEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A32FC1B24C1E33800CE3B0F /* UselessEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UselessEngine.h; sourceTree = "<group>"; };
 		1A32FC1C24C1E33800CE3B0F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -162,6 +164,7 @@
 				1A5993CF2592E7DB006E4AC4 /* GameWorldGridNode.swift */,
 				1AD99B76259ADF1B005A008D /* GameWorldDelegate.swift */,
 				1A32FC2424C1E36400CE3B0F /* GameWorldCollisionDelegate.swift */,
+				1A2010CC25B377DA00776B52 /* GameWorldCollisionGrid.swift */,
 				1AD99B62259AC8E1005A008D /* GameWorldPathfindingDelegate.swift */,
 				1A32FC3424C1E36500CE3B0F /* GameWorld.swift */,
 				1A32FC4324C1E36600CE3B0F /* Settings.swift */,
@@ -322,6 +325,7 @@
 				1A32FC5A24C1E36700CE3B0F /* GameObjectStateFoundationBehavior.swift in Sources */,
 				1AD99B77259ADF1B005A008D /* GameWorldDelegate.swift in Sources */,
 				1A32FC4E24C1E36700CE3B0F /* PhysicsCoefficients.swift in Sources */,
+				1A2010CD25B377DA00776B52 /* GameWorldCollisionGrid.swift in Sources */,
 				1A32FC6D24C1E36700CE3B0F /* PlaneCoordinate.swift in Sources */,
 				1A32FC6E24C1E36700CE3B0F /* Settings.swift in Sources */,
 				1AD99B63259AC8E1005A008D /* GameWorldPathfindingDelegate.swift in Sources */,

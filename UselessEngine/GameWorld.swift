@@ -11,20 +11,27 @@ public class GameWorld
     public var gravity: Float {
         return delegate.gravity
     }
-    
+
     public var grid: [UnitPosition: GameWorldGridNode]
     public private(set) var objects: ContiguousArray<GameEntity>
     
     private let delegate: GameWorldDelegate
+
+    private let collisionGrid: GameWorldCollisionGrid
     private let collisionDelegate: GameWorldCollisionDelegate
+    
     private let pathfindingDelegate: GameWorldPathfindingDelegate
     
     /// Initializes a game world.
     public init(worldDelegate: GameWorldDelegate,
+                collisionCellSize: Vector2d,
                 collisionDelegate: GameWorldCollisionDelegate,
                 pathfindingDelegate: GameWorldPathfindingDelegate)
     {
+        self.collisionGrid = GameWorldCollisionGrid(cellSize: collisionCellSize)
+        
         self.grid = [:]
+        
         self.objects = []
         
         self.delegate = worldDelegate
@@ -41,7 +48,7 @@ public class GameWorld
         print("GameWorld:deinit")
         #endif
     }
-
+    
     public func add(gridNode: GameWorldGridNode)
     {
         // add tile node reference to grid
@@ -74,43 +81,61 @@ public class GameWorld
     {
         objects.append(gameObject)
 
-        // update grid for game object
-        delegate.initGrid(for: gameObject, in: self)
+        // update the collision grid with this object
+        collisionGrid.update(for: gameObject, collisionBox: { $0.physics?.collisionDelegate?.contactAABB })
         
         #if DEBUG_VERBOSE
         print("GameObject added to GameWorld.")
         #endif
     }
-
-    public func update(_ dt: Float)
+    
+    public func update(_ dt: Float) // TODO: get viewport, update "up to" viewport
     {
         // update all world objects
-        objects.forEach { worldObject in
+        let movingObjects: [GameObject] = objects.compactMap { worldObject in
             // update world object
             let observedChanges = worldObject.update(dt, in: self)
             if observedChanges.contains(.position) {
-                if let gameObject = worldObject as? GameObject
-                {
+                // if the object's position changed...
+                if let gameObject = worldObject as? GameObject {
                     // keep game object within the world's boundaries
                     collisionDelegate.resolveBoundaries(on: gameObject, in: self)
-                    
-                    // update grid with game object's position change
-                    delegate.updateGrid(for: gameObject, in: self)
+                    collisionGrid.update(for: gameObject, collisionBox: { $0.physics?.collisionDelegate?.contactAABB })
+                    // and return the game object
+                    return gameObject
                 }
             }
+            // if here, the object did not move
+            return nil
         }
         
         // resolve any collisions
-        grid.values.forEach {
-            guard $0.objects.count > 1 else {
-                return
-            }
+        movingObjects.forEach { movingObject in
+            collisionGrid.onNeighbors(of: movingObject) { otherObject in
+                
+                guard let movingObjectPhysics = movingObject.physics,
+                      let movingObjectCollisionDelegate = movingObjectPhysics.collisionDelegate,
+                      let otherObjectPhysics = otherObject.physics,
+                      let otherObjectCollisionDelegate = otherObjectPhysics.collisionDelegate
+                else {
+                    return
+                }
 
-            $0.objects.forEach { gameObject in
-                let hitObjects = collisionDelegate.resolveCollisions(on: gameObject, in: self)
-                hitObjects.forEach {
-                    // update grid with game object's position change
-                    delegate.updateGrid(for: $0, in: self)
+                if otherObjectCollisionDelegate.collisionBitmask.contains(movingObjectCollisionDelegate.categoryBitmask)
+                    || movingObjectCollisionDelegate.collisionBitmask.contains(otherObjectCollisionDelegate.categoryBitmask)
+                {
+                    // resolve potential collision
+                    if let hit = movingObjectCollisionDelegate.contactAABB.intersect(otherObjectCollisionDelegate.contactAABB),
+                       let corrections = collisionDelegate.resolveCollision(on: movingObject, against: otherObject, for: hit)
+                    {
+                        // call event handlers
+                        movingObjectCollisionDelegate.handleCollision(between: movingObject, and: otherObject, withCorrection: corrections.thisCorrection)
+                        otherObjectCollisionDelegate.handleCollision(between: otherObject, and: movingObject, withCorrection: corrections.otherCorrection)
+
+                        // update collision grid
+                        collisionGrid.update(for: movingObject, collisionBox: { $0.physics?.collisionDelegate?.contactAABB })
+                        collisionGrid.update(for: otherObject, collisionBox: { $0.physics?.collisionDelegate?.contactAABB })
+                    }
                 }
             }
         }

@@ -9,6 +9,7 @@
 public protocol GameWorldCollisionDelegate {
 
     func resolveBoundaries(on gameObject: GameObject, in world: GameWorld)
-    func resolveCollisions(on gameObject: GameObject, in world: GameWorld) -> [GameObject]
+    func resolveCollision(on gameObject: GameObject, against otherObject: GameObject, for hit: Hit) -> (thisCorrection: Vector,
+                                                                                                        otherCorrection: Vector)?
 
 }

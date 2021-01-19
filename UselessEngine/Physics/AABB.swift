@@ -42,22 +42,22 @@ public struct AABB {
             updateCenterPosition()
     }
     
-    public func intersect(_ otherAABB: AABB, withTolerance tolerance: Float = 0.0) -> Hit? {
+    public func intersect(_ otherAABB: AABB) -> Hit? {
         let dx = otherAABB.centerPosition.x - self.centerPosition.x
         let px = (self.halfwidths.dx + otherAABB.halfwidths.dx) - abs(dx)
-        if px < tolerance {
+        if px < Float.leastNormalMagnitude {
             return nil
         }
         
         let dy = otherAABB.centerPosition.y - self.centerPosition.y
         let py = (self.halfwidths.dy + otherAABB.halfwidths.dy) - abs(dy)
-        if py < tolerance {
+        if py < Float.leastNormalMagnitude {
             return nil
         }
         
         let dz = otherAABB.centerPosition.z - self.centerPosition.z
         let pz = (self.halfwidths.dz + otherAABB.halfwidths.dz) - abs(dz)
-        if pz < tolerance {
+        if pz < Float.leastNormalMagnitude {
             return nil
         }
         

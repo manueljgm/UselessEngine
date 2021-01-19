@@ -42,6 +42,7 @@ public class GameTile: GameEntity, Identifiable
     }
     
     public func update(_ dt: Float, in world: GameWorld) -> GameEntityChanges {
+        graphics?.update(with: self, dt: dt)
         return []
     }
     

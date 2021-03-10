@@ -8,37 +8,45 @@
 
 public struct Position: PlaneCoordinate {
     
-    public static let zero: Position = Position(x: 0.0, y: 0.0)
+    public static let zero: Position = Position(x: .zero, y: .zero)
     
     public var x: Float
     public var y: Float
     public var z: Float
     
-//    var position2d: Position2d {
-//        return Position2d(x: x, y: y)
-//    }
-
-    public init(x: Float, y: Float, z: Float = 0.0) {
+    public subscript(component: GeometryComponent) -> Float {
+        switch component {
+        case .x:
+            return x
+        case .y:
+            return y
+        case .z:
+            return z
+        }
+    }
+    
+    public init(x: Float, y: Float, z: Float = .zero) {
         self.x = x
         self.y = y
         self.z = z
     }
     
     public mutating func add(b: Vector) {
-        self.x += b.dx
-        self.y += b.dy
-        self.z += b.dz
+        x += b.dx
+        y += b.dy
+        z += b.dz
     }
     
     public mutating func add(b: Vector, scaled scale: Float) {
-        self.x += b.dx * scale
-        self.y += b.dy * scale
-        self.z += b.dz * scale
+        x += b.dx * scale
+        y += b.dy * scale
+        z += b.dz * scale
     }
     
-    public func offset(toPosition position: Position) -> Vector {
-        let offset = Vector(dx: self.x - position.x , dy: self.y - position.y, dz: self.z - position.z)
-        return offset
+    public mutating func subtract(b: Vector) {
+        x -= b.dx
+        y -= b.dy
+        z -= b.dz
     }
     
 }
@@ -65,14 +73,6 @@ public func +(lhs: PlaneCoordinate, rhs: Position) -> Position {
 
 public func -(lhs: PlaneCoordinate, rhs: Position) -> Position {
     return Position(x: lhs.x - rhs.x, y: lhs.y - rhs.y)
-}
-
-public func +(lhs: Position, rhs: Vector) -> Position {
-    return Position(x: lhs.x + rhs.dx, y: lhs.y + rhs.dy, z: lhs.z + rhs.dz)
-}
-
-public func -(lhs: Position, rhs: Vector) -> Position {
-    return Position(x: lhs.x - rhs.dx, y: lhs.y - rhs.dy, z: lhs.z - rhs.dz)
 }
 
 extension Position: Equatable {}

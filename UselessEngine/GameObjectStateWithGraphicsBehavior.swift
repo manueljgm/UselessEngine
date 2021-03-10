@@ -6,7 +6,7 @@
 //  Copyright © 2015 Useless Robot. All rights reserved.
 //
 
-open class GameObjectStateWithGraphicsBehavior<TGraphicsComponent: GameObjectStateGraphicsComponent>: Observer {
+open class GameObjectStateWithGraphicsBehavior<TGraphicsComponent: GameObjectStateGraphicsComponent> {
     
     public var fallbackState: GameObjectState?
     public private(set) var graphics: TGraphicsComponent?
@@ -29,11 +29,10 @@ open class GameObjectStateWithGraphicsBehavior<TGraphicsComponent: GameObjectSta
         print("GameObjectStateWithGraphicsBehavior:enter")
         #endif
 
-        if
-            let ownerState = self as? GameObjectState,
-            let targetSprite = gameObject.graphics?.sprite {
-                self.graphics = TGraphicsComponent(ownerState: ownerState, targetSprite: targetSprite)
-                self.graphics?.animation.renderFrame()
+        if let ownerState = self as? GameObjectState {
+            let targetSprite = gameObject.graphics.sprite
+            self.graphics = TGraphicsComponent(ownerState: ownerState, targetSprite: targetSprite)
+            self.graphics?.animation.renderFrame()
         }
         
         didEnter(with: gameObject)
@@ -52,8 +51,8 @@ open class GameObjectStateWithGraphicsBehavior<TGraphicsComponent: GameObjectSta
         
     }
 
-    public final func receive(_ event: EngineEvent, from sender: AnyObject, payload: Any? = nil) {
-        graphics?.receive(event, from: sender, payload: payload)
+    public final func receive(event: GameWorldMemberEvent, from sender: GameObject, payload: Any? = nil) {
+        graphics?.receive(event: event, from: sender, payload: payload)
     }
     
 }

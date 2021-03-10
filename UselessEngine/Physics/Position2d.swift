@@ -8,7 +8,7 @@
 
 public struct Position2d: PlaneCoordinate {
     
-    public static let zero: Position2d = Position2d(x: 0.0, y: 0.0)
+    public static let zero: Position2d = Position2d(x: .zero, y: .zero)
 
     public var x: Float
     public var y: Float
@@ -19,34 +19,26 @@ public struct Position2d: PlaneCoordinate {
     }
 
     public mutating func add(b: Vector2d) {
-        self.x += b.dx
-        self.y += b.dy
+        x += b.dx
+        y += b.dy
     }
     
     public mutating func add(b: Vector2d, scaled scale: Float) {
-        self.x += b.dx * scale
-        self.y += b.dy * scale
+        x += b.dx * scale
+        y += b.dy * scale
     }
     
-    public func offset(toPosition position: Position2d) -> Position2d {
-        return Position2d(x: self.x - position.x , y: self.y - position.y)
+    public func distance(to position: Position2d) -> Vector2d {
+        return Vector2d(dx: position.x - x, dy: position.y - y)
     }
     
 }
 
-public func +(lhs: Position2d, rhs: PlaneCoordinate) -> Position2d {
+public func +(lhs: Position2d, rhs: Position2d) -> Position2d {
     return Position2d(x: lhs.x + rhs.x, y: lhs.y + rhs.y)
 }
 
-public func -(lhs: Position2d, rhs: PlaneCoordinate) -> Position2d {
-    return Position2d(x: lhs.x - rhs.x, y: lhs.y - rhs.y)
-}
-
-public func +(lhs: PlaneCoordinate, rhs: Position2d) -> Position2d {
-    return Position2d(x: lhs.x + rhs.x, y: lhs.y + rhs.y)
-}
-
-public func -(lhs: PlaneCoordinate, rhs: Position2d) -> Position2d {
+public func -(lhs: Position2d, rhs: Position2d) -> Position2d {
     return Position2d(x: lhs.x - rhs.x, y: lhs.y - rhs.y)
 }
 

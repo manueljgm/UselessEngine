@@ -15,7 +15,6 @@
 		1A317E7B25C24BB0004358E3 /* GameWorldTerrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A317E7A25C24BB0004358E3 /* GameWorldTerrain.swift */; };
 		1A31D40025CCF497004837C9 /* Ray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A31D3FF25CCF497004837C9 /* Ray.swift */; };
 		1A32FC1D24C1E33800CE3B0F /* UselessEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A32FC1B24C1E33800CE3B0F /* UselessEngine.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		1A32FC4E24C1E36700CE3B0F /* PhysicsCoefficients.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC2324C1E36400CE3B0F /* PhysicsCoefficients.swift */; };
 		1A32FC4F24C1E36700CE3B0F /* GameWorldCollisionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC2424C1E36400CE3B0F /* GameWorldCollisionDelegate.swift */; };
 		1A32FC5124C1E36700CE3B0F /* AABB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC2624C1E36400CE3B0F /* AABB.swift */; };
 		1A32FC5224C1E36700CE3B0F /* Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC2724C1E36400CE3B0F /* Animation.swift */; };
@@ -87,7 +86,6 @@
 		1A32FC1824C1E33800CE3B0F /* UselessEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = UselessEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A32FC1B24C1E33800CE3B0F /* UselessEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UselessEngine.h; sourceTree = "<group>"; };
 		1A32FC1C24C1E33800CE3B0F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1A32FC2324C1E36400CE3B0F /* PhysicsCoefficients.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhysicsCoefficients.swift; sourceTree = "<group>"; };
 		1A32FC2424C1E36400CE3B0F /* GameWorldCollisionDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameWorldCollisionDelegate.swift; sourceTree = "<group>"; };
 		1A32FC2624C1E36400CE3B0F /* AABB.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AABB.swift; sourceTree = "<group>"; };
 		1A32FC2724C1E36400CE3B0F /* Animation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Animation.swift; sourceTree = "<group>"; };
@@ -234,7 +232,6 @@
 				1A32FC3224C1E36500CE3B0F /* PointMassSpringJoint.swift */,
 				1A32FC2624C1E36400CE3B0F /* AABB.swift */,
 				1A32FC3024C1E36500CE3B0F /* Hit.swift */,
-				1A32FC2324C1E36400CE3B0F /* PhysicsCoefficients.swift */,
 				1A32FC4024C1E36600CE3B0F /* PhysicsCollisionCategories.swift */,
 				1A32FC4524C1E36600CE3B0F /* PhysicsCollisionDelegate.swift */,
 				1A31D3FF25CCF497004837C9 /* Ray.swift */,
@@ -408,7 +405,6 @@
 				1A317E6225BEF523004358E3 /* GameObjectObserver.swift in Sources */,
 				1A32FC7324C1E36700CE3B0F /* GameObjectCommandQueueingComponent.swift in Sources */,
 				1A32FC5A24C1E36700CE3B0F /* GameObjectStateWithSimpleBehavior.swift in Sources */,
-				1A32FC4E24C1E36700CE3B0F /* PhysicsCoefficients.swift in Sources */,
 				1A2010CD25B377DA00776B52 /* GameWorldCollisionGrid.swift in Sources */,
 				1A317E4125BE195B004358E3 /* GameWorldPositionable.swift in Sources */,
 				1A32FC6D24C1E36700CE3B0F /* PlaneCoordinate.swift in Sources */,

@@ -11,11 +11,7 @@ public struct AABB {
     /// AABB position
     public var position: Position {
         didSet {
-            self.centerPosition = Position(
-                x: self.centerPosition.x + (self.position.x - oldValue.x),
-                y: self.centerPosition.y + (self.position.y - oldValue.y),
-                z: self.centerPosition.z + (self.position.z - oldValue.z)
-            )
+            updateRelativePositions()
         }
     }
     
@@ -25,38 +21,56 @@ public struct AABB {
     /// AABB anchor position
     public var anchorPosition: Vector {
         didSet {
-            updateCenterPosition()
+            updateRelativePositions()
         }
     }
     
-    public private(set) var centerPosition: Position!
+    public private(set) var center: Position!
+    public private(set) var minimum: Position!
+    public private(set) var maximum: Position!
     
-    public init(position: Position = Position.zero,
+    public init(position: Position = .zero,
                 halfwidths: Vector,
                 anchorPosition: Vector = Vector(dx: 0.5, dy: 0.5, dz: 0.5)) {
             
-            self.position = position
-            self.halfwidths = halfwidths
-            self.anchorPosition = anchorPosition
+        self.position = position
+        self.halfwidths = halfwidths
+        self.anchorPosition = anchorPosition
             
-            updateCenterPosition()
+        updateRelativePositions()
+    }
+    
+    public func contains(_ point: Position) -> Bool {
+        if point.x < center.x - halfwidths.dx || point.x > center.x + halfwidths.dx {
+            return false
+        }
+        
+        if point.y < center.y - halfwidths.dy || point.y > center.y + halfwidths.dy {
+            return false
+        }
+        
+        if point.z < center.z - halfwidths.dz || point.z > center.z + halfwidths.dz {
+            return false
+        }
+        
+        return true
     }
     
     public func intersect(_ otherAABB: AABB) -> Hit? {
-        let dx = otherAABB.centerPosition.x - self.centerPosition.x
-        let px = (self.halfwidths.dx + otherAABB.halfwidths.dx) - abs(dx)
+        let dx = otherAABB.center.x - center.x
+        let px = (halfwidths.dx + otherAABB.halfwidths.dx) - abs(dx)
         if px < Float.leastNormalMagnitude {
             return nil
         }
         
-        let dy = otherAABB.centerPosition.y - self.centerPosition.y
-        let py = (self.halfwidths.dy + otherAABB.halfwidths.dy) - abs(dy)
+        let dy = otherAABB.center.y - center.y
+        let py = (halfwidths.dy + otherAABB.halfwidths.dy) - abs(dy)
         if py < Float.leastNormalMagnitude {
             return nil
         }
         
-        let dz = otherAABB.centerPosition.z - self.centerPosition.z
-        let pz = (self.halfwidths.dz + otherAABB.halfwidths.dz) - abs(dz)
+        let dz = otherAABB.center.z - center.z
+        let pz = (halfwidths.dz + otherAABB.halfwidths.dz) - abs(dz)
         if pz < Float.leastNormalMagnitude {
             return nil
         }
@@ -68,12 +82,75 @@ public struct AABB {
         return hit
     }
     
-    private mutating func updateCenterPosition() {
-        centerPosition = Position(
-            x: self.position.x + (2.0 * (0.5 - self.anchorPosition.dx) * self.halfwidths.dx),
-            y: self.position.y + (2.0 * (0.5 - self.anchorPosition.dy) * self.halfwidths.dy),
-            z: self.position.z + (2.0 * (0.5 - self.anchorPosition.dz) * self.halfwidths.dz)
-        )
+    public func intersect(_ ray: Ray, ignoringZ ignoreZ: Bool = false) -> Vector? {
+        var tNear = -Float.infinity
+        var tFar = Float.infinity
+
+        if !intersect(ray, onAxis: .x, &tNear, &tFar) { return nil }
+        if !intersect(ray, onAxis: .y, &tNear, &tFar) { return nil }
+        if !ignoreZ && !intersect(ray, onAxis: .z, &tNear, &tFar) { return nil }
+
+        let t = (tNear < 0 || tFar < 0) ? max(tNear, tFar) : min(tNear, tFar)
+
+        var result = ray.direction
+        result.scale(by: t)
+        result.add(ray.position)
+        
+        return result
+    }
+    
+    // MARK: - Helper Methods
+    
+    private mutating func updateRelativePositions() {
+        center = Position(x: position.x + (halfwidths.dx * 2.0 * (0.5 - anchorPosition.dx)),
+                          y: position.y + (halfwidths.dy * 2.0 * (0.5 - anchorPosition.dy)),
+                          z: position.z + (halfwidths.dz * 2.0 * (0.5 - anchorPosition.dz)))
+
+        minimum = Position(x: center.x - halfwidths.dx,
+                           y: center.y - halfwidths.dy,
+                           z: center.z - halfwidths.dz)
+
+        maximum = Position(x: center.x + halfwidths.dx,
+                           y: center.y + halfwidths.dy,
+                           z: center.z + halfwidths.dz)
+    }
+    
+    private func intersect(_ ray: Ray, onAxis component: GeometryComponent, _ tNear: inout Float, _ tFar: inout Float) -> Bool {
+        var t1: Float = .zero,
+            t2: Float = .zero
+        
+        if ray.direction[component] == .zero {
+            if ray.position[component] < minimum[component] || ray.position[component] > maximum[component] {
+                return false
+            }
+        } else {
+            t1 = (minimum[component] - ray.position[component]) / ray.direction[component]
+            t2 = (maximum[component] - ray.position[component]) / ray.direction[component]
+
+            if t1 > t2 {
+                let swap = t1
+                t1 = t2
+                t2 = swap
+            }
+
+            if t1 > tNear {
+                tNear = t1
+            }
+
+            if t2 < tFar {
+                tFar = t2
+            }
+
+            if tNear > tFar {
+                return false
+            }
+
+            if tFar < 0 {
+                return false
+            }
+        }
+
+        return true
     }
     
 }

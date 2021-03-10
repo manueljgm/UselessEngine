@@ -8,19 +8,11 @@
 
 public struct Vector {
     
-    public static let zero: Vector = Vector(dx: 0.0, dy: 0.0, dz: 0.0)
+    public static let zero: Vector = Vector(dx: .zero, dy: .zero, dz: .zero)
     
     public var dx: Float
     public var dy: Float
     public var dz: Float
-    
-    public var vector2d: Vector2d {
-        return Vector2d(dx: dx, dy: dy)
-    }
-    
-    public var isNonZero: Bool {
-        return abs(dx) > 0.0 || abs(dy) > 0.0 || abs(dz) > 0.0
-    }
     
     public var magnitude: Float {
         return sqrt(pow(dx, 2) + pow(dy, 2) + pow(dz, 2))
@@ -34,11 +26,17 @@ public struct Vector {
         return acos(dz / magnitude)
     }
     
-    public var unit: Vector {
-        let m = magnitude
-        return Vector(dx: dx / m, dy: dy / m, dz: dz / m)
+    public subscript(component: GeometryComponent) -> Float {
+        switch component {
+        case .x:
+            return dx
+        case .y:
+            return dy
+        case .z:
+            return dz
+        }
     }
-
+    
     public init(dx: Float, dy: Float, dz: Float) {
         self.dx = dx
         self.dy = dy
@@ -62,46 +60,60 @@ public struct Vector {
         dy += b.dy * scale
         dz += b.dz * scale
     }
+    
+    public mutating func add(_ p: Position) {
+        dx += p.x
+        dy += p.y
+        dz += p.z
+    }
 
-    public mutating func scale(_ scale: Float)
-    {
+    public mutating func subtract(b: Vector) {
+        dx -= b.dx
+        dy -= b.dy
+        dz -= b.dz
+    }
+    
+    public mutating func scale(by scale: Float) {
+        dx *= scale
+        dy *= scale
+        dz *= scale
+    }
+    
+    public func scaled(by scale: Float) -> Vector {
+        return Vector(dx: dx * scale, dy: dy * scale, dz: dz * scale)
+    }
+    
+    public mutating func normalize() {
         let m = magnitude
-        guard !m.isZero else {
+        if m < 1e-12 {
             return
         }
         
-        let newLength = m * scale
-        let resizeFactor = newLength / m
-        dx = dx * resizeFactor
-        dy = dy * resizeFactor
-        dz = dz * resizeFactor
+        dx /= m
+        dy /= m
+        dz /= m
     }
-    
-    public func scaled(by scale: Float) -> Vector
-    {
+
+    public func normalized() -> Vector {
         let m = magnitude
-        guard !m.isZero else {
+        if m < 1e-12 {
             return .zero
         }
         
-        let newLength = m * scale
-        let resizeFactor = newLength / m
-        return Vector(dx: dx * resizeFactor, dy: dy * resizeFactor, dz: dz * resizeFactor)
-    }
-    
-    public static func from(_ pointA: Position, to pointB: Position) -> Vector {
-        return Vector(dx: pointB.x - pointA.x,
-                      dy: pointB.y - pointA.y,
-                      dz: pointB.z - pointA.z)
+        return Vector(dx: dx / m, dy: dy / m, dz: dz / m)
     }
     
 }
-
-extension Vector: Equatable {}
 
 public func +(lhs: Vector, rhs: Vector) -> Vector {
     return Vector(dx: lhs.dx + rhs.dx, dy: lhs.dy + rhs.dy, dz: lhs.dz + rhs.dz)
 }
+
+public func -(lhs: Vector, rhs: Vector) -> Vector {
+    return Vector(dx: lhs.dx - rhs.dx, dy: lhs.dy - rhs.dy, dz: lhs.dz - rhs.dz)
+}
+
+extension Vector: Equatable {}
 
 public func ==(lhs: Vector, rhs: Vector) -> Bool {
     return lhs.dx == rhs.dx && lhs.dy == rhs.dy && lhs.dz == rhs.dz

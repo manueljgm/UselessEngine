@@ -1,13 +1,13 @@
 //
-//  GameObjectStateFoundationBehavior.swift
+//  GameObjectStateWithSimpleBehavior.swift
 //  UselessEngine
 //
 //  Created by Manny Martins on 10/26/15.
 //  Copyright © 2015 Useless Robot. All rights reserved.
 //
 
-open class GameObjectStateFoundationBehavior: Observer
-{
+open class GameObjectStateWithSimpleBehavior {
+    
     public var fallbackState: GameObjectState?
     
     public init() {
@@ -21,5 +21,5 @@ open class GameObjectStateFoundationBehavior: Observer
     open func didEnter(with gameObject: GameObject) {
         
     }
-
+    
 }

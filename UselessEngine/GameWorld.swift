@@ -8,36 +8,25 @@
 
 public class GameWorld
 {
-    public var gravity: Float {
-        return delegate.gravity
-    }
-
-    public var grid: [UnitPosition: GameWorldGridNode]
-    public private(set) var objects: ContiguousArray<GameEntity>
+    public var gravity: Float
+    public private(set) var size: (width: Float, height: Float)
+    public private(set) var objects: [GameObject]
+    public private(set) var terrain: GameWorldTerrain
+    public let collisionGrid: GameWorldCollisionGrid
     
-    private let delegate: GameWorldDelegate
-
-    private let collisionGrid: GameWorldCollisionGrid
     private let collisionDelegate: GameWorldCollisionDelegate
-    
-    private let pathfindingDelegate: GameWorldPathfindingDelegate
-    
+
     /// Initializes a game world.
-    public init(worldDelegate: GameWorldDelegate,
-                collisionCellSize: Vector2d,
-                collisionDelegate: GameWorldCollisionDelegate,
-                pathfindingDelegate: GameWorldPathfindingDelegate)
+    public init(gravity: Float, tileSize: Vector2d, collisionCellSize: Vector2d, collisionDelegate: GameWorldCollisionDelegate)
     {
-        self.collisionGrid = GameWorldCollisionGrid(cellSize: collisionCellSize)
-        
-        self.grid = [:]
-        
+        self.gravity = gravity
+        self.size = (.zero, .zero)
         self.objects = []
-        
-        self.delegate = worldDelegate
+        self.terrain = GameWorldTerrain(tileSize: tileSize)
+
+        self.collisionGrid = GameWorldCollisionGrid(cellSize: collisionCellSize)
         self.collisionDelegate = collisionDelegate
-        self.pathfindingDelegate = pathfindingDelegate
-        
+
         #if DEBUG_VERBOSE
         print("GameWorld:init")
         #endif
@@ -48,33 +37,19 @@ public class GameWorld
         print("GameWorld:deinit")
         #endif
     }
-    
-    public func add(gridNode: GameWorldGridNode)
-    {
-        // add tile node reference to grid
-        grid[gridNode.position] = gridNode
-        
-        let u = grid[UnitPosition(x: gridNode.position.x, y: gridNode.position.y+1)]
-        let d = grid[UnitPosition(x: gridNode.position.x, y: gridNode.position.y-1)]
-        let l = grid[UnitPosition(x: gridNode.position.x-1, y: gridNode.position.y)]
-        let r = grid[UnitPosition(x: gridNode.position.x+1, y: gridNode.position.y)]
-        
-        gridNode.up = u
-        gridNode.down = d
-        gridNode.left = l
-        gridNode.right = r
 
-        u?.down = gridNode
-        d?.up = gridNode
-        l?.right = gridNode
-        r?.left = gridNode
+    public func add(gameTile: GameTile) -> Bool
+    {
+        let success = terrain.add(tile: gameTile)
+        if success {
+            size.width = max(size.width, gameTile.position.x + gameTile.size.width)
+            size.height = max(size.height, gameTile.position.y + gameTile.size.height)
+            #if DEBUG_VERBOSE
+            print("GameTile added to GameWorld.")
+            #endif
+        }
         
-        // add tile node to objects list
-        objects.append(gridNode.tile)
-        
-        #if DEBUG_VERBOSE
-        print("GameTile added to GameWorld.")
-        #endif
+        return success
     }
 
     public func add(gameObject: GameObject)
@@ -82,28 +57,26 @@ public class GameWorld
         objects.append(gameObject)
 
         // update the collision grid with this object
-        collisionGrid.update(for: gameObject, collisionBox: { $0.physics?.collisionDelegate?.contactAABB })
+        collisionGrid.update(for: gameObject)
         
         #if DEBUG_VERBOSE
-        print("GameObject added to GameWorld.")
+        print(String(format: "GameObject added to GameWorld at (x: %.2f, y: %.2f, z: %.2f).", gameObject.position.x, gameObject.position.y, gameObject.position.z))
         #endif
     }
     
-    public func update(_ dt: Float) // TODO: get viewport, update "up to" viewport
+    public func update(_ dt: Float)
     {
-        // update all world objects
-        let movingObjects: [GameObject] = objects.compactMap { worldObject in
+        // update all game objects
+        let movingObjects: [GameObject] = objects.compactMap { gameObject in
             // update world object
-            let observedChanges = worldObject.update(dt, in: self)
+            let observedChanges = gameObject.update(dt, in: self)
+            // and if the object's position changed...
             if observedChanges.contains(.position) {
-                // if the object's position changed...
-                if let gameObject = worldObject as? GameObject {
-                    // keep game object within the world's boundaries
-                    collisionDelegate.resolveBoundaries(on: gameObject, in: self)
-                    collisionGrid.update(for: gameObject, collisionBox: { $0.physics?.collisionDelegate?.contactAABB })
-                    // and return the game object
-                    return gameObject
-                }
+                // keep game object within the world's boundaries
+                collisionDelegate.resolveBoundaries(on: gameObject, in: self)
+                collisionGrid.update(for: gameObject)
+                // and return the game object
+                return gameObject
             }
             // if here, the object did not move
             return nil
@@ -122,7 +95,7 @@ public class GameWorld
                 }
 
                 if otherObjectCollisionDelegate.collisionBitmask.contains(movingObjectCollisionDelegate.categoryBitmask)
-                    || movingObjectCollisionDelegate.collisionBitmask.contains(otherObjectCollisionDelegate.categoryBitmask)
+                    && movingObjectCollisionDelegate.collisionBitmask.contains(otherObjectCollisionDelegate.categoryBitmask)
                 {
                     // resolve potential collision
                     if let hit = movingObjectCollisionDelegate.contactAABB.intersect(otherObjectCollisionDelegate.contactAABB),
@@ -133,27 +106,20 @@ public class GameWorld
                         otherObjectCollisionDelegate.handleCollision(between: otherObject, and: movingObject, withCorrection: corrections.otherCorrection)
 
                         // update collision grid
-                        collisionGrid.update(for: movingObject, collisionBox: { $0.physics?.collisionDelegate?.contactAABB })
-                        collisionGrid.update(for: otherObject, collisionBox: { $0.physics?.collisionDelegate?.contactAABB })
+                        collisionGrid.update(for: movingObject)
+                        collisionGrid.update(for: otherObject)
                     }
                 }
             }
         }
+        
+        // update terrain
+        terrain.update(dt: dt, in: self)
     }
-    
-    public func gridPosition(from position: PlaneCoordinate) -> UnitPosition
+
+    public func elevation(at point: PlaneCoordinate) -> Float
     {
-        return delegate.gridPosition(from: position)
-    }
-    
-    public func elevation(at position: PlaneCoordinate) -> Float
-    {
-        return delegate.elevation(at: position, in: self)
-    }
-    
-    public func path(from start: UnitPosition, to goal: UnitPosition) -> [UnitPosition]
-    {
-        return pathfindingDelegate.path(from: start, to: goal, in: grid)
+        return terrain.elevation(at: point)
     }
 
 }

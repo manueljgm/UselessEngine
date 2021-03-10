@@ -6,17 +6,20 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
-public protocol GameObjectState: Observer {
+public protocol GameObjectState: class, GameObjectObserver {
+
     var isOutOfAction: Bool { get }
     var fallbackState: GameObjectState? { get set }
+
     func enter(with gameObject: GameObject)
     func handle(command: GameObjectCommand, for gameObject: GameObject)
     func update(with gameObject: GameObject, in world: GameWorld, dt: Float)
     func reset(with gameObject: GameObject)
+
 }
 
-extension GameObjectState
-{
+extension GameObjectState {
+
     public func handle(command: GameObjectCommand, for gameObject: GameObject) {
         
     }
@@ -24,4 +27,5 @@ extension GameObjectState
     public func reset(with gameObject: GameObject) {
         
     }
+
 }

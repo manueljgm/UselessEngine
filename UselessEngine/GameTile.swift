@@ -6,15 +6,17 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
-public class GameTile: GameEntity, Identifiable
+public class GameTile: GameWorldMember, Identifiable
 {
     public let id: UUID = UUID()
     
-    public let graphics: GameEntityGraphicsComponent?
+    public let graphics: GameWorldMemberGraphicsComponent
+    
+    public let size: (width: Float, height: Float)
     
     public var position: Position {
         didSet {
-            graphics?.receive(event: .positionChange, from: self)
+            graphics.receive(event: .positionChange, from: self, payload: oldValue)
         }
     }
     
@@ -22,9 +24,12 @@ public class GameTile: GameEntity, Identifiable
 
     private static var inited: Int = 0
     
-    public init(graphics graphicsComponent: GameEntityGraphicsComponent, elevation: GameTileElevation)
+    public init(graphics graphicsComponent: GameWorldMemberGraphicsComponent,
+                size: (width: Float, height: Float),
+                elevation: GameTileElevation)
     {
         self.graphics = graphicsComponent
+        self.size = size
         self.position = .zero
         self.elevation = elevation
 
@@ -41,9 +46,9 @@ public class GameTile: GameEntity, Identifiable
         #endif
     }
     
-    public func update(_ dt: Float, in world: GameWorld) -> GameEntityChanges {
-        graphics?.update(with: self, dt: dt)
-        return []
+    public func update(_ dt: Float, in world: GameWorld) -> GameWorldMemberChanges {
+        graphics.update(with: self, dt: dt)
+        return .none
     }
     
 }

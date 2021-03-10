@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Useless Robot. All rights reserved.
 //
 
-public class GameObject: GameEntity, Identifiable
+public class GameObject: GameWorldMember, Identifiable
 {
     // MARK: - Properties
     
@@ -14,7 +14,7 @@ public class GameObject: GameEntity, Identifiable
     
     public private(set) var state: GameObjectState?
 
-    public let graphics: GameEntityGraphicsComponent?
+    public let graphics: GameWorldMemberGraphicsComponent
     public let physics: GameObjectPhysicsComponent?
     public var input: GameObjectInputComponent?
     
@@ -22,9 +22,9 @@ public class GameObject: GameEntity, Identifiable
     public var position: Position {
         didSet {
             if (position != oldValue) {
-                graphics?.receive(event: .positionChange, from: self)
-                physics?.receive(event: .positionChange, from: self)
-                state?.receive(.positionChange, from: self, payload: oldValue)
+                graphics.receive(event: .positionChange, from: self, payload: oldValue)
+                physics?.receive(event: .positionChange, from: self, payload: oldValue)
+                state?.receive(event: .positionChange, from: self, payload: oldValue)
             }
         }
     }
@@ -33,7 +33,7 @@ public class GameObject: GameEntity, Identifiable
     public var velocity: Vector {
         didSet {
             if (velocity != oldValue) {
-                state?.receive(.velocityChange, from: self, payload: oldValue)
+                state?.receive(event: .velocityChange, from: self, payload: oldValue)
             }
         }
     }
@@ -42,7 +42,7 @@ public class GameObject: GameEntity, Identifiable
     
     // MARK: Init
     
-    public init(graphics graphicsComponent: GameEntityGraphicsComponent? = nil,
+    public init(graphics graphicsComponent: GameWorldMemberGraphicsComponent,
                 physics physicsComponent: GameObjectPhysicsComponent? = nil,
                 input inputComponent: GameObjectInputComponent? = nil)
     {
@@ -68,17 +68,17 @@ public class GameObject: GameEntity, Identifiable
     
     // MARK: Update
     
-    public func update(_ dt: Float, in world: GameWorld) -> GameEntityChanges
+    public func update(_ dt: Float, in world: GameWorld) -> GameWorldMemberChanges
     {
         let previousPosition = position
         let previousVelocity = velocity
         
         input?.update(with: self, dt: dt)
         state?.update(with: self, in: world, dt: dt)
-        physics?.update(with: self, dt: dt)
-        graphics?.update(with: self, dt: dt)
+        physics?.update(with: self, in: world, dt: dt)
+        graphics.update(with: self, dt: dt)
         
-        var changes: GameEntityChanges = []
+        var changes: GameWorldMemberChanges = []
         if position != previousPosition {
             changes.insert(.position)
         }

@@ -20,25 +20,17 @@ public class GameObjectCommandQueueingComponent: GameObjectInputComponent
     public final func queue(command: GameObjectCommand)
     {
         if (command.priority == .urgent) {
-            // override all commands
-            commandQueue.removeAll(keepingCapacity: true)
+            // if urgent, override all commands
+            commandQueue = [command]
         } else {
-            // override commands with same or lower priority than this command
-            for i in stride(from: (commandQueue.count - 1), through: 0, by: -1) {
-                if commandQueue[i].priority <= command.priority {
-                    commandQueue.remove(at: i)
-                }
-            }
+            // else keep commands with higher priority than this command
+            commandQueue = commandQueue.filter({ $0.priority > command.priority })
+            // including the new one
+            commandQueue.insert(command, at: 0)
         }
-        
-        commandQueue.insert(command, at: 0)
     }
     
     public func update(with gameObject: GameObject, dt: Float) {
-        dequeueAndDoCommand(with: gameObject)
-    }
-    
-    private func dequeueAndDoCommand(with gameObject: GameObject) {
         if let command = commandQueue.popLast() {
             gameObject.state?.handle(command: command, for: gameObject)
         }

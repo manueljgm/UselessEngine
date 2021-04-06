@@ -6,26 +6,39 @@
 //  Copyright © 2015 Useless Robot. All rights reserved.
 //
 
+import UselessCommon
+
 public class GameWorld
 {
+    public var delegate: GameWorldDelegate?
+    
     public var gravity: Float
     public private(set) var size: (width: Float, height: Float)
     public private(set) var objects: [GameObject]
+    public private(set) var checkpoints: [Position]
     public private(set) var terrain: GameWorldTerrain
     public let collisionGrid: GameWorldCollisionGrid
+    public let pathGraph: GameWorldGraph
     
     private let collisionDelegate: GameWorldCollisionDelegate
 
     /// Initializes a game world.
-    public init(gravity: Float, tileSize: Vector2d, collisionCellSize: Vector2d, collisionDelegate: GameWorldCollisionDelegate)
+    public init(gravity: Float,
+                tileSize: Vector2d,
+                collisionCellSize: Vector2d,
+                collisionDelegate: GameWorldCollisionDelegate,
+                pathGraphDelegate: GameWorldGraphDelegate)
     {
         self.gravity = gravity
         self.size = (.zero, .zero)
         self.objects = []
+        self.checkpoints = []
         self.terrain = GameWorldTerrain(tileSize: tileSize)
 
         self.collisionGrid = GameWorldCollisionGrid(cellSize: collisionCellSize)
         self.collisionDelegate = collisionDelegate
+
+        self.pathGraph = GameWorldGraph(graphDelegate: pathGraphDelegate)
 
         #if DEBUG_VERBOSE
         print("GameWorld:init")
@@ -44,6 +57,9 @@ public class GameWorld
         if success {
             size.width = max(size.width, gameTile.position.x + gameTile.size.width)
             size.height = max(size.height, gameTile.position.y + gameTile.size.height)
+            
+            delegate?.gameWorld(self, added: gameTile)
+            
             #if DEBUG_VERBOSE
             print("GameTile added to GameWorld.")
             #endif
@@ -59,9 +75,38 @@ public class GameWorld
         // update the collision grid with this object
         collisionGrid.update(for: gameObject)
         
+        delegate?.gameWorld(self, added: gameObject)
+        
         #if DEBUG_VERBOSE
         print(String(format: "GameObject added to GameWorld at (x: %.2f, y: %.2f, z: %.2f).", gameObject.position.x, gameObject.position.y, gameObject.position.z))
         #endif
+    }
+    
+    public func add(member: GameWorldMember)
+    {
+        switch member {
+            case let gameTile as GameTile:
+                let _ = add(gameTile: gameTile)
+            case let gameObject as GameObject:
+                add(gameObject: gameObject)
+            default:
+                break
+        }
+    }
+    
+    public func addCheckpoint(at position: Position) {
+        checkpoints.append(position)
+        checkpoints.sort(by: {
+            if $0.x < $1.x {
+                return true
+            } else if $0.x > $1.x {
+                return false
+            } else if $0.y < $0.y { // && $0.x == $1.x
+                return true
+            } else {
+                return false
+            }
+        })
     }
     
     public func update(_ dt: Float)

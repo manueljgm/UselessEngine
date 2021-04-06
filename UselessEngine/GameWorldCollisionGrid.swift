@@ -53,7 +53,7 @@ public class GameWorldCollisionGrid {
     }
     
     public func hasObject(at position: Position,
-                          matchCriteria match: (GameObject) -> Bool) -> Bool
+                          matchCriteria match: (GameObject) -> Bool = { _ in return true }) -> Bool
     {
         let cellPosition = UnitPosition(x: Int(floor((position.x) / collisionCellSize.dx)),
                                         y: Int(floor((position.y) / collisionCellSize.dy)))
@@ -73,9 +73,9 @@ public class GameWorldCollisionGrid {
         return false
     }
     
-    public func hasObject(between startPosition: Position,
-                          and endPosition: Position,
-                          matchCriteria match: (GameObject) -> Bool) -> Bool
+    public func nextObject(between startPosition: Position,
+                           and endPosition: Position,
+                           matchCriteria match: (GameObject) -> Bool = { _ in return true }) -> (object: GameObject, distance: Vector)?
     {
         let x0 = startPosition.x / collisionCellSize.dx
         let y0 = startPosition.y / collisionCellSize.dy
@@ -120,14 +120,17 @@ public class GameWorldCollisionGrid {
 
         let ray = Ray(position: startPosition, direction: endPosition - startPosition)
         for _ in stride(from: n, to: 0, by: -1) {
-            if let gameObjects = gameObjectsByCellPosition[UnitPosition(x: x, y: y)] {
-                for gameObject in gameObjects {
-                    if match(gameObject) {
-                        if let _ = gameObject.physics?.collisionDelegate?.contactAABB.intersect(ray, ignoringZ: true) {
-                            return true
-                        }
+            var nearestResult: (GameObject?, Vector) = (nil, Vector(dx: .infinity, dy: .infinity, dz: .infinity))
+            gameObjectsByCellPosition[UnitPosition(x: x, y: y)]?.forEach { gameObject in
+                if match(gameObject), let intersectDistance = gameObject.physics?.collisionDelegate?.contactAABB.intersect(ray, ignoringZ: true) {
+                    if intersectDistance.magnitude < nearestResult.1.magnitude {
+                        // store the closer match
+                        nearestResult = (gameObject, intersectDistance)
                     }
                 }
+            }
+            if nearestResult.0 != nil {
+                return (nearestResult.0!, nearestResult.1)
             }
 
             if error > 0 {
@@ -139,7 +142,14 @@ public class GameWorldCollisionGrid {
             }
         }
         
-        return false
+        return nil
+    }
+    
+    public func hasObject(between startPosition: Position,
+                          and endPosition: Position,
+                          matchCriteria match: (GameObject) -> Bool = { _ in return true }) -> Bool
+    {
+        return nextObject(between: startPosition, and: endPosition, matchCriteria: match) != nil
     }
     
     // MARK: - Helper Methods

@@ -37,7 +37,7 @@ public struct Vector {
         }
     }
     
-    public init(dx: Float, dy: Float, dz: Float) {
+    public init(dx: Float, dy: Float, dz: Float = .zero) {
         self.dx = dx
         self.dy = dy
         self.dz = dz
@@ -101,6 +101,20 @@ public struct Vector {
         }
         
         return Vector(dx: dx / m, dy: dy / m, dz: dz / m)
+    }
+    
+    public func dot(b: Vector) -> Float {
+        return dx * b.dx + dy * b.dy + dz * b.dz
+    }
+    
+    public func theta(b: Vector) -> Float {
+        return acos(normalized().dot(b: b.normalized())) * 180.0 / .pi
+    }
+    
+    public func cross(b: Vector) -> Vector {
+        return Vector(dx: dy * b.dz - dz * b.dy,
+                      dy: dz * b.dx - dx * b.dz,
+                      dz: dx * b.dy - dy * b.dx)
     }
     
 }

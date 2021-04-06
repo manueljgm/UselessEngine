@@ -40,16 +40,24 @@ public struct AABB {
         updateRelativePositions()
     }
     
+    public func minkowskiDifference(_ otherAABB: AABB) -> AABB {
+        let mdHalfwidths = halfwidths + otherAABB.halfwidths
+        let mdPosition = Position(x: minimum.x - otherAABB.maximum.x + mdHalfwidths.dx,
+                                  y: minimum.y - otherAABB.maximum.y + mdHalfwidths.dy,
+                                  z: minimum.z - otherAABB.maximum.z + mdHalfwidths.dz)
+        return AABB(position: mdPosition, halfwidths: mdHalfwidths)
+    }
+    
     public func contains(_ point: Position) -> Bool {
-        if point.x < center.x - halfwidths.dx || point.x > center.x + halfwidths.dx {
+        if point.x < minimum.x || point.x > maximum.x {
             return false
         }
         
-        if point.y < center.y - halfwidths.dy || point.y > center.y + halfwidths.dy {
+        if point.y < minimum.y || point.y > maximum.y {
             return false
         }
         
-        if point.z < center.z - halfwidths.dz || point.z > center.z + halfwidths.dz {
+        if point.z < minimum.z || point.z > maximum.z {
             return false
         }
         

@@ -6,7 +6,6 @@
 //  Copyright © 2021 Useless Robot. All rights reserved.
 //
 
-import SpriteKit
 import UselessCommon
 
 public enum GameWorldGraphError: Error {
@@ -16,24 +15,23 @@ public enum GameWorldGraphError: Error {
 public class GameWorldGraph {
     
     private var nodes: [UnitPosition: GameWorldGraphNode]
-    private let nodeSpacing: (dx: Float, dy: Float)
-    
+    private var nodeSpacing: (dx: Float, dy: Float)?
     private let delegate: GameWorldGraphDelegate
     
-    init(nodeSpacing: (dx: Float, dy: Float), graphDelegate: GameWorldGraphDelegate) {
+    public init(graphDelegate: GameWorldGraphDelegate) {
         self.nodes = [:]
-        self.nodeSpacing = nodeSpacing
         self.delegate = graphDelegate
     }
-    
-    func nodeAt(graphPosition: UnitPosition) -> GameWorldGraphNode? {
-        return nodes[graphPosition]
-    }
  
-    func generate(for world: GameWorld, checkCriteria: @escaping (GameObject) -> Bool = { _ in return true }) throws {
+    public func generate(for world: GameWorld,
+                  nodeSpacing: (dx: Float, dy: Float),
+                  isIncluded checkCriteria: @escaping (GameObject) -> Bool = { _ in return true }) throws
+    {
         guard world.size.width - nodeSpacing.dx > nodeSpacing.dx && world.size.height - nodeSpacing.dy > nodeSpacing.dy else {
             throw GameWorldGraphError.GameWorldNotCompatible
         }
+        
+        self.nodeSpacing = nodeSpacing
         
         let upperX = Int(floor(world.size.width / nodeSpacing.dx))
         let upperY = Int(floor(world.size.height / nodeSpacing.dy))
@@ -77,17 +75,13 @@ public class GameWorldGraph {
             checkAndAddEdge(node, UnitPosition(x: nodeGridPosition.x+1, y: nodeGridPosition.y)) // r
         }
     }
-    
-    func cost(from origin: GameWorldGraphNode, to destination: GameWorldGraphNode) -> Float {
-        return delegate.cost(from: origin, to: destination)
-    }
-    
-    func heuristic(from origin: GameWorldGraphNode, to goal: GameWorldGraphNode) -> Float {
-        return delegate.heuristic(from: origin, to: goal)
-    }
  
-    func path(from start: Position, to goal: Position) -> [Position]
+    public func path(from start: Position, to goal: Position) -> [Position]
     {
+        guard let nodeSpacing = self.nodeSpacing else {
+            return []
+        }
+        
         let startGraphPosition = UnitPosition(x: Int(round(start.x / nodeSpacing.dx)), y: Int(round(start.y / nodeSpacing.dy)))
         let goalGraphPosition = UnitPosition(x: Int(round(goal.x / nodeSpacing.dx)), y: Int(round(goal.y / nodeSpacing.dy)))
         guard let start = nodes[startGraphPosition],
@@ -133,6 +127,20 @@ public class GameWorldGraph {
         }
 
         return path.reversed()
+    }
+    
+    public func node(at graphPosition: UnitPosition) -> GameWorldGraphNode? {
+        return nodes[graphPosition]
+    }
+    
+    // MARK: - Private Methods
+    
+    private func cost(from origin: GameWorldGraphNode, to destination: GameWorldGraphNode) -> Float {
+        return delegate.cost(from: origin, to: destination)
+    }
+    
+    private func heuristic(from origin: GameWorldGraphNode, to goal: GameWorldGraphNode) -> Float {
+        return delegate.heuristic(from: origin, to: goal)
     }
     
 }

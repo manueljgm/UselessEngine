@@ -16,7 +16,10 @@ public protocol PhysicsCollisionDelegate: class
     var contactWithConsequences: Bool { get set }
  
     func handleContact(between gameObject: GameObject, and otherGameObject: GameObject)
-    func handleCollision(between gameObject: GameObject, and otherGameObject: GameObject, withCorrection correctionOffset: Vector)
+    func handleCollision(between gameObject: GameObject,
+                         and otherGameObject: GameObject,
+                         withCorrection correctionOffset: Vector,
+                         in world: GameWorld)
 }
 
 extension PhysicsCollisionDelegate
@@ -25,7 +28,10 @@ extension PhysicsCollisionDelegate
         
     }
     
-    public func handleCollision(between gameObject: GameObject, and otherGameObject: GameObject, withCorrection correctionOffset: Vector) {
+    public func handleCollision(between gameObject: GameObject,
+                                and otherGameObject: GameObject,
+                                withCorrection correctionOffset: Vector,
+                                in world: GameWorld) {
 
     }
 }

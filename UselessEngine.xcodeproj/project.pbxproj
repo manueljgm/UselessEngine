@@ -226,21 +226,21 @@
 		1A32FC7A24C1E39100CE3B0F /* Physics */ = {
 			isa = PBXGroup;
 			children = (
+				1ADC0D3125D37B5A0085CCEE /* GeometryComponent.swift */,
 				1A32FC4224C1E36600CE3B0F /* PlaneCoordinate.swift */,
 				1A32FC4C24C1E36700CE3B0F /* Position.swift */,
 				1A32FC4724C1E36600CE3B0F /* Position2d.swift */,
 				1A32FC4A24C1E36700CE3B0F /* UnitPosition.swift */,
 				1A32FC3124C1E36500CE3B0F /* Vector.swift */,
 				1A32FC3B24C1E36500CE3B0F /* Vector2d.swift */,
-				1AC6463024CBC4CE007D8C21 /* Boost.swift */,
 				1A32FC3624C1E36500CE3B0F /* PointMass.swift */,
 				1A32FC3224C1E36500CE3B0F /* PointMassSpringJoint.swift */,
 				1A32FC2624C1E36400CE3B0F /* AABB.swift */,
 				1A32FC3024C1E36500CE3B0F /* Hit.swift */,
+				1A31D3FF25CCF497004837C9 /* Ray.swift */,
+				1AC6463024CBC4CE007D8C21 /* Boost.swift */,
 				1A32FC4024C1E36600CE3B0F /* PhysicsCollisionCategories.swift */,
 				1A32FC4524C1E36600CE3B0F /* PhysicsCollisionDelegate.swift */,
-				1A31D3FF25CCF497004837C9 /* Ray.swift */,
-				1ADC0D3125D37B5A0085CCEE /* GeometryComponent.swift */,
 			);
 			path = Physics;
 			sourceTree = "<group>";

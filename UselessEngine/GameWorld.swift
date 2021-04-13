@@ -147,9 +147,14 @@ public class GameWorld
                        let corrections = collisionDelegate.resolveCollision(on: movingObject, against: otherObject, for: hit)
                     {
                         // call event handlers
-                        movingObjectCollisionDelegate.handleCollision(between: movingObject, and: otherObject, withCorrection: corrections.thisCorrection)
-                        otherObjectCollisionDelegate.handleCollision(between: otherObject, and: movingObject, withCorrection: corrections.otherCorrection)
-
+                        movingObjectCollisionDelegate.handleCollision(between: movingObject,
+                                                                      and: otherObject,
+                                                                      withCorrection: corrections.thisCorrection,
+                                                                      in: self)
+                        otherObjectCollisionDelegate.handleCollision(between: otherObject,
+                                                                     and: movingObject,
+                                                                     withCorrection: corrections.otherCorrection,
+                                                                     in: self)
                         // update collision grid
                         collisionGrid.update(for: movingObject)
                         collisionGrid.update(for: otherObject)

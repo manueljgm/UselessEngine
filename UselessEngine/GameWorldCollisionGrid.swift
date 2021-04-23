@@ -41,6 +41,13 @@ public class GameWorldCollisionGrid {
             collisionCellPositionsByGameObjectId[gameObject.id] = currentPositions
         }
     }
+    
+    func remove(gameObject: GameObject) {
+        collisionCellPositionsByGameObjectId[gameObject.id]?.forEach { cellPosition in
+            gameObjectsByCellPosition[cellPosition]?.removeAll(where: { $0 == gameObject })
+            collisionCellPositionsByGameObjectId.removeValue(forKey: gameObject.id)
+        }
+    }
 
     public func onNeighbors(of gameObject: GameObject, doAction: (GameObject) -> Void) {
         collisionCellPositionsByGameObjectId[gameObject.id]?.forEach { cellPosition in

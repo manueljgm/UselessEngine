@@ -109,6 +109,12 @@ public class GameWorld
         })
     }
     
+    public func remove(gameObject: GameObject) {
+        collisionGrid.remove(gameObject: gameObject)
+        objects.removeAll(where: { $0 == gameObject })
+        delegate?.gameWorld(self, removed: gameObject)
+    }
+    
     public func update(_ dt: Float)
     {
         // update all game objects

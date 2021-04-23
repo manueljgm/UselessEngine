@@ -16,7 +16,11 @@ public struct AABB {
     }
     
     /// AABB halfwidths
-    public private(set) var halfwidths: Vector
+    public var halfwidths: Vector {
+        didSet {
+            updateRelativePositions()
+        }
+    }
     
     /// AABB anchor position
     public var anchorPosition: Vector {

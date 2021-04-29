@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
-public protocol GameObjectState: class, GameObjectObserver {
+public protocol GameObjectState: GameObjectObserver {
 
     var isOutOfAction: Bool { get }
     var fallbackState: GameObjectState? { get set }

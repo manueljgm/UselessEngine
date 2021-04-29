@@ -8,18 +8,18 @@
 
 import SpriteKit
 
-public protocol GameObjectStateGraphicsComponent: class, GameObjectObserver {
+public protocol GameObjectStateGraphicsComponent: GameObjectObserver {
 
     var animation: Animation { get }
 
     init(ownerState: GameObjectState, targetSprite: SKSpriteNode)
-    func update(with owner: GameObject, dt: Float)
+    func update(with owner: GameObject, in world: GameWorld, dt: Float)
 
 }
 
 extension GameObjectStateGraphicsComponent {
     
-    public func update(with gameObject: GameObject, dt: Float) {
+    public func update(with gameObject: GameObject, in world: GameWorld, dt: Float) {
         animation.update(dt)
     }
     

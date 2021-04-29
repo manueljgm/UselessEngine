@@ -33,6 +33,8 @@ public struct AABB {
     public private(set) var minimum: Position!
     public private(set) var maximum: Position!
     
+    private static let epsilon: Float = 1e-6
+    
     public init(position: Position = .zero,
                 halfwidths: Vector,
                 anchorPosition: Vector = Vector(dx: 0.5, dy: 0.5, dz: 0.5)) {
@@ -71,19 +73,19 @@ public struct AABB {
     public func intersect(_ otherAABB: AABB) -> Hit? {
         let dx = otherAABB.center.x - center.x
         let px = (halfwidths.dx + otherAABB.halfwidths.dx) - abs(dx)
-        if px < Float.leastNormalMagnitude {
+        if px < AABB.epsilon {
             return nil
         }
         
         let dy = otherAABB.center.y - center.y
         let py = (halfwidths.dy + otherAABB.halfwidths.dy) - abs(dy)
-        if py < Float.leastNormalMagnitude {
+        if py < AABB.epsilon {
             return nil
         }
         
         let dz = otherAABB.center.z - center.z
         let pz = (halfwidths.dz + otherAABB.halfwidths.dz) - abs(dz)
-        if pz < Float.leastNormalMagnitude {
+        if pz < AABB.epsilon {
             return nil
         }
         

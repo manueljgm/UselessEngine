@@ -119,15 +119,23 @@ public class GameWorld
     {
         // update all game objects
         let movingObjects: [GameObject] = objects.compactMap { gameObject in
+            let previousPosition = gameObject.position
             // update world object
             let observedChanges = gameObject.update(dt, in: self)
             // and if the object's position changed...
             if observedChanges.contains(.position) {
                 // keep game object within the world's boundaries
                 collisionDelegate.resolveBoundaries(on: gameObject, in: self)
-                collisionGrid.update(for: gameObject)
-                // and return the game object
-                return gameObject
+                // if the position actually changed
+                if gameObject.position != previousPosition {
+                    // update the collision grid
+                    collisionGrid.update(for: gameObject)
+                    // and return the game object
+                    return gameObject
+                } else {
+                    // if here, the object did not move
+                    return nil
+                }
             }
             // if here, the object did not move
             return nil
@@ -135,8 +143,13 @@ public class GameWorld
         
         // resolve any collisions
         movingObjects.forEach { movingObject in
+            
+            defer {
+                // notify positive change event of moving object
+                delegate?.receive(event: .positionChange, from: movingObject, payload: nil)
+            }
+            
             collisionGrid.onNeighbors(of: movingObject) { otherObject in
-                
                 guard let movingObjectPhysics = movingObject.physics,
                       let movingObjectCollisionDelegate = movingObjectPhysics.collisionDelegate,
                       let otherObjectPhysics = otherObject.physics,
@@ -164,9 +177,13 @@ public class GameWorld
                         // update collision grid
                         collisionGrid.update(for: movingObject)
                         collisionGrid.update(for: otherObject)
+                        
+                        // notify positive change event of "other" object
+                        delegate?.receive(event: .positionChange, from: otherObject, payload: nil)
                     }
                 }
             }
+            
         }
         
         // update terrain

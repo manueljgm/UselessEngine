@@ -97,6 +97,7 @@ public class GameObject: GameWorldMember, Identifiable
     }
     
     public func push(state newState: GameObjectState) {
+        var newState = newState
         newState.fallbackState = state
         enter(state: newState)
     }

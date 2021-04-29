@@ -43,7 +43,7 @@ open class GameObjectStateWithGraphicsBehavior<TGraphicsComponent: GameObjectSta
     }
     
     public final func update(with gameObject: GameObject, in world: GameWorld, dt: Float) {
-        graphics?.update(with: gameObject, dt: dt)
+        graphics?.update(with: gameObject, in: world, dt: dt)
         didUpdate(with: gameObject, in: world, dt: dt)
     }
     

@@ -6,7 +6,7 @@
 //  Copyright © 2015 Useless Robot. All rights reserved.
 //
 
-public protocol PhysicsCollisionDelegate: class
+public protocol PhysicsCollisionDelegate
 {
     var categoryBitmask: PhysicsCollisionCategories { get }
     var contactBitmask: PhysicsCollisionCategories { get }

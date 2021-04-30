@@ -10,7 +10,7 @@ import UselessCommon
 
 public class GameWorld
 {
-    public var delegate: GameWorldDelegate?
+    public weak var delegate: GameWorldDelegate?
     
     public var gravity: Float
     public private(set) var size: (width: Float, height: Float)

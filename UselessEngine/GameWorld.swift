@@ -12,6 +12,8 @@ public class GameWorld
 {
     public weak var delegate: GameWorldDelegate?
     
+    public var isPaused: Bool
+    
     public var gravity: Float
     public private(set) var size: (width: Float, height: Float)
     public private(set) var objects: [GameObject]
@@ -29,6 +31,7 @@ public class GameWorld
                 collisionDelegate: GameWorldCollisionDelegate,
                 pathGraphDelegate: GameWorldGraphDelegate)
     {
+        self.isPaused = false
         self.gravity = gravity
         self.size = (.zero, .zero)
         self.objects = []
@@ -117,6 +120,10 @@ public class GameWorld
     
     public func update(_ dt: Float)
     {
+        if isPaused {
+            return
+        }
+        
         // update all game objects
         let movingObjects: [GameObject] = objects.compactMap { gameObject in
             let previousPosition = gameObject.position

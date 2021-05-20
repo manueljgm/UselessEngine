@@ -6,7 +6,7 @@
 //  Copyright © 2018 Useless Robot. All rights reserved.
 //
 
-public protocol GameObjectSubcomponent: class {
+public protocol GameObjectSubcomponent: AnyObject {
 
     var id: UUID { get }
 

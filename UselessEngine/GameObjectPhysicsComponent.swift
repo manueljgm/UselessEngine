@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Useless Robot. All rights reserved.
 //
 
-public protocol GameObjectPhysicsComponent: class, GameObjectObserver {
+public protocol GameObjectPhysicsComponent: AnyObject, GameObjectObserver {
     
     var id: UUID { get }
     var mass: Float { get } // in kg

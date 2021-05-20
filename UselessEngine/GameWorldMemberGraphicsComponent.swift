@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-public protocol GameWorldMemberGraphicsComponent: class, GameWorldMemberObserver {
+public protocol GameWorldMemberGraphicsComponent: AnyObject, GameWorldMemberObserver {
 
     var sprite: SKSpriteNode { get }
 

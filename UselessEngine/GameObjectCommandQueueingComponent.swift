@@ -8,8 +8,6 @@
 
 public class GameObjectCommandQueueingComponent: GameObjectInputComponent
 {
-    public let id: UUID = UUID()
-    
     /// Queued input commands.
     private var commandQueue: [GameObjectCommand] = []
     

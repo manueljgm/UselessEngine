@@ -9,12 +9,12 @@
 public class GameWorldCollisionGrid {
 
     private var collisionCellSize: Vector2d
-    private var collisionCellPositionsByGameObjectId: [UUID: [UnitPosition]]
+    private var collisionCellPositionsByGameObject: [GameObject: [UnitPosition]]
     private var gameObjectsByCellPosition: [UnitPosition: [GameObject]]
 
     init(cellSize: Vector2d) {
         self.gameObjectsByCellPosition = [:]
-        self.collisionCellPositionsByGameObjectId = [:]
+        self.collisionCellPositionsByGameObject = [:]
         self.collisionCellSize = cellSize
     }
     
@@ -22,7 +22,7 @@ public class GameWorldCollisionGrid {
     {
         if let collisionBox = gameObject.physics?.collisionDelegate?.contactAABB
         {
-            let previousPositions = collisionCellPositionsByGameObjectId[gameObject.id] ?? []
+            let previousPositions = collisionCellPositionsByGameObject[gameObject] ?? []
             let currentPositions = gridPositions(below: collisionBox)
             
             if currentPositions != previousPositions {
@@ -38,19 +38,19 @@ public class GameWorldCollisionGrid {
                 }
             }
             
-            collisionCellPositionsByGameObjectId[gameObject.id] = currentPositions
+            collisionCellPositionsByGameObject[gameObject] = currentPositions
         }
     }
     
     func remove(gameObject: GameObject) {
-        collisionCellPositionsByGameObjectId[gameObject.id]?.forEach { cellPosition in
+        collisionCellPositionsByGameObject[gameObject]?.forEach { cellPosition in
             gameObjectsByCellPosition[cellPosition]?.removeAll(where: { $0 == gameObject })
-            collisionCellPositionsByGameObjectId.removeValue(forKey: gameObject.id)
+            collisionCellPositionsByGameObject.removeValue(forKey: gameObject)
         }
     }
 
     public func onNeighbors(of gameObject: GameObject, doAction: (GameObject) -> Void) {
-        collisionCellPositionsByGameObjectId[gameObject.id]?.forEach { cellPosition in
+        collisionCellPositionsByGameObject[gameObject]?.forEach { cellPosition in
             gameObjectsByCellPosition[cellPosition]?.forEach { otherObject in
                 if otherObject != gameObject {
                     doAction(otherObject)

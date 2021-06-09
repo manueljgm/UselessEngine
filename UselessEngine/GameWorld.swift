@@ -123,78 +123,77 @@ public class GameWorld
         if isPaused {
             return
         }
+
+        // set up queue to broadcast game object change notifications
+        var changeNotificationQueue = [GameObject: GameWorldMemberChanges]()
         
         // update all game objects
-        let movingObjects: [GameObject] = objects.compactMap { gameObject in
-            let previousPosition = gameObject.position
-            // update world object
-            let observedChanges = gameObject.update(dt, in: self)
-            // and if the object's position changed...
-            if observedChanges.contains(.position) {
-                // keep game object within the world's boundaries
-                collisionDelegate.resolveBoundaries(on: gameObject, in: self)
-                // if the position actually changed
-                if gameObject.position != previousPosition {
-                    // update the collision grid
-                    collisionGrid.update(for: gameObject)
-                    // and return the game object
-                    return gameObject
-                } else {
-                    // if here, the object did not move
-                    return nil
-                }
-            }
-            // if here, the object did not move
-            return nil
-        }
-        
-        // resolve any collisions
-        movingObjects.forEach { movingObject in
-            
-            defer {
-                // notify positive change event of moving object
-                delegate?.receive(event: .positionChange, from: movingObject, payload: nil)
-            }
-            
-            collisionGrid.onNeighbors(of: movingObject) { otherObject in
-                guard let movingObjectPhysics = movingObject.physics,
-                      let movingObjectCollisionDelegate = movingObjectPhysics.collisionDelegate,
-                      let otherObjectPhysics = otherObject.physics,
-                      let otherObjectCollisionDelegate = otherObjectPhysics.collisionDelegate
-                else {
-                    return
-                }
+        objects.forEach { gameObject in
 
-                if otherObjectCollisionDelegate.collisionBitmask.contains(movingObjectCollisionDelegate.categoryBitmask)
-                    && movingObjectCollisionDelegate.collisionBitmask.contains(otherObjectCollisionDelegate.categoryBitmask)
-                {
-                    // resolve potential collision
-                    if let hit = movingObjectCollisionDelegate.contactAABB.intersect(otherObjectCollisionDelegate.contactAABB),
-                       let corrections = collisionDelegate.resolveCollision(on: movingObject, against: otherObject, for: hit)
+            // update the game object
+            let changesObserved = gameObject.update(dt, in: self)
+            if changesObserved != .none {
+                changeNotificationQueue[gameObject] = changesObserved
+            }
+
+            // if the object's position changed, check and resolve for boundaries or collisions
+            if changesObserved.contains(.position) {
+                
+                // update the collision grid for position changes
+                collisionGrid.update(for: gameObject)
+
+                // resolve any collisions
+                collisionGrid.onNeighbors(of: gameObject) { otherObject in
+                    guard let gameObjectPhysics = gameObject.physics,
+                          let gameObjectCollisionDelegate = gameObjectPhysics.collisionDelegate,
+                          let otherObjectPhysics = otherObject.physics,
+                          let otherObjectCollisionDelegate = otherObjectPhysics.collisionDelegate
+                    else {
+                        return
+                    }
+
+                    if otherObjectCollisionDelegate.collisionBitmask.contains(gameObjectCollisionDelegate.categoryBitmask)
+                        && gameObjectCollisionDelegate.collisionBitmask.contains(otherObjectCollisionDelegate.categoryBitmask)
                     {
-                        // call event handlers
-                        movingObjectCollisionDelegate.handleCollision(between: movingObject,
-                                                                      and: otherObject,
-                                                                      withCorrection: corrections.thisCorrection,
-                                                                      in: self)
-                        otherObjectCollisionDelegate.handleCollision(between: otherObject,
-                                                                     and: movingObject,
-                                                                     withCorrection: corrections.otherCorrection,
-                                                                     in: self)
-                        // update collision grid
-                        collisionGrid.update(for: movingObject)
-                        collisionGrid.update(for: otherObject)
-                        
-                        // notify positive change event of "other" object
-                        delegate?.receive(event: .positionChange, from: otherObject, payload: nil)
+                        // resolve potential collision
+                        if let hit = gameObjectCollisionDelegate.contactAABB.intersect(otherObjectCollisionDelegate.contactAABB),
+                           let corrections = collisionDelegate.resolveCollision(on: gameObject, against: otherObject, for: hit)
+                        {
+                            // a hit occurred, so call collision handlers
+                            gameObjectCollisionDelegate.handleCollision(between: gameObject,
+                                                                          and: otherObject,
+                                                                          withCorrection: corrections.thisCorrection,
+                                                                          in: self)
+                            otherObjectCollisionDelegate.handleCollision(between: otherObject,
+                                                                         and: gameObject,
+                                                                         withCorrection: corrections.otherCorrection,
+                                                                         in: self)
+                            
+                            // and update the collision grid for changes
+                            if corrections.thisCorrection != .zero {
+                                collisionGrid.update(for: gameObject)
+                                changeNotificationQueue[gameObject]?.insert(.position)
+                            }
+                            if corrections.otherCorrection != .zero {
+                                collisionGrid.update(for: otherObject)
+                                changeNotificationQueue[otherObject]?.insert(.position)
+                            }
+                        }
                     }
                 }
             }
-            
+
         }
-        
+            
         // update terrain
         terrain.update(dt: dt, in: self)
+        
+        // broadcast game object change events
+        changeNotificationQueue.forEach {
+            if $0.value != .none {
+                delegate?.receive(event: .memberChange(with: $0.value), from: $0.key, payload: nil)
+            }
+        }
     }
 
     public func elevation(at point: PlaneCoordinate) -> Float

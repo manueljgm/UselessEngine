@@ -8,7 +8,6 @@
 
 public protocol GameObjectPhysicsComponent: AnyObject, GameObjectObserver {
     
-    var id: UUID { get }
     var mass: Float { get } // in kg
     var thrust: Vector { get set }
     var boost: Boost? { get set }

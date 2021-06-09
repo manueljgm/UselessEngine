@@ -6,17 +6,15 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
-public class GameTile: GameWorldMember, Identifiable
+public class GameTile: GameWorldMember
 {
-    public let id: UUID = UUID()
-    
     public let graphics: GameWorldMemberGraphicsComponent
     
     public let size: (width: Float, height: Float)
     
     public var position: Position {
         didSet {
-            graphics.receive(event: .positionChange, from: self, payload: oldValue)
+            graphics.receive(event: .memberChange(with: .position), from: self, payload: oldValue)
         }
     }
     
@@ -54,7 +52,17 @@ public class GameTile: GameWorldMember, Identifiable
 }
 
 extension GameTile: Equatable {
+    
     public static func == (lhs: GameTile, rhs: GameTile) -> Bool {
-        return lhs.id == rhs.id
+        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
     }
+    
+}
+
+extension GameTile: Hashable {
+
+    public func hash(into hasher: inout Hasher) {
+         hasher.combine(ObjectIdentifier(self))
+    }
+    
 }

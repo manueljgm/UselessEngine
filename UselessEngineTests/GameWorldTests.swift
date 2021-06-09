@@ -61,8 +61,10 @@ fileprivate class TestObjectPhysicsComponent: GameObjectPhysicsComponent {
     
     func receive(event: GameWorldMemberEvent, from sender: GameObject, payload: Any?) {
         switch event {
-        case .positionChange:
-            collisionDelegate?.contactAABB.position = sender.position
+        case .memberChange(let changes):
+            if changes.contains(.position) {
+                collisionDelegate?.contactAABB.position = sender.position
+            }
         default:
             break
         }

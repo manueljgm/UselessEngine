@@ -8,8 +8,6 @@
 
 public protocol GameObjectInputComponent: AnyObject {
 
-    var id: UUID { get }
-
     func queue(command: GameObjectCommand)
     func update(with owner: GameObject, dt: Float)
 

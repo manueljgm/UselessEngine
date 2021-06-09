@@ -8,8 +8,6 @@
 
 public protocol GameObjectSubcomponent: AnyObject {
 
-    var id: UUID { get }
-
     func update(with owner: GameObject, in world: GameWorld, dt: Float)
 
 }

@@ -15,7 +15,8 @@ public struct GameWorldMemberChanges: OptionSet {
     }
     
     public static let none = GameWorldMemberChanges([])
-    public static let position = GameWorldMemberChanges(rawValue: 1 << 0)
-    public static let velocity = GameWorldMemberChanges(rawValue: 1 << 1)
+    public static let state = GameWorldMemberChanges(rawValue: 1 << 0)
+    public static let position = GameWorldMemberChanges(rawValue: 1 << 1)
+    public static let velocity = GameWorldMemberChanges(rawValue: 1 << 2)
 
 }

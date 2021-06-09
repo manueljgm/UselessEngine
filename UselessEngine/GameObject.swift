@@ -6,11 +6,11 @@
 //  Copyright (c) 2014 Useless Robot. All rights reserved.
 //
 
-public class GameObject: GameWorldMember, Identifiable
+public class GameObject: GameWorldMember
 {
     // MARK: - Properties
-    
-    public let id: UUID = UUID()
+
+    private static var inited: Int = 0
     
     public private(set) var state: GameObjectState?
 
@@ -22,9 +22,10 @@ public class GameObject: GameWorldMember, Identifiable
     public var position: Position {
         didSet {
             if (position != oldValue) {
-                graphics.receive(event: .positionChange, from: self, payload: oldValue)
-                physics?.receive(event: .positionChange, from: self, payload: oldValue)
-                state?.receive(event: .positionChange, from: self, payload: oldValue)
+                graphics.receive(event: .memberChange(with: .position), from: self, payload: oldValue)
+                physics?.receive(event:.memberChange(with: .position), from: self, payload: oldValue)
+                state?.receive(event: .memberChange(with: .position), from: self, payload: oldValue)
+                changes.insert(.position)
             }
         }
     }
@@ -33,12 +34,13 @@ public class GameObject: GameWorldMember, Identifiable
     public var velocity: Vector {
         didSet {
             if (velocity != oldValue) {
-                state?.receive(event: .velocityChange, from: self, payload: oldValue)
+                state?.receive(event: .memberChange(with: .velocity), from: self, payload: oldValue)
+                changes.insert(.velocity)
             }
         }
     }
     
-    private static var inited: Int = 0
+    private var changes: GameWorldMemberChanges = []
     
     // MARK: Init
     
@@ -67,24 +69,16 @@ public class GameObject: GameWorldMember, Identifiable
     }
     
     // MARK: Update
-    
+
     public func update(_ dt: Float, in world: GameWorld) -> GameWorldMemberChanges
     {
-        let previousPosition = position
-        let previousVelocity = velocity
-        
         input?.update(with: self, dt: dt)
         state?.update(with: self, in: world, dt: dt)
         physics?.update(with: self, in: world, dt: dt)
         graphics.update(with: self, dt: dt)
-        
-        var changes: GameWorldMemberChanges = []
-        if position != previousPosition {
-            changes.insert(.position)
-        }
-        if velocity != previousVelocity {
-            changes.insert(.velocity)
-            
+
+        defer {
+            changes = .none
         }
         return changes
     }
@@ -94,22 +88,35 @@ public class GameObject: GameWorldMember, Identifiable
     public func enter(state newState: GameObjectState) {
         state = newState
         state?.enter(with: self)
+        changes.insert(.state)
     }
     
     public func push(state newState: GameObjectState) {
         var newState = newState
         newState.fallbackState = state
         enter(state: newState)
+        changes.insert(.state)
     }
     
     public func exitState() {
         state = state?.fallbackState
         state?.reset(with: self)
+        changes.insert(.state)
     }
 }
 
 extension GameObject: Equatable {
+    
     public static func == (lhs: GameObject, rhs: GameObject) -> Bool {
-        return lhs.id == rhs.id
+        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
     }
+    
+}
+
+extension GameObject: Hashable {
+
+    public func hash(into hasher: inout Hasher) {
+         hasher.combine(ObjectIdentifier(self))
+    }
+    
 }

@@ -6,9 +6,7 @@
 //  Copyright (c) 2014 Useless Robot. All rights reserved.
 //
 
-public protocol GameObjectInputComponent: class {
-
-    var id: UUID { get }
+public protocol GameObjectInputComponent: AnyObject {
 
     func queue(command: GameObjectCommand)
     func update(with owner: GameObject, dt: Float)

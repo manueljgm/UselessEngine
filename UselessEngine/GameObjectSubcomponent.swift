@@ -6,9 +6,7 @@
 //  Copyright © 2018 Useless Robot. All rights reserved.
 //
 
-public protocol GameObjectSubcomponent: class {
-
-    var id: UUID { get }
+public protocol GameObjectSubcomponent: AnyObject {
 
     func update(with owner: GameObject, in world: GameWorld, dt: Float)
 

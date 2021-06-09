@@ -55,6 +55,7 @@
 		1A5FB9EF24DAE3AE0025BE93 /* AnimationFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5FB9EE24DAE3AE0025BE93 /* AnimationFrame.swift */; };
 		1A6E667C260045DB00081B38 /* GameWorldDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A6E667B260045DB00081B38 /* GameWorldDelegate.swift */; };
 		1AB525FC25F70F0B00CDC6B0 /* GameWorldGraphDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AB525FB25F70F0B00CDC6B0 /* GameWorldGraphDelegate.swift */; };
+		1AC5A5F926705170001830F6 /* GameObjectStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC5A5F826705170001830F6 /* GameObjectStateTests.swift */; };
 		1AC6463124CBC4CE007D8C21 /* Boost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC6463024CBC4CE007D8C21 /* Boost.swift */; };
 		1ACEEFED25CB920700095943 /* AABBTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ACEEFEC25CB920700095943 /* AABBTests.swift */; };
 		1ADC0D3225D37B5A0085CCEE /* GeometryComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ADC0D3125D37B5A0085CCEE /* GeometryComponent.swift */; };
@@ -130,6 +131,7 @@
 		1A5FB9EE24DAE3AE0025BE93 /* AnimationFrame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimationFrame.swift; sourceTree = "<group>"; };
 		1A6E667B260045DB00081B38 /* GameWorldDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldDelegate.swift; sourceTree = "<group>"; };
 		1AB525FB25F70F0B00CDC6B0 /* GameWorldGraphDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldGraphDelegate.swift; sourceTree = "<group>"; };
+		1AC5A5F826705170001830F6 /* GameObjectStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameObjectStateTests.swift; sourceTree = "<group>"; };
 		1AC6463024CBC4CE007D8C21 /* Boost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Boost.swift; sourceTree = "<group>"; };
 		1ACEEFEC25CB920700095943 /* AABBTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AABBTests.swift; sourceTree = "<group>"; };
 		1ADC0D3125D37B5A0085CCEE /* GeometryComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeometryComponent.swift; sourceTree = "<group>"; };
@@ -250,6 +252,7 @@
 			children = (
 				1A42FBB825B67AE60040D481 /* UselessEngineTests.swift */,
 				1ACEEFEC25CB920700095943 /* AABBTests.swift */,
+				1AC5A5F826705170001830F6 /* GameObjectStateTests.swift */,
 				1ADC0D3B25DCBACB0085CCEE /* GameWorldTests.swift */,
 				1A4AB7382616A50600712D3D /* VectorTests.swift */,
 				1A42FBBA25B67AE60040D481 /* Info.plist */,
@@ -452,6 +455,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1A42FBB925B67AE60040D481 /* UselessEngineTests.swift in Sources */,
+				1AC5A5F926705170001830F6 /* GameObjectStateTests.swift in Sources */,
 				1ACEEFED25CB920700095943 /* AABBTests.swift in Sources */,
 				1A4AB7392616A50600712D3D /* VectorTests.swift in Sources */,
 				1ADC0D3C25DCBACB0085CCEE /* GameWorldTests.swift in Sources */,
@@ -521,7 +525,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -579,7 +583,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;

@@ -8,14 +8,17 @@
 
 public protocol GameObjectState: GameObjectObserver {
 
+    var id: UUID { get }
+    
     var isOutOfAction: Bool { get }
+    
     var fallbackState: GameObjectState? { get set }
 
     func enter(with gameObject: GameObject)
     func handle(command: GameObjectCommand, for gameObject: GameObject)
     func update(with gameObject: GameObject, in world: GameWorld, dt: Float)
     func reset(with gameObject: GameObject)
-
+    
 }
 
 extension GameObjectState {

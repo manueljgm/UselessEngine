@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
-public protocol GameWorldMemberObserver {
+public protocol GameWorldMemberObserver: AnyObject {
 
     func receive(event: GameWorldMemberEvent, from sender: GameWorldMember, payload: Any?)
 

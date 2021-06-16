@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
-public protocol GameObjectState: GameObjectObserver {
+public protocol GameObjectState: GameWorldMemberObserver {
 
     var id: UUID { get }
     

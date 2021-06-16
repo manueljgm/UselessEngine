@@ -11,7 +11,7 @@ import Foundation
 public class GameWorldTerrain {
 
     private var tileSize: Vector2d
-    private var tiles: [GameTile]
+    private var tiles: Set<GameTile>
     private var tileByGridPosition: [UnitPosition: GameTile]
     
     public init(tileSize: Vector2d) {
@@ -28,7 +28,7 @@ public class GameWorldTerrain {
         }
     
         tileByGridPosition[gridPositionKey] = tile
-        tiles.append(tile)
+        tiles.insert(tile)
         
         return true
     }

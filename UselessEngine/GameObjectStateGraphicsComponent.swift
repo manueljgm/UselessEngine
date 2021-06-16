@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-public protocol GameObjectStateGraphicsComponent: GameObjectObserver {
+public protocol GameObjectStateGraphicsComponent: GameWorldMemberObserver {
 
     var animation: Animation { get }
 

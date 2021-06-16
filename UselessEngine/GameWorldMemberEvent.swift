@@ -7,8 +7,8 @@
 //
 
 public enum GameWorldMemberEvent {
+    
     case memberChange(with: GameWorldMemberChanges)
-    case eventStart(byId: UUID)
-    case eventChange(byId: UUID)
-    case eventEnd(byId: UUID)
+    case memberEvent(byId: UUID)
+
 }

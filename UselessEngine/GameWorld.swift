@@ -1,5 +1,5 @@
 //
-//  PhysicsWorld.swift
+//  GameWorld.swift
 //  UselessEngine
 //
 //  Created by Manny Martins on 12/15/15.
@@ -16,7 +16,7 @@ public class GameWorld
     
     public var gravity: Float
     public private(set) var size: (width: Float, height: Float)
-    public private(set) var objects: [GameObject]
+    public private(set) var objects: Set<GameObject>
     public private(set) var checkpoints: [Position]
     public private(set) var terrain: GameWorldTerrain
     public let collisionGrid: GameWorldCollisionGrid
@@ -71,9 +71,12 @@ public class GameWorld
         return success
     }
 
-    public func add(gameObject: GameObject)
-    {
-        objects.append(gameObject)
+    public func add(gameObject: GameObject) {
+        // subscribe to the object's notifications
+        gameObject.add(observer: self)
+        
+        // add the object to this world's object set
+        objects.insert(gameObject)
 
         // update the collision grid with this object
         collisionGrid.update(for: gameObject)
@@ -113,8 +116,13 @@ public class GameWorld
     }
     
     public func remove(gameObject: GameObject) {
+        // remove the object from this world
         collisionGrid.remove(gameObject: gameObject)
-        objects.removeAll(where: { $0 == gameObject })
+        objects.remove(gameObject)
+        
+        // unsubscribe from the object's notifications
+        gameObject.remove(observer: self)
+        
         delegate?.gameWorld(self, removed: gameObject)
     }
     
@@ -124,17 +132,10 @@ public class GameWorld
             return
         }
 
-        // set up queue to broadcast game object change notifications
-        var changeNotificationQueue = [GameObject: GameWorldMemberChanges]()
-        
         // update all game objects
         objects.forEach { gameObject in
-
             // update the game object
             let changesObserved = gameObject.update(dt, in: self)
-            if changesObserved != .none {
-                changeNotificationQueue[gameObject] = changesObserved
-            }
 
             // if the object's position changed, check and resolve for boundaries or collisions
             if changesObserved.contains(.position) {
@@ -172,28 +173,18 @@ public class GameWorld
                             // and update the collision grid for changes
                             if corrections.thisCorrection != .zero {
                                 collisionGrid.update(for: gameObject)
-                                changeNotificationQueue[gameObject]?.insert(.position)
                             }
                             if corrections.otherCorrection != .zero {
                                 collisionGrid.update(for: otherObject)
-                                changeNotificationQueue[otherObject]?.insert(.position)
                             }
                         }
                     }
                 }
             }
-
         }
             
         // update terrain
         terrain.update(dt: dt, in: self)
-        
-        // broadcast game object change events
-        changeNotificationQueue.forEach {
-            if $0.value != .none {
-                delegate?.receive(event: .memberChange(with: $0.value), from: $0.key, payload: nil)
-            }
-        }
     }
 
     public func elevation(at point: PlaneCoordinate) -> Float
@@ -201,4 +192,20 @@ public class GameWorld
         return terrain.elevation(at: point)
     }
 
+}
+
+extension GameWorld: Equatable {
+    
+    public static func ==(lhs: GameWorld, rhs: GameWorld) -> Bool {
+        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+    }
+    
+}
+
+extension GameWorld: GameWorldMemberObserver {
+    
+    public func receive(event: GameWorldMemberEvent, from sender: GameWorldMember, payload: Any?) {
+        delegate?.receive(event: event, from: sender, payload: payload)
+    }
+    
 }

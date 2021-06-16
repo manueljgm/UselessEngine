@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Useless Robot. All rights reserved.
 //
 
-public protocol GameObjectPhysicsComponent: AnyObject, GameObjectObserver {
+public protocol GameObjectPhysicsComponent: GameWorldMemberObserver {
     
     var mass: Float { get } // in kg
     var thrust: Vector { get set }

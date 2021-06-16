@@ -22,10 +22,8 @@ public class GameObject: GameWorldMember
     public var position: Position {
         didSet {
             if (position != oldValue) {
-                graphics.receive(event: .memberChange(with: .position), from: self, payload: oldValue)
-                physics?.receive(event:.memberChange(with: .position), from: self, payload: oldValue)
-                state?.receive(event: .memberChange(with: .position), from: self, payload: oldValue)
                 changes.insert(.position)
+                broadcast(event: .memberChange(with: .position), payload: oldValue)
             }
         }
     }
@@ -34,24 +32,39 @@ public class GameObject: GameWorldMember
     public var velocity: Vector {
         didSet {
             if (velocity != oldValue) {
-                state?.receive(event: .memberChange(with: .velocity), from: self, payload: oldValue)
                 changes.insert(.velocity)
+                broadcast(event: .memberChange(with: .velocity), payload: oldValue)
             }
         }
     }
-    
+
     private var changes: GameWorldMemberChanges = []
+    private var observers: NSHashTable<AnyObject>
     
-    // MARK: Init
+    // MARK: - Init
     
     public init(graphics graphicsComponent: GameWorldMemberGraphicsComponent,
                 physics physicsComponent: GameObjectPhysicsComponent? = nil,
                 input inputComponent: GameObjectInputComponent? = nil)
     {
         state = nil
+        
+        observers = NSHashTable<AnyObject>.weakObjects()
+        
         graphics = graphicsComponent
+        defer {
+            add(observer: graphics)
+        }
+        
         physics = physicsComponent
+        defer {
+            if physics != nil {
+                observers.add(physics!)
+            }
+        }
+        
         input = inputComponent
+        
         position = .zero
         velocity = .zero
         
@@ -68,7 +81,7 @@ public class GameObject: GameWorldMember
         #endif
     }
     
-    // MARK: Update
+    // MARK: - Update
 
     public func update(_ dt: Float, in world: GameWorld) -> GameWorldMemberChanges
     {
@@ -83,26 +96,53 @@ public class GameObject: GameWorldMember
         return changes
     }
     
-    // MARK: State
+    // MARK: - State
 
     public func enter(state newState: GameObjectState) {
         state = newState
         state?.enter(with: self)
         changes.insert(.state)
+        observers.objectEnumerator().forEach { observer in
+            (observer as? GameWorldMemberObserver)?.receive(event: .memberChange(with: .state), from: self, payload: nil)
+        }
     }
     
     public func push(state newState: GameObjectState) {
-        var newState = newState
+        let newState = newState
         newState.fallbackState = state
         enter(state: newState)
         changes.insert(.state)
+        observers.objectEnumerator().forEach { observer in
+            (observer as? GameWorldMemberObserver)?.receive(event: .memberChange(with: .state), from: self, payload: nil)
+        }
     }
     
     public func exitState() {
         state = state?.fallbackState
         state?.reset(with: self)
         changes.insert(.state)
+        observers.objectEnumerator().forEach { observer in
+            (observer as? GameWorldMemberObserver)?.receive(event: .memberChange(with: .state), from: self, payload: nil)
+        }
     }
+    
+    // MARK: - Events
+    
+    public func add(observer: GameWorldMemberObserver) {
+        observers.add(observer)
+    }
+    
+    public func broadcast(event: GameWorldMemberEvent, payload: Any? = nil) {
+        state?.receive(event: event, from: self, payload: payload)
+        observers.objectEnumerator().forEach { observer in
+            (observer as? GameWorldMemberObserver)?.receive(event: event, from: self, payload: payload)
+        }
+    }
+    
+    public func remove(observer: GameWorldMemberObserver) {
+        observers.remove(observer)
+    }
+    
 }
 
 extension GameObject: Equatable {

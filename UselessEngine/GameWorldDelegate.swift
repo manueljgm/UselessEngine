@@ -6,7 +6,7 @@
 //  Copyright © 2021 Useless Robot. All rights reserved.
 //
 
-public protocol GameWorldDelegate: AnyObject, GameObjectObserver {
+public protocol GameWorldDelegate: GameWorldMemberObserver {
     
     func gameWorld(_ gameWorld: GameWorld, added gameWorldMember: GameWorldMember)
     func gameWorld(_ gameWorld: GameWorld, removed gameWorldMember: GameWorldMember)

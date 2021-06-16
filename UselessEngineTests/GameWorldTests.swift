@@ -59,7 +59,7 @@ fileprivate class TestObjectPhysicsComponent: GameObjectPhysicsComponent {
         // do nothing
     }
     
-    func receive(event: GameWorldMemberEvent, from sender: GameObject, payload: Any?) {
+    func receive(event: GameWorldMemberEvent, from sender: GameWorldMember, payload: Any?) {
         switch event {
         case .memberChange(let changes):
             if changes.contains(.position) {

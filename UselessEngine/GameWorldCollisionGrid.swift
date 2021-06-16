@@ -9,8 +9,8 @@
 public class GameWorldCollisionGrid {
 
     private var collisionCellSize: Vector2d
-    private var collisionCellPositionsByGameObject: [GameObject: [UnitPosition]]
-    private var gameObjectsByCellPosition: [UnitPosition: [GameObject]]
+    private var collisionCellPositionsByGameObject: [GameObject: Set<UnitPosition>]
+    private var gameObjectsByCellPosition: [UnitPosition: Set<GameObject>]
 
     init(cellSize: Vector2d) {
         self.gameObjectsByCellPosition = [:]
@@ -27,12 +27,12 @@ public class GameWorldCollisionGrid {
             
             if currentPositions != previousPositions {
                 previousPositions.forEach {
-                    gameObjectsByCellPosition[$0]?.removeAll(where: { $0 == gameObject })
+                    gameObjectsByCellPosition[$0]?.remove(gameObject)
                 }
                 
                 currentPositions.forEach {
                     var gameObjects = gameObjectsByCellPosition[$0] ?? []
-                    gameObjects.append(gameObject)
+                    gameObjects.insert(gameObject)
                     gameObjectsByCellPosition[$0] = gameObjects
                     // TODO: Can this be optimized?
                 }
@@ -44,7 +44,7 @@ public class GameWorldCollisionGrid {
     
     func remove(gameObject: GameObject) {
         collisionCellPositionsByGameObject[gameObject]?.forEach { cellPosition in
-            gameObjectsByCellPosition[cellPosition]?.removeAll(where: { $0 == gameObject })
+            gameObjectsByCellPosition[cellPosition]?.remove(gameObject)
             collisionCellPositionsByGameObject.removeValue(forKey: gameObject)
         }
     }
@@ -161,7 +161,7 @@ public class GameWorldCollisionGrid {
     
     // MARK: - Helper Methods
     
-    private func gridPositions(below boundingBox: AABB) -> [UnitPosition]
+    private func gridPositions(below boundingBox: AABB) -> Set<UnitPosition>
     {
         // calculate bottom left grid corner contain with padding
         let bottomLeftX = Int(floor((boundingBox.center.x - boundingBox.halfwidths.dx) / collisionCellSize.dx))
@@ -171,10 +171,10 @@ public class GameWorldCollisionGrid {
         let topRightX = Int(floor((boundingBox.center.x + boundingBox.halfwidths.dx) / collisionCellSize.dx))
         let topRightY = Int(floor((boundingBox.center.y + boundingBox.halfwidths.dy) / collisionCellSize.dy))
 
-        var gridPositions: [UnitPosition] = []
+        var gridPositions: Set<UnitPosition> = []
         (bottomLeftY...topRightY).forEach { y in
             (bottomLeftX...topRightX).forEach { x in
-                gridPositions.append(UnitPosition(x: x, y: y))
+                gridPositions.insert(UnitPosition(x: x, y: y))
             }
         }
 

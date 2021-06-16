@@ -51,7 +51,7 @@ open class GameObjectStateWithGraphicsBehavior<TGraphicsComponent: GameObjectSta
         
     }
 
-    public final func receive(event: GameWorldMemberEvent, from sender: GameObject, payload: Any? = nil) {
+    public final func receive(event: GameWorldMemberEvent, from sender: GameWorldMember, payload: Any? = nil) {
         graphics?.receive(event: event, from: sender, payload: payload)
     }
     

@@ -6,7 +6,7 @@
 //  Copyright © 2015 Useless Robot. All rights reserved.
 //
 
-public enum GameWorldMemberEvent {
+public enum GameWorldMemberEvent: Equatable {
     
     case memberChange(with: GameWorldMemberChanges)
     case memberEvent(byId: UUID)

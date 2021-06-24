@@ -15,6 +15,7 @@ public class GameObject: GameWorldMember
     public private(set) var state: GameObjectState?
 
     public let graphics: GameWorldMemberGraphicsComponent
+    public let audio: GameObjectAudioComponent?
     public let physics: GameObjectPhysicsComponent?
     public var input: GameObjectInputComponent?
     
@@ -44,12 +45,15 @@ public class GameObject: GameWorldMember
     // MARK: - Init
     
     public init(graphics graphicsComponent: GameWorldMemberGraphicsComponent,
+                audio audioComponent: GameObjectAudioComponent? = nil,
                 physics physicsComponent: GameObjectPhysicsComponent? = nil,
                 input inputComponent: GameObjectInputComponent? = nil)
     {
         state = nil
         
         observers = NSHashTable<AnyObject>.weakObjects()
+        
+        audio = audioComponent
         
         graphics = graphicsComponent
         defer {

@@ -8,8 +8,8 @@
 
 import UselessCommon
 
-public class GameWorld
-{
+public class GameWorld {
+    
     public weak var delegate: GameWorldDelegate?
     
     public var isPaused: Bool
@@ -29,8 +29,8 @@ public class GameWorld
                 tileSize: Vector2d,
                 collisionCellSize: Vector2d,
                 collisionDelegate: GameWorldCollisionDelegate,
-                pathGraphDelegate: GameWorldGraphDelegate)
-    {
+                pathGraphDelegate: GameWorldGraphDelegate) {
+        
         self.isPaused = false
         self.gravity = gravity
         self.size = (.zero, .zero)
@@ -54,8 +54,7 @@ public class GameWorld
         #endif
     }
 
-    public func add(gameTile: GameTile) -> Bool
-    {
+    public func add(gameTile: GameTile) -> Bool {
         let success = terrain.add(tile: gameTile)
         if success {
             size.width = max(size.width, gameTile.position.x + gameTile.size.width)
@@ -88,8 +87,7 @@ public class GameWorld
         #endif
     }
     
-    public func add(member: GameWorldMember)
-    {
+    public func add(member: GameWorldMember) {
         switch member {
             case let gameTile as GameTile:
                 let _ = add(gameTile: gameTile)
@@ -139,28 +137,31 @@ public class GameWorld
 
             // if the object's position changed, check and resolve for boundaries or collisions
             if changesObserved.contains(.position) {
-                
                 // update the collision grid for position changes
                 collisionGrid.update(for: gameObject)
 
                 // resolve any collisions
                 collisionGrid.onNeighbors(of: gameObject) { otherObject in
-                    guard let gameObjectPhysics = gameObject.physics,
-                          let gameObjectCollisionDelegate = gameObjectPhysics.collisionDelegate,
-                          let otherObjectPhysics = otherObject.physics,
-                          let otherObjectCollisionDelegate = otherObjectPhysics.collisionDelegate
+                    guard let gameObjectCollisionDelegate = gameObject.physics?.collisionDelegate,
+                          let otherObjectCollisionDelegate = otherObject.physics?.collisionDelegate
                     else {
                         return
                     }
 
-                    if otherObjectCollisionDelegate.collisionBitmask.contains(gameObjectCollisionDelegate.categoryBitmask)
-                        && gameObjectCollisionDelegate.collisionBitmask.contains(otherObjectCollisionDelegate.categoryBitmask)
-                    {
-                        // resolve potential collision
-                        if let hit = gameObjectCollisionDelegate.contactAABB.intersect(otherObjectCollisionDelegate.contactAABB),
-                           let corrections = collisionDelegate.resolveCollision(on: gameObject, against: otherObject, for: hit)
-                        {
-                            // a hit occurred, so call collision handlers
+                    // check for a hit
+                    if let hit = gameObjectCollisionDelegate.contactAABB.intersect(otherObjectCollisionDelegate.contactAABB) {
+                        // a hit is detected so if contactable,
+                        // handle the contact
+                        if collisionDelegate.isGameObject(gameObject, contactableWith: otherObject) {
+                            // call event handlers
+                            gameObjectCollisionDelegate.handleContact(between: gameObject, and: otherObject, in: self)
+                            otherObjectCollisionDelegate.handleContact(between: otherObject, and: gameObject, in: self)
+                        }
+                        // and if collidable, handle collision
+                        if collisionDelegate.isGameObject(gameObject, collidableWith: otherObject) {
+                            // resolve the collision by correcting positions
+                            let corrections = collisionDelegate.resolveCollision(on: gameObject, against: otherObject, for: hit)
+                            // then call event handlers
                             gameObjectCollisionDelegate.handleCollision(between: gameObject,
                                                                           and: otherObject,
                                                                           withCorrection: corrections.thisCorrection,
@@ -169,7 +170,6 @@ public class GameWorld
                                                                          and: gameObject,
                                                                          withCorrection: corrections.otherCorrection,
                                                                          in: self)
-                            
                             // and update the collision grid for changes
                             if corrections.thisCorrection != .zero {
                                 collisionGrid.update(for: gameObject)
@@ -187,11 +187,10 @@ public class GameWorld
         terrain.update(dt: dt, in: self)
     }
 
-    public func elevation(at point: PlaneCoordinate) -> Float
-    {
+    public func elevation(at point: PlaneCoordinate) -> Float {
         return terrain.elevation(at: point)
     }
-
+    
 }
 
 extension GameWorld: Equatable {

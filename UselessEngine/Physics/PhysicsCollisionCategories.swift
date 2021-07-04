@@ -15,7 +15,7 @@ public struct PhysicsCollisionCategories : OptionSet {
         self.rawValue = rawValue
     }
     
-    public static let None = PhysicsCollisionCategories([])
-    public static let All = PhysicsCollisionCategories(rawValue: UInt.max)
+    public static let none = PhysicsCollisionCategories([])
+    public static let all = PhysicsCollisionCategories(rawValue: UInt.max)
 
 }

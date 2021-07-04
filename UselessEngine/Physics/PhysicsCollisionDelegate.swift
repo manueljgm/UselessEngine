@@ -6,8 +6,8 @@
 //  Copyright © 2015 Useless Robot. All rights reserved.
 //
 
-public protocol PhysicsCollisionDelegate
-{
+public protocol PhysicsCollisionDelegate {
+    
     var categoryBitmask: PhysicsCollisionCategories { get }
     var contactBitmask: PhysicsCollisionCategories { get }
     var collisionBitmask: PhysicsCollisionCategories { get }
@@ -15,16 +15,28 @@ public protocol PhysicsCollisionDelegate
     var contactAABB: AABB { get set }
     var contactWithConsequences: Bool { get set }
  
-    func handleContact(between gameObject: GameObject, and otherGameObject: GameObject)
+    func didUpdate(dt: Float)
+    
+    func handleContact(between gameObject: GameObject,
+                       and otherObject: GameObject,
+                       in world: GameWorld)
+    
     func handleCollision(between gameObject: GameObject,
-                         and otherGameObject: GameObject,
+                         and otherObject: GameObject,
                          withCorrection correctionOffset: Vector,
                          in world: GameWorld)
+    
 }
 
-extension PhysicsCollisionDelegate
-{
-    public func handleContact(between gameObject: GameObject, and otherGameObject: GameObject) {
+extension PhysicsCollisionDelegate {
+
+    public func didUpdate(dt: Float) {
+        
+    }
+    
+    public func handleContact(between gameObject: GameObject,
+                              and otherGameObject: GameObject,
+                              in world: GameWorld) {
         
     }
     
@@ -34,4 +46,5 @@ extension PhysicsCollisionDelegate
                                 in world: GameWorld) {
 
     }
+    
 }

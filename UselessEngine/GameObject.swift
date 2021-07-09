@@ -16,7 +16,7 @@ public class GameObject: GameWorldMember
 
     public let graphics: GameWorldMemberGraphicsComponent
     public let audio: GameObjectAudioComponent?
-    public let physics: GameObjectPhysicsComponent?
+    public let physics: GameObjectPhysicsComponent
     public var input: GameObjectInputComponent?
     
     /// The object's position.
@@ -46,7 +46,7 @@ public class GameObject: GameWorldMember
     
     public init(graphics graphicsComponent: GameWorldMemberGraphicsComponent,
                 audio audioComponent: GameObjectAudioComponent? = nil,
-                physics physicsComponent: GameObjectPhysicsComponent? = nil,
+                physics physicsComponent: GameObjectPhysicsComponent,
                 input inputComponent: GameObjectInputComponent? = nil)
     {
         state = nil
@@ -62,9 +62,7 @@ public class GameObject: GameWorldMember
         
         physics = physicsComponent
         defer {
-            if physics != nil {
-                observers.add(physics!)
-            }
+            add(observer: physics)
         }
         
         input = inputComponent
@@ -91,7 +89,7 @@ public class GameObject: GameWorldMember
     {
         input?.update(with: self, dt: dt)
         state?.update(with: self, in: world, dt: dt)
-        physics?.update(with: self, in: world, dt: dt)
+        physics.update(with: self, in: world, dt: dt)
         graphics.update(with: self, dt: dt)
 
         defer {

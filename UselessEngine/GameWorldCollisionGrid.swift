@@ -18,28 +18,26 @@ public class GameWorldCollisionGrid {
         self.collisionCellSize = cellSize
     }
     
-    func update(for gameObject: GameObject)
-    {
-        if let collisionBox = gameObject.physics?.collisionDelegate?.contactAABB
-        {
-            let previousPositions = collisionCellPositionsByGameObject[gameObject] ?? []
-            let currentPositions = gridPositions(below: collisionBox)
-            
-            if currentPositions != previousPositions {
-                previousPositions.forEach {
-                    gameObjectsByCellPosition[$0]?.remove(gameObject)
-                }
-                
-                currentPositions.forEach {
-                    var gameObjects = gameObjectsByCellPosition[$0] ?? []
-                    gameObjects.insert(gameObject)
-                    gameObjectsByCellPosition[$0] = gameObjects
-                    // TODO: Can this be optimized?
-                }
+    func update(for gameObject: GameObject) {
+        let collisionBox = gameObject.physics.collisionDelegate.contactAABB
+
+        let previousPositions = collisionCellPositionsByGameObject[gameObject] ?? []
+        let currentPositions = gridPositions(below: collisionBox)
+        
+        if currentPositions != previousPositions {
+            previousPositions.forEach {
+                gameObjectsByCellPosition[$0]?.remove(gameObject)
             }
             
-            collisionCellPositionsByGameObject[gameObject] = currentPositions
+            currentPositions.forEach {
+                var gameObjects = gameObjectsByCellPosition[$0] ?? []
+                gameObjects.insert(gameObject)
+                gameObjectsByCellPosition[$0] = gameObjects
+                // TODO: Can this be optimized?
+            }
         }
+        
+        collisionCellPositionsByGameObject[gameObject] = currentPositions
     }
     
     func remove(gameObject: GameObject) {
@@ -68,16 +66,9 @@ public class GameWorldCollisionGrid {
         guard let gameObjects = gameObjectsByCellPosition[cellPosition], gameObjects.count > 0 else {
             return false
         }
-        
-        for gameObject in gameObjects {
-            if match(gameObject) {
-                if let collisionBox = gameObject.physics?.collisionDelegate?.contactAABB, collisionBox.contains(position) {
-                    return true
-                }
-            }
-        }
-        
-        return false
+
+        let match = gameObjects.contains(where: { match($0) && $0.physics.collisionDelegate.contactAABB.contains(position) })
+        return match
     }
     
     public func nextObject(between startPosition: Position,
@@ -129,7 +120,7 @@ public class GameWorldCollisionGrid {
         for _ in stride(from: n, to: 0, by: -1) {
             var nearestResult: (GameObject?, Vector) = (nil, Vector(dx: .infinity, dy: .infinity, dz: .infinity))
             gameObjectsByCellPosition[UnitPosition(x: x, y: y)]?.forEach { gameObject in
-                if match(gameObject), let intersectDistance = gameObject.physics?.collisionDelegate?.contactAABB.intersect(ray, ignoringZ: true) {
+                if match(gameObject), let intersectDistance = gameObject.physics.collisionDelegate.contactAABB.intersect(ray, ignoringZ: true) {
                     if intersectDistance.magnitude < nearestResult.1.magnitude {
                         // store the closer match
                         nearestResult = (gameObject, intersectDistance)

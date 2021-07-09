@@ -20,7 +20,7 @@ public class GameWorld {
     public private(set) var checkpoints: [Position]
     public private(set) var terrain: GameWorldTerrain
     public let collisionGrid: GameWorldCollisionGrid
-    public let pathGraph: GameWorldGraph
+    public let pathGraph: GameWorldGraph?
     
     private let collisionDelegate: GameWorldCollisionDelegate
 
@@ -29,7 +29,7 @@ public class GameWorld {
                 tileSize: Vector2d,
                 collisionCellSize: Vector2d,
                 collisionDelegate: GameWorldCollisionDelegate,
-                pathGraphDelegate: GameWorldGraphDelegate) {
+                pathGraphDelegate: GameWorldGraphDelegate? = nil) {
         
         self.isPaused = false
         self.gravity = gravity
@@ -41,7 +41,11 @@ public class GameWorld {
         self.collisionGrid = GameWorldCollisionGrid(cellSize: collisionCellSize)
         self.collisionDelegate = collisionDelegate
 
-        self.pathGraph = GameWorldGraph(graphDelegate: pathGraphDelegate)
+        if let pathGraphDelegate = pathGraphDelegate {
+            self.pathGraph = GameWorldGraph(graphDelegate: pathGraphDelegate)
+        } else {
+            self.pathGraph = nil
+        }
 
         #if DEBUG_VERBOSE
         print("GameWorld:init")
@@ -142,31 +146,26 @@ public class GameWorld {
 
                 // resolve any collisions
                 collisionGrid.onNeighbors(of: gameObject) { otherObject in
-                    guard let gameObjectCollisionDelegate = gameObject.physics?.collisionDelegate,
-                          let otherObjectCollisionDelegate = otherObject.physics?.collisionDelegate
-                    else {
-                        return
-                    }
-
                     // check for a hit
-                    if let hit = gameObjectCollisionDelegate.contactAABB.intersect(otherObjectCollisionDelegate.contactAABB) {
+                    if let hit = gameObject.physics.collisionDelegate.contactAABB
+                        .intersect(otherObject.physics.collisionDelegate.contactAABB) {
                         // a hit is detected so if contactable,
                         // handle the contact
                         if collisionDelegate.isGameObject(gameObject, contactableWith: otherObject) {
                             // call event handlers
-                            gameObjectCollisionDelegate.handleContact(between: gameObject, and: otherObject, in: self)
-                            otherObjectCollisionDelegate.handleContact(between: otherObject, and: gameObject, in: self)
+                            gameObject.physics.collisionDelegate.handleContact(between: gameObject, and: otherObject, in: self)
+                            otherObject.physics.collisionDelegate.handleContact(between: otherObject, and: gameObject, in: self)
                         }
                         // and if collidable, handle collision
                         if collisionDelegate.isGameObject(gameObject, collidableWith: otherObject) {
                             // resolve the collision by correcting positions
                             let corrections = collisionDelegate.resolveCollision(on: gameObject, against: otherObject, for: hit)
                             // then call event handlers
-                            gameObjectCollisionDelegate.handleCollision(between: gameObject,
+                            gameObject.physics.collisionDelegate.handleCollision(between: gameObject,
                                                                           and: otherObject,
                                                                           withCorrection: corrections.thisCorrection,
                                                                           in: self)
-                            otherObjectCollisionDelegate.handleCollision(between: otherObject,
+                            otherObject.physics.collisionDelegate.handleCollision(between: otherObject,
                                                                          and: gameObject,
                                                                          withCorrection: corrections.otherCorrection,
                                                                          in: self)

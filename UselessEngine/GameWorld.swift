@@ -128,7 +128,7 @@ public class GameWorld {
         delegate?.gameWorld(self, removed: gameObject)
     }
     
-    public func update(_ dt: Float)
+    public func update(_ dt: Float, matchCriteria: (GameObject) -> Bool = { _ in return true })
     {
         if isPaused {
             return
@@ -136,6 +136,11 @@ public class GameWorld {
 
         // update all game objects
         objects.forEach { gameObject in
+            // match the game object
+            guard matchCriteria(gameObject) else {
+                return
+            }
+            
             // update the game object
             let changesObserved = gameObject.update(dt, in: self)
 

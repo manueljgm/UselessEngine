@@ -12,8 +12,7 @@ public protocol PhysicsCollisionDelegate: AnyObject {
     var contactBitmask: PhysicsCollisionCategories { get }
     var collisionBitmask: PhysicsCollisionCategories { get }
     
-    var contactAABB: AABB { get set }
-    var contactWithConsequences: Bool { get set }
+    var contactAABB: AABB { get set }          
  
     func didUpdate(dt: Float)
     

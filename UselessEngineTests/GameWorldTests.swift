@@ -36,7 +36,6 @@ fileprivate class TestObjectPhysicsCollision: PhysicsCollisionDelegate {
     var contactBitmask: PhysicsCollisionCategories = .All
     var collisionBitmask: PhysicsCollisionCategories = .All
     var contactAABB: AABB
-    var contactWithConsequences: Bool = false
     init(aabb: AABB) {
         contactAABB = aabb
     }

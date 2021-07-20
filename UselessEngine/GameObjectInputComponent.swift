@@ -8,7 +8,7 @@
 
 public protocol GameObjectInputComponent: AnyObject {
 
-    func queue(command: GameObjectCommand)
+    func queue(command: GameObjectCommand, payload: AnyObject?)
     func update(with owner: GameObject, dt: Float)
 
 }

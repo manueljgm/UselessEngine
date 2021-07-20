@@ -15,7 +15,7 @@ public protocol GameObjectState: GameWorldMemberObserver {
     var fallbackState: GameObjectState? { get set }
 
     func enter(with gameObject: GameObject)
-    func handle(command: GameObjectCommand, for gameObject: GameObject)
+    func handle(command: GameObjectCommand, on gameObject: GameObject, payload: AnyObject?)
     func update(with gameObject: GameObject, in world: GameWorld, dt: Float)
     func reset(with gameObject: GameObject)
     
@@ -23,8 +23,8 @@ public protocol GameObjectState: GameWorldMemberObserver {
 
 extension GameObjectState {
 
-    public func handle(command: GameObjectCommand, for gameObject: GameObject) {
-        
+    public func handle(command: GameObjectCommand, on gameObject: GameObject, payload: AnyObject?) {
+
     }
     
     public func reset(with gameObject: GameObject) {

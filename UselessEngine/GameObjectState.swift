@@ -17,7 +17,7 @@ public protocol GameObjectState: GameWorldMemberObserver {
     func enter(with gameObject: GameObject)
     func handle(command: GameObjectCommand, on gameObject: GameObject, payload: AnyObject?)
     func update(with gameObject: GameObject, in world: GameWorld, dt: Float)
-    func reset(with gameObject: GameObject)
+    func reenter(with gameObject: GameObject)
     
 }
 
@@ -27,7 +27,7 @@ extension GameObjectState {
 
     }
     
-    public func reset(with gameObject: GameObject) {
+    public func reenter(with gameObject: GameObject) {
         
     }
 

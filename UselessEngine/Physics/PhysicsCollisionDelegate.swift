@@ -9,8 +9,8 @@
 public protocol PhysicsCollisionDelegate: AnyObject {
     
     var categoryBitmask: PhysicsCollisionCategories { get }
-    var contactBitmask: PhysicsCollisionCategories { get }
-    var collisionBitmask: PhysicsCollisionCategories { get }
+    var contactBitmask: PhysicsCollisionCategories { get set }
+    var collisionBitmask: PhysicsCollisionCategories { get set }
     
     var contactAABB: AABB { get set }          
  

@@ -121,7 +121,7 @@ public class GameObject: GameWorldMember
     
     public func exitState() {
         state = state?.fallbackState
-        state?.reset(with: self)
+        state?.reenter(with: self)
         changes.insert(.state)
         observers.objectEnumerator().forEach { observer in
             (observer as? GameWorldMemberObserver)?.receive(event: .memberChange(with: .state), from: self, payload: nil)

@@ -101,6 +101,7 @@ public class GameObject: GameWorldMember
     // MARK: - State
 
     public func enter(state newState: GameObjectState) {
+        state?.willExit(with: self)
         state = newState
         state?.enter(with: self)
         changes.insert(.state)
@@ -113,13 +114,10 @@ public class GameObject: GameWorldMember
         let newState = newState
         newState.fallbackState = state
         enter(state: newState)
-        changes.insert(.state)
-        observers.objectEnumerator().forEach { observer in
-            (observer as? GameWorldMemberObserver)?.receive(event: .memberChange(with: .state), from: self, payload: nil)
-        }
     }
     
     public func exitState() {
+        state?.willExit(with: self)
         state = state?.fallbackState
         state?.reenter(with: self)
         changes.insert(.state)

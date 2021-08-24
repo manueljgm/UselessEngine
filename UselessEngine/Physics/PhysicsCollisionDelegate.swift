@@ -12,9 +12,7 @@ public protocol PhysicsCollisionDelegate: AnyObject {
     var contactBitmask: PhysicsCollisionCategories { get set }
     var collisionBitmask: PhysicsCollisionCategories { get set }
     
-    var contactAABB: AABB { get set }          
- 
-    func didUpdate(dt: Float)
+    var contactAABB: AABB { get set }
     
     func handleContact(between gameObject: GameObject,
                        and otherObject: GameObject,
@@ -28,10 +26,6 @@ public protocol PhysicsCollisionDelegate: AnyObject {
 }
 
 extension PhysicsCollisionDelegate {
-
-    public func didUpdate(dt: Float) {
-        
-    }
     
     public func handleContact(between gameObject: GameObject,
                               and otherGameObject: GameObject,

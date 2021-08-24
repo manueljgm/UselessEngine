@@ -21,7 +21,6 @@
 		1A32FC5424C1E36700CE3B0F /* GameObjectInputComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC2924C1E36400CE3B0F /* GameObjectInputComponent.swift */; };
 		1A32FC5524C1E36700CE3B0F /* GameObjectState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC2A24C1E36400CE3B0F /* GameObjectState.swift */; };
 		1A32FC5724C1E36700CE3B0F /* GameWorldMemberGraphicsComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC2C24C1E36400CE3B0F /* GameWorldMemberGraphicsComponent.swift */; };
-		1A32FC5824C1E36700CE3B0F /* GameObjectSubcomponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC2D24C1E36400CE3B0F /* GameObjectSubcomponent.swift */; };
 		1A32FC5924C1E36700CE3B0F /* GameTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC2E24C1E36500CE3B0F /* GameTile.swift */; };
 		1A32FC5A24C1E36700CE3B0F /* GameObjectStateWithSimpleBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC2F24C1E36500CE3B0F /* GameObjectStateWithSimpleBehavior.swift */; };
 		1A32FC5B24C1E36700CE3B0F /* Hit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A32FC3024C1E36500CE3B0F /* Hit.swift */; };
@@ -60,6 +59,7 @@
 		1ACEEFED25CB920700095943 /* AABBTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ACEEFEC25CB920700095943 /* AABBTests.swift */; };
 		1ADC0D3225D37B5A0085CCEE /* GeometryComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ADC0D3125D37B5A0085CCEE /* GeometryComponent.swift */; };
 		1ADC0D3C25DCBACB0085CCEE /* GameWorldTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ADC0D3B25DCBACB0085CCEE /* GameWorldTests.swift */; };
+		1AF4E08026D4207700DA47C5 /* PhysicsThrustDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF4E07F26D4207700DA47C5 /* PhysicsThrustDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -95,7 +95,6 @@
 		1A32FC2924C1E36400CE3B0F /* GameObjectInputComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameObjectInputComponent.swift; sourceTree = "<group>"; };
 		1A32FC2A24C1E36400CE3B0F /* GameObjectState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameObjectState.swift; sourceTree = "<group>"; };
 		1A32FC2C24C1E36400CE3B0F /* GameWorldMemberGraphicsComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameWorldMemberGraphicsComponent.swift; sourceTree = "<group>"; };
-		1A32FC2D24C1E36400CE3B0F /* GameObjectSubcomponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameObjectSubcomponent.swift; sourceTree = "<group>"; };
 		1A32FC2E24C1E36500CE3B0F /* GameTile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameTile.swift; sourceTree = "<group>"; };
 		1A32FC2F24C1E36500CE3B0F /* GameObjectStateWithSimpleBehavior.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameObjectStateWithSimpleBehavior.swift; sourceTree = "<group>"; };
 		1A32FC3024C1E36500CE3B0F /* Hit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hit.swift; sourceTree = "<group>"; };
@@ -136,6 +135,7 @@
 		1ACEEFEC25CB920700095943 /* AABBTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AABBTests.swift; sourceTree = "<group>"; };
 		1ADC0D3125D37B5A0085CCEE /* GeometryComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeometryComponent.swift; sourceTree = "<group>"; };
 		1ADC0D3B25DCBACB0085CCEE /* GameWorldTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldTests.swift; sourceTree = "<group>"; };
+		1AF4E07F26D4207700DA47C5 /* PhysicsThrustDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsThrustDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -191,7 +191,6 @@
 				1A317E2325BA8305004358E3 /* GameWorldMemberChanges.swift */,
 				1A32FC4124C1E36600CE3B0F /* GameWorldMember.swift */,
 				1A5BDF28267E88D100E96D04 /* GameObjectAudioComponent.swift */,
-				1A32FC2D24C1E36400CE3B0F /* GameObjectSubcomponent.swift */,
 				1A32FC4D24C1E36700CE3B0F /* GameObjectPhysicsComponent.swift */,
 				1A32FC3824C1E36500CE3B0F /* GameObjectCommand.swift */,
 				1A32FC2924C1E36400CE3B0F /* GameObjectInputComponent.swift */,
@@ -241,6 +240,7 @@
 				1A32FC3024C1E36500CE3B0F /* Hit.swift */,
 				1A31D3FF25CCF497004837C9 /* Ray.swift */,
 				1AC6463024CBC4CE007D8C21 /* Boost.swift */,
+				1AF4E07F26D4207700DA47C5 /* PhysicsThrustDelegate.swift */,
 				1A32FC4024C1E36600CE3B0F /* PhysicsCollisionCategories.swift */,
 				1A32FC4524C1E36600CE3B0F /* PhysicsCollisionDelegate.swift */,
 			);
@@ -409,9 +409,9 @@
 				1AB525FC25F70F0B00CDC6B0 /* GameWorldGraphDelegate.swift in Sources */,
 				1A5BDF29267E88D100E96D04 /* GameObjectAudioComponent.swift in Sources */,
 				1A32FC4F24C1E36700CE3B0F /* GameWorldCollisionDelegate.swift in Sources */,
+				1AF4E08026D4207700DA47C5 /* PhysicsThrustDelegate.swift in Sources */,
 				1A32FC6024C1E36700CE3B0F /* GameTileElevation.swift in Sources */,
 				1A32FC5924C1E36700CE3B0F /* GameTile.swift in Sources */,
-				1A32FC5824C1E36700CE3B0F /* GameObjectSubcomponent.swift in Sources */,
 				1A32FC7324C1E36700CE3B0F /* GameObjectCommandQueueingComponent.swift in Sources */,
 				1A32FC5A24C1E36700CE3B0F /* GameObjectStateWithSimpleBehavior.swift in Sources */,
 				1A2010CD25B377DA00776B52 /* GameWorldCollisionGrid.swift in Sources */,

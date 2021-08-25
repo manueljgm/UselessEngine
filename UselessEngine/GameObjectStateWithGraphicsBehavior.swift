@@ -23,8 +23,7 @@ open class GameObjectStateWithGraphicsBehavior<TGraphicsComponent: GameObjectSta
         #endif
     }
     
-    public final func enter(with gameObject: GameObject)
-    {
+    public final func enter(with gameObject: GameObject) {
         #if DEBUG_VERBOSE
         print("GameObjectStateWithGraphicsBehavior:enter")
         #endif

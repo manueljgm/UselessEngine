@@ -152,25 +152,25 @@ public class GameWorld {
                 // resolve any collisions
                 collisionGrid.onNeighbors(of: gameObject) { otherObject in
                     // check for a hit
-                    if let hit = gameObject.physics.collisionDelegate.contactAABB
-                        .intersect(otherObject.physics.collisionDelegate.contactAABB) {
+                    if let hit = gameObject.physics.collision.contactAABB
+                        .intersect(otherObject.physics.collision.contactAABB) {
                         // a hit is detected so if contactable,
                         // handle the contact
                         if collisionDelegate.isGameObject(gameObject, contactableWith: otherObject) {
                             // call event handlers
-                            gameObject.physics.collisionDelegate.handleContact(between: gameObject, and: otherObject, in: self)
-                            otherObject.physics.collisionDelegate.handleContact(between: otherObject, and: gameObject, in: self)
+                            gameObject.state?.handleContact(between: gameObject, and: otherObject, in: self)
+                            otherObject.state?.handleContact(between: otherObject, and: gameObject, in: self)
                         }
                         // and if collidable, handle collision
                         if collisionDelegate.isGameObject(gameObject, collidableWith: otherObject) {
                             // resolve the collision by correcting positions
                             let corrections = collisionDelegate.resolveCollision(on: gameObject, against: otherObject, for: hit)
                             // then call event handlers
-                            gameObject.physics.collisionDelegate.handleCollision(between: gameObject,
+                            gameObject.state?.handleCollision(between: gameObject,
                                                                           and: otherObject,
                                                                           withCorrection: corrections.thisCorrection,
                                                                           in: self)
-                            otherObject.physics.collisionDelegate.handleCollision(between: otherObject,
+                            otherObject.state?.handleCollision(between: otherObject,
                                                                          and: gameObject,
                                                                          withCorrection: corrections.otherCorrection,
                                                                          in: self)

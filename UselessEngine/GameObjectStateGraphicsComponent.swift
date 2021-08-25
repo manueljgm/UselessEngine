@@ -8,12 +8,11 @@
 
 import SpriteKit
 
-public protocol GameObjectStateGraphicsComponent: GameWorldMemberObserver {
+public protocol GameObjectStateGraphicsComponent: GameWorldUpdateable, GameWorldMemberObserver {
 
     var animation: Animation { get }
 
     init(ownerState: GameObjectState, targetSprite: SKSpriteNode)
-    func update(with owner: GameObject, in world: GameWorld, dt: Float)
 
 }
 

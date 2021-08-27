@@ -10,6 +10,7 @@ public protocol GameObjectState: GameWorldUpdateable, GameWorldMemberObserver, G
 
     var id: UUID { get }
     
+    @available(*, deprecated)
     var isOutOfAction: Bool { get }
     
     var fallbackState: GameObjectState? { get set }

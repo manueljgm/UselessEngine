@@ -10,8 +10,9 @@ import Foundation
 
 public class GameWorldTerrain {
 
-    private var tileSize: Vector2d
-    private var tiles: Set<GameTile>
+    public private(set) var tileSize: Vector2d
+    public private(set) var tiles: Set<GameTile>
+    
     private var tileByGridPosition: [UnitPosition: GameTile]
     
     public init(tileSize: Vector2d) {

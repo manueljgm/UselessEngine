@@ -6,17 +6,18 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
-public protocol GameObjectState: GameWorldMemberObserver {
+public protocol GameObjectState: GameWorldUpdateable, GameWorldMemberObserver, GameObjectCollisionDelegate {
 
+    @available(*, deprecated)
     var id: UUID { get }
     
+    @available(*, deprecated)
     var isOutOfAction: Bool { get }
     
     var fallbackState: GameObjectState? { get set }
 
     func enter(with gameObject: GameObject)
     func handle(command: GameObjectCommand, on gameObject: GameObject, payload: AnyObject?)
-    func update(with gameObject: GameObject, in world: GameWorld, dt: Float)
     func reenter(with gameObject: GameObject)
     func willExit(with gameObject: GameObject)
     

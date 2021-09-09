@@ -13,13 +13,16 @@ import SpriteKit
 // MARK: - Test Types
 
 fileprivate class TestWorldCollisionDelegate: GameWorldCollisionDelegate {
-    func resolveBoundaries(on gameObject: GameObject, in world: GameWorld) {
-        // do nothing
+    func isGameObject(_ gameObject: GameObject, contactableWith otherObject: GameObject) -> Bool {
+        return false
     }
     
-    func resolveCollision(on gameObject: GameObject, against otherObject: GameObject, for hit: Hit) -> (thisCorrection: Vector, otherCorrection: Vector)? {
-        // do nothing
-        return nil
+    func isGameObject(_ gameObject: GameObject, collidableWith otherObject: GameObject) -> Bool {
+        return false
+    }
+    
+    func resolveCollision(on gameObject: GameObject, against otherObject: GameObject, for hit: Hit) -> (thisCorrection: Vector, otherCorrection: Vector) {
+        return (.zero, .zero)
     }
 }
 
@@ -31,10 +34,10 @@ fileprivate class TestObjectGraphicsComponent: GameWorldMemberGraphicsComponent 
     }
 }
 
-fileprivate class TestObjectPhysicsCollision: PhysicsCollisionDelegate {
-    var categoryBitmask: PhysicsCollisionCategories = .All
-    var contactBitmask: PhysicsCollisionCategories = .All
-    var collisionBitmask: PhysicsCollisionCategories = .All
+fileprivate class TestObjectPhysicsCollision: GameObjectCollisionComponent {
+    var categoryBitmask: GameObjectCollisionCategories = .all
+    var contactBitmask: GameObjectCollisionCategories = .all
+    var collisionBitmask: GameObjectCollisionCategories = .all
     var contactAABB: AABB
     init(aabb: AABB) {
         contactAABB = aabb
@@ -42,16 +45,18 @@ fileprivate class TestObjectPhysicsCollision: PhysicsCollisionDelegate {
 }
 
 fileprivate class TestObjectPhysicsComponent: GameObjectPhysicsComponent {
-    var id: UUID = UUID()
-    var mass: Float = 1.0
-    var thrust: Vector = .zero
-    var boost: Boost? =  nil
-    var addDrag: Bool = false
-    
-    var collisionDelegate: PhysicsCollisionDelegate?
+    var mass: Float
+    var collision: GameObjectCollisionComponent
+    var gravityScale: Float
+    var thrust: GameObjectThrustComponent?
+    var distanceTraveled: Float
     
     init(aabb: AABB) {
-        collisionDelegate = TestObjectPhysicsCollision(aabb: aabb)
+        mass = 1.0
+        collision = TestObjectPhysicsCollision(aabb: aabb)
+        gravityScale = 1.0
+        thrust = nil
+        distanceTraveled = 0.0
     }
     
     func update(with owner: GameObject, in world: GameWorld, dt: Float) {
@@ -62,7 +67,7 @@ fileprivate class TestObjectPhysicsComponent: GameObjectPhysicsComponent {
         switch event {
         case .memberChange(let changes):
             if changes.contains(.position) {
-                collisionDelegate?.contactAABB.position = sender.position
+                collision.contactAABB.position = sender.position
             }
         default:
             break
@@ -129,8 +134,8 @@ class GameWorldTests: XCTestCase {
                                      physics: TestObjectPhysicsComponent(aabb: AABB(halfwidths: Vector(dx: 0.5, dy: 0.5, dz: 0.5))),
                                      input: nil)
         testObject2.position = Position(x: 3, y: 3)
-        testWorld.add(member: testObject2)
-        testWorld.add(member: testObject1)
+        testWorld.queue(gameObject: testObject2)
+        testWorld.queue(gameObject: testObject1)
         var result: (object: GameObject, distance: Vector)? = nil
         measure {
             result = testWorld.collisionGrid.nextObject(between: Position(x: 0.0, y: 0.0), and: Position(x: 20.0, y: 20.0))

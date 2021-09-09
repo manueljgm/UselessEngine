@@ -10,20 +10,33 @@ import UselessCommon
 
 public class GameWorld {
     
-    public weak var delegate: GameWorldDelegate?
+    public weak var delegate: GameWorldDelegate? {
+        didSet {
+            // update delegate with world's tiles and objects
+            terrain.tiles.forEach {
+                delegate?.gameWorld(self, added: $0)
+            }
+            inhabitants.forEach {
+                delegate?.gameWorld(self, added: $0)
+            }
+        }
+    }
     
     public var isPaused: Bool
     
     public var gravity: Float
     public private(set) var size: (width: Float, height: Float)
-    public private(set) var objects: Set<GameObject>
-    public private(set) var checkpoints: [Position]
     public private(set) var terrain: GameWorldTerrain
+    public private(set) var checkpoints: [Position]
+    public private(set) var waitingRoom: Set<GameObject>
+    public private(set) var inhabitants: Set<GameObject>
     public let collisionGrid: GameWorldCollisionGrid
     public let pathGraph: GameWorldGraph?
     
     private let collisionDelegate: GameWorldCollisionDelegate
 
+    // MARK: - Init
+    
     /// Initializes a game world.
     public init(gravity: Float,
                 tileSize: Vector2d,
@@ -34,9 +47,10 @@ public class GameWorld {
         self.isPaused = false
         self.gravity = gravity
         self.size = (.zero, .zero)
-        self.objects = []
-        self.checkpoints = []
         self.terrain = GameWorldTerrain(tileSize: tileSize)
+        self.checkpoints = []
+        self.waitingRoom = []
+        self.inhabitants = []
 
         self.collisionGrid = GameWorldCollisionGrid(cellSize: collisionCellSize)
         self.collisionDelegate = collisionDelegate
@@ -57,10 +71,18 @@ public class GameWorld {
         print("GameWorld:deinit")
         #endif
     }
+    
+    // MARK: - Public Methods
 
     public func add(gameTile: GameTile) -> Bool {
+        // add the tile to this world's terrain
         let success = terrain.add(tile: gameTile)
         if success {
+            // update all inhabitants for any elevation changes (there must be a more efficient way)
+            inhabitants.forEach {
+                $0.position.z = max($0.position.z, terrain.elevation(at: $0.position))
+            }
+            
             size.width = max(size.width, gameTile.position.x + gameTile.size.width)
             size.height = max(size.height, gameTile.position.y + gameTile.size.height)
             
@@ -72,34 +94,6 @@ public class GameWorld {
         }
         
         return success
-    }
-
-    public func add(gameObject: GameObject) {
-        // subscribe to the object's notifications
-        gameObject.add(observer: self)
-        
-        // add the object to this world's object set
-        objects.insert(gameObject)
-
-        // update the collision grid with this object
-        collisionGrid.update(for: gameObject)
-        
-        delegate?.gameWorld(self, added: gameObject)
-        
-        #if DEBUG_VERBOSE
-        print(String(format: "GameObject added to GameWorld at (x: %.2f, y: %.2f, z: %.2f).", gameObject.position.x, gameObject.position.y, gameObject.position.z))
-        #endif
-    }
-    
-    public func add(member: GameWorldMember) {
-        switch member {
-            case let gameTile as GameTile:
-                let _ = add(gameTile: gameTile)
-            case let gameObject as GameObject:
-                add(gameObject: gameObject)
-            default:
-                break
-        }
     }
     
     public func addCheckpoint(at position: Position) {
@@ -116,11 +110,16 @@ public class GameWorld {
             }
         })
     }
+
+    public func queue(gameObject: GameObject) {
+        waitingRoom.insert(gameObject)
+    }
     
     public func remove(gameObject: GameObject) {
         // remove the object from this world
         collisionGrid.remove(gameObject: gameObject)
-        objects.remove(gameObject)
+        inhabitants.remove(gameObject)
+        waitingRoom.remove(gameObject)
         
         // unsubscribe from the object's notifications
         gameObject.remove(observer: self)
@@ -128,14 +127,13 @@ public class GameWorld {
         delegate?.gameWorld(self, removed: gameObject)
     }
     
-    public func update(_ dt: Float, matchCriteria: (GameObject) -> Bool = { _ in return true })
-    {
+    public func update(_ dt: Float, matchCriteria: (GameObject) -> Bool = { _ in return true }) {
         if isPaused {
             return
         }
 
         // update all game objects
-        objects.forEach { gameObject in
+        inhabitants.forEach { gameObject in
             // match the game object
             guard matchCriteria(gameObject) else {
                 return
@@ -152,25 +150,25 @@ public class GameWorld {
                 // resolve any collisions
                 collisionGrid.onNeighbors(of: gameObject) { otherObject in
                     // check for a hit
-                    if let hit = gameObject.physics.collisionDelegate.contactAABB
-                        .intersect(otherObject.physics.collisionDelegate.contactAABB) {
+                    if let hit = gameObject.physics.collision.contactAABB
+                        .intersect(otherObject.physics.collision.contactAABB) {
                         // a hit is detected so if contactable,
                         // handle the contact
                         if collisionDelegate.isGameObject(gameObject, contactableWith: otherObject) {
                             // call event handlers
-                            gameObject.physics.collisionDelegate.handleContact(between: gameObject, and: otherObject, in: self)
-                            otherObject.physics.collisionDelegate.handleContact(between: otherObject, and: gameObject, in: self)
+                            gameObject.state?.handleContact(between: gameObject, and: otherObject, in: self)
+                            otherObject.state?.handleContact(between: otherObject, and: gameObject, in: self)
                         }
                         // and if collidable, handle collision
                         if collisionDelegate.isGameObject(gameObject, collidableWith: otherObject) {
                             // resolve the collision by correcting positions
                             let corrections = collisionDelegate.resolveCollision(on: gameObject, against: otherObject, for: hit)
                             // then call event handlers
-                            gameObject.physics.collisionDelegate.handleCollision(between: gameObject,
+                            gameObject.state?.handleCollision(between: gameObject,
                                                                           and: otherObject,
                                                                           withCorrection: corrections.thisCorrection,
                                                                           in: self)
-                            otherObject.physics.collisionDelegate.handleCollision(between: otherObject,
+                            otherObject.state?.handleCollision(between: otherObject,
                                                                          and: gameObject,
                                                                          withCorrection: corrections.otherCorrection,
                                                                          in: self)
@@ -189,10 +187,38 @@ public class GameWorld {
             
         // update terrain
         terrain.update(dt: dt, in: self)
+        
+        // process waiting room
+        processWaitingRoom()
     }
 
     public func elevation(at point: PlaneCoordinate) -> Float {
         return terrain.elevation(at: point)
+    }
+    
+    // MARK: - Private Methods
+    
+    private func add(gameObject: GameObject) {
+        // subscribe to the object's notifications
+        gameObject.add(observer: self)
+        
+        // add the object to this world's list of inhabitants
+        inhabitants.insert(gameObject)
+
+        // update the collision grid with this object
+        collisionGrid.update(for: gameObject)
+        
+        delegate?.gameWorld(self, added: gameObject)
+        
+        #if DEBUG_VERBOSE
+        print(String(format: "GameObject added to GameWorld at (x: %.2f, y: %.2f, z: %.2f).", gameObject.position.x, gameObject.position.y, gameObject.position.z))
+        #endif
+    }
+    
+    private func processWaitingRoom() {
+        while let waitingObject = waitingRoom.popFirst() {
+            add(gameObject: waitingObject)
+        }
     }
     
 }

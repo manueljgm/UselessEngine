@@ -10,8 +10,9 @@ import Foundation
 
 public class GameWorldTerrain {
 
-    private var tileSize: Vector2d
-    private var tiles: Set<GameTile>
+    public private(set) var tileSize: Vector2d
+    public private(set) var tiles: Set<GameTile>
+    
     private var tileByGridPosition: [UnitPosition: GameTile]
     
     public init(tileSize: Vector2d) {
@@ -20,8 +21,7 @@ public class GameWorldTerrain {
         self.tileByGridPosition = [:]
     }
     
-    public func add(tile: GameTile) -> Bool
-    {
+    public func add(tile: GameTile) -> Bool {
         let gridPositionKey = gridPosition(from: tile.position)
         if tileByGridPosition.keys.contains(gridPositionKey) {
             return false
@@ -43,8 +43,7 @@ public class GameWorldTerrain {
         return tileByGridPosition[gridPosition(from: position)]
     }
     
-    public func elevation(at point: PlaneCoordinate) -> Float
-    {
+    public func elevation(at point: PlaneCoordinate) -> Float {
         guard let tile = tile(at: point) else {
             return .zero
         }
@@ -56,8 +55,8 @@ public class GameWorldTerrain {
     // MARK: - Helper Methods
     
     private func gridPosition(from position: PlaneCoordinate) -> UnitPosition {
-        return UnitPosition(x: Int(floor(position.x / tileSize.dx)),
-                            y: Int(floor(position.y / tileSize.dy)))
+        return UnitPosition(x: Int(round(position.x / tileSize.dx)),
+                            y: Int(round(position.y / tileSize.dy)))
 
     }
     

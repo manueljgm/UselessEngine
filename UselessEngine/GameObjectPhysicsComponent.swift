@@ -6,24 +6,20 @@
 //  Copyright (c) 2014 Useless Robot. All rights reserved.
 //
 
-public protocol GameObjectPhysicsComponent: GameWorldMemberObserver {
+public protocol GameObjectPhysicsComponent: GameWorldUpdateable, GameWorldMemberObserver {
     
     var mass: Float { get } // in kg
-    var thrust: Vector { get set }
-    var boost: Boost? { get set }
-    var addDrag: Bool { get set }
-    
-    /// Reference to collision delegate that manages contact and collision behavior for this object.
-    var collisionDelegate: PhysicsCollisionDelegate { get }
-    
-    func update(with owner: GameObject, in world: GameWorld, dt: Float)
-    
+    var collision: GameObjectCollisionComponent { get }
+    var gravityScale: Float { get set }
+    var thrust: GameObjectThrustComponent? { get }
+    var distanceTraveled: Float { get } // in m
+
 }
 
 extension GameObjectPhysicsComponent {
     
-    func update(with owner: GameObject, in world: GameWorld, dt: Float) {
-        collisionDelegate.didUpdate(dt: dt)
+    public func update(with gameObject: GameObject, in world: GameWorld, dt: Float) {
+        thrust?.update(with: gameObject, in: world, dt: dt)
     }
 
 }

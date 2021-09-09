@@ -25,10 +25,6 @@ fileprivate class TestGameObjectState: GameObjectState {
 
     }
     
-    func update(with gameObject: GameObject, in world: GameWorld, dt: Float) {
-
-    }
-    
 }
 
 

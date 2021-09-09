@@ -85,12 +85,11 @@ public class GameObject: GameWorldMember
     
     // MARK: - Update
 
-    public func update(_ dt: Float, in world: GameWorld) -> GameWorldMemberChanges
-    {
-        input?.update(with: self, dt: dt)
-        state?.update(with: self, in: world, dt: dt)
+    public func update(_ dt: Float, in world: GameWorld) -> GameWorldMemberChanges {
         physics.update(with: self, in: world, dt: dt)
         graphics.update(with: self, dt: dt)
+        state?.update(with: self, in: world, dt: dt)
+        input?.update(with: self, dt: dt)
 
         defer {
             changes = .none
@@ -101,6 +100,7 @@ public class GameObject: GameWorldMember
     // MARK: - State
 
     public func enter(state newState: GameObjectState) {
+        state?.willExit(with: self)
         state = newState
         state?.enter(with: self)
         changes.insert(.state)
@@ -113,13 +113,10 @@ public class GameObject: GameWorldMember
         let newState = newState
         newState.fallbackState = state
         enter(state: newState)
-        changes.insert(.state)
-        observers.objectEnumerator().forEach { observer in
-            (observer as? GameWorldMemberObserver)?.receive(event: .memberChange(with: .state), from: self, payload: nil)
-        }
     }
     
     public func exitState() {
+        state?.willExit(with: self)
         state = state?.fallbackState
         state?.reenter(with: self)
         changes.insert(.state)

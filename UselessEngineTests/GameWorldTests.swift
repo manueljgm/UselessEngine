@@ -134,8 +134,8 @@ class GameWorldTests: XCTestCase {
                                      physics: TestObjectPhysicsComponent(aabb: AABB(halfwidths: Vector(dx: 0.5, dy: 0.5, dz: 0.5))),
                                      input: nil)
         testObject2.position = Position(x: 3, y: 3)
-        testWorld.add(member: testObject2)
-        testWorld.add(member: testObject1)
+        testWorld.queue(gameObject: testObject2)
+        testWorld.queue(gameObject: testObject1)
         var result: (object: GameObject, distance: Vector)? = nil
         measure {
             result = testWorld.collisionGrid.nextObject(between: Position(x: 0.0, y: 0.0), and: Position(x: 20.0, y: 20.0))

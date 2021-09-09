@@ -13,5 +13,7 @@ public protocol GameWorldMemberGraphicsComponent: GameWorldMemberObserver {
     var sprite: SKSpriteNode { get }
 
     func update(with owner: GameWorldMember, dt: Float)
+    
+    func play(animation frames: [AnimationFrame], at position: CGPoint, anchorPoint: CGPoint, repeating: Bool)
 
 }

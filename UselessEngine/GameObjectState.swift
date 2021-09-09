@@ -8,6 +8,7 @@
 
 public protocol GameObjectState: GameWorldUpdateable, GameWorldMemberObserver, GameObjectCollisionDelegate {
 
+    @available(*, deprecated)
     var id: UUID { get }
     
     @available(*, deprecated)

@@ -11,25 +11,30 @@ import UselessCommon
 
 public class Animation {
     
+    public let targetSprite: SKSpriteNode
+    
     public private(set) var positionIndex: Int {
         didSet {
-            if !skipRender { renderFrame() }
-            skipRender = false
+            if !skipLoad { loadFrame() }
+            skipLoad = false
         }
     }
     
-    public private(set) var elapsed: Float {
-        didSet {
-            elapsed = clamp(elapsed, lower: 0.0, upper: 1.0)
-        }
+    public private(set) var elapsed: Float
+    
+    public let isRepeating: Bool
+    public var isFinalFrame: Bool {
+        return positionIndex == (textures.count - 1)
+    }
+    public var isFrameElapsed: Bool {
+        return (1.0 - elapsed) < Animation.epsilon
+    }
+    public var isFinished: Bool {
+        return isFinalFrame && isFrameElapsed
     }
     
-    public private(set) var repeats: Bool
-    public var finished: Bool {
-        return positionIndex == (textures.count - 1) && elapsed >= 1.0
-    }
-
-    private let targetSprite: SKSpriteNode
+    public weak var delegate: AnimationDelegate?
+    
     private var textures: [SKTexture]
     private var currentTexture: SKTexture {
         return textures[positionIndex]
@@ -39,23 +44,23 @@ public class Animation {
         return rates[positionIndex]
     }
     
-    private var skipRender = false
+    private var skipLoad = false
     
+    private static let epsilon: Float = 1e-6
     private static var inited = 0
     
-    public init(targetSprite: SKSpriteNode, frames: [AnimationFrame], repeats: Bool)
-    {
-        let frames = frames.count > 0 ? frames : [AnimationFrame(texture: SKTexture())]
-        
-        positionIndex = 0
-        elapsed = 0.0
-        self.repeats = repeats
-
+    public init(targetSprite: SKSpriteNode, frames: [AnimationFrame], repeats isRepeating: Bool) {
         self.targetSprite = targetSprite
-        textures = frames.map { $0.texture }
-        rates = frames.map { Float($0.rate) }
 
-        renderFrame()
+        self.positionIndex = 0
+        self.elapsed = 0.0
+        self.isRepeating = isRepeating
+
+        let frames = frames.count > 0 ? frames : [AnimationFrame(texture: SKTexture())]
+        self.textures = frames.map { $0.texture }
+        self.rates = frames.map { Float($0.rate) }
+
+        loadFrame()
 
         Animation.inited += 1
     }
@@ -65,8 +70,7 @@ public class Animation {
         self.init(targetSprite: targetSprite, frames: frames, repeats: repeats)
     }
     
-    public convenience init(targetSprite: SKSpriteNode, headFrame: AnimationFrame, repeats: Bool)
-    {
+    public convenience init(targetSprite: SKSpriteNode, headFrame: AnimationFrame, repeats: Bool) {
         self.init(targetSprite: targetSprite, frames: [headFrame], repeats: repeats)
     }
     
@@ -86,44 +90,50 @@ public class Animation {
         rates.append(Float(rate > 0 ? rate : Settings.defaults.graphics.animationFrameRate))
     }
 
-    public func renderFrame() {
+    public func loadFrame() {
         targetSprite.texture = currentTexture
         targetSprite.size = currentTexture.size()
     }
     
     public func update(_ dt: Float) {
-        guard elapsed < 1.0 else {
+        if isFinished {
+            // the animation is finished
             return
         }
 
+        // increment the elapsed counter for the current frame
         elapsed += currentRate * dt
-        if elapsed >= 1.0 { // TODO: consider distributing the remaining dt onto subsequent frames
+        
+        if isFrameElapsed {
             if positionIndex == (textures.count - 1) {
-                if repeats {
+                // the final frame has elapsed
+                if isRepeating {
+                    // jump back to the first frame to repeat the animation
                     positionIndex = 0
-                    // TODO: confirm that the loop behavior is correct
                 } else {
+                    // the animation has finished
+                    delegate?.didFinish(animation: self)
                     return
                 }
             } else {
+                // the current frame has elapsed, so the frame position is advanced
                 positionIndex += 1
             }
             
+            // unwind the elapsed counter for the next frame
             elapsed = 0.0
         }
     }
     
-    public func setFrame(toIndex newPosition: Int, elapsed newElapsed: Float = 0.0, andRender render: Bool) {
-        guard newPosition < textures.count else {
-            return
-        }
-        skipRender = !render
+    public func setFrame(toIndex newPosition: Int, elapsed newElapsed: Float = 0.0, andLoad doLoad: Bool) {
+        let newPosition = clamp(newPosition, lower: 0, upper: textures.count - 1)
+        skipLoad = !doLoad
         positionIndex = max(newPosition, 0)
         elapsed = max(newElapsed, 0.0)
     }
     
-    public func reset(andRenderFrame render: Bool = true) {
-        skipRender = !render
+    public func reset(andLoadFrame doLoad: Bool = true) {
+        skipLoad = !doLoad
         positionIndex = 0
         elapsed = 0.0
     }

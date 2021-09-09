@@ -85,12 +85,11 @@ public class GameObject: GameWorldMember
     
     // MARK: - Update
 
-    public func update(_ dt: Float, in world: GameWorld) -> GameWorldMemberChanges
-    {
-        input?.update(with: self, dt: dt)
-        state?.update(with: self, in: world, dt: dt)
+    public func update(_ dt: Float, in world: GameWorld) -> GameWorldMemberChanges {
         physics.update(with: self, in: world, dt: dt)
         graphics.update(with: self, dt: dt)
+        state?.update(with: self, in: world, dt: dt)
+        input?.update(with: self, dt: dt)
 
         defer {
             changes = .none

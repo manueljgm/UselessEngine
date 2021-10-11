@@ -8,6 +8,7 @@
 
 public protocol GameWorldPositionable: AnyObject {
 
+    var world: GameWorld? { get }
     var position: Position { get set }
 
 }

@@ -29,7 +29,7 @@ fileprivate class TestWorldCollisionDelegate: GameWorldCollisionDelegate {
 fileprivate class TestObjectGraphicsComponent: GameWorldMemberGraphicsComponent {
     var sprite: SKSpriteNode = SKSpriteNode()
     
-    func update(with owner: GameWorldMember, dt: Float) {
+    func update(with owner: GameWorldMember, in world: GameWorld, dt: Float) {
         // do nothing
     }
 }
@@ -114,10 +114,12 @@ class GameWorldTests: XCTestCase {
                                         size: (width: tileSize.dx, height: tileSize.dy),
                                         elevation: TestTileElevation())
                     tile.position = Position(x: tileSize.dx * Float(x), y: tileSize.dy * Float(y))
-                    let _ = testWorld.add(gameTile: tile)
+                    let _ = testWorld.add(member: tile)
                 }
             }
         }
+        
+        testWorld.update(0.0)
     }
 
     override func tearDownWithError() throws {
@@ -130,16 +132,21 @@ class GameWorldTests: XCTestCase {
                                     physics: TestObjectPhysicsComponent(aabb: AABB(halfwidths: Vector(dx: 0.55, dy: 0.55, dz: 0.55))),
                                     input: nil)
         testObject1.position = Position(x: 3, y: 3)
+        testWorld.add(member: testObject1)
+        
         let testObject2 = GameObject(graphics: TestObjectGraphicsComponent(),
                                      physics: TestObjectPhysicsComponent(aabb: AABB(halfwidths: Vector(dx: 0.5, dy: 0.5, dz: 0.5))),
                                      input: nil)
-        testObject2.position = Position(x: 3, y: 3)
-        testWorld.queue(gameObject: testObject2)
-        testWorld.queue(gameObject: testObject1)
+        testObject2.position = Position(x: 6, y: 6)
+        testWorld.add(member: testObject2)
+
+        testWorld.update(0.0)
+        
         var result: (object: GameObject, distance: Vector)? = nil
         measure {
             result = testWorld.collisionGrid.nextObject(between: Position(x: 0.0, y: 0.0), and: Position(x: 20.0, y: 20.0))
         }
+        
         XCTAssert(result != nil)
     }
     

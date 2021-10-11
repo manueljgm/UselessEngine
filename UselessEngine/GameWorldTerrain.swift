@@ -21,16 +21,16 @@ public class GameWorldTerrain {
         self.tileByGridPosition = [:]
     }
     
-    public func add(tile: GameTile) -> Bool {
+    public func add(tile: GameTile) {
         let gridPositionKey = gridPosition(from: tile.position)
-        if tileByGridPosition.keys.contains(gridPositionKey) {
-            return false
+        
+        if let preexistingTile = tileByGridPosition[gridPositionKey] {
+            tiles.remove(preexistingTile)
+            preexistingTile.world?.remove(member: preexistingTile)
         }
     
         tileByGridPosition[gridPositionKey] = tile
         tiles.insert(tile)
-        
-        return true
     }
     
     public func update(dt: Float, in world: GameWorld) {

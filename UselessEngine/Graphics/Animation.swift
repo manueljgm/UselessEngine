@@ -11,6 +11,7 @@ import UselessCommon
 
 public class Animation {
     
+    public private(set) weak var target: GameWorldMember?
     public let targetSprite: SKSpriteNode
     
     public private(set) var positionIndex: Int {
@@ -49,7 +50,21 @@ public class Animation {
     private static let epsilon: Float = 1e-6
     private static var inited = 0
     
-    public init(targetSprite: SKSpriteNode, frames: [AnimationFrame], repeats isRepeating: Bool) {
+    public convenience init(targetSprite: SKSpriteNode, frames: [AnimationFrame], repeats isRepeating: Bool) {
+        self.init(target: nil, targetSprite: targetSprite, frames: frames, repeats: isRepeating)
+    }
+    
+    public convenience init(target: GameWorldMember, frames: [AnimationFrame], repeats isRepeating: Bool) {
+        self.init(target: target, targetSprite: target.graphics.sprite, frames: frames, repeats: isRepeating)
+    }
+    
+    public convenience init(target: GameWorldMember, textures: [SKTexture], repeats: Bool) {
+        let frames = textures.map { AnimationFrame(texture: $0) }
+        self.init(target: target, frames: frames, repeats: repeats)
+    }
+    
+    private init(target: GameWorldMember?, targetSprite: SKSpriteNode, frames: [AnimationFrame], repeats isRepeating: Bool) {
+        self.target = target
         self.targetSprite = targetSprite
 
         self.positionIndex = 0
@@ -63,19 +78,6 @@ public class Animation {
         loadFrame()
 
         Animation.inited += 1
-    }
-    
-    public convenience init(targetSprite: SKSpriteNode, textures: [SKTexture], repeats: Bool) {
-        let frames = textures.map { AnimationFrame(texture: $0) }
-        self.init(targetSprite: targetSprite, frames: frames, repeats: repeats)
-    }
-    
-    public convenience init(targetSprite: SKSpriteNode, headFrame: AnimationFrame, repeats: Bool) {
-        self.init(targetSprite: targetSprite, frames: [headFrame], repeats: repeats)
-    }
-    
-    public convenience init(targetSprite: SKSpriteNode, headFrameTexture: SKTexture, repeats: Bool) {
-        self.init(targetSprite: targetSprite, headFrame: AnimationFrame(texture: headFrameTexture, rate: Settings.defaults.graphics.animationFrameRate), repeats: repeats)
     }
     
     deinit {

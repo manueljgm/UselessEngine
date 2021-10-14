@@ -6,17 +6,9 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
-public class GameTile: GameWorldMember
-{
-    public let graphics: GameWorldMemberGraphicsComponent
+public class GameTile: GameWorldMember {
     
     public let size: (width: Float, height: Float)
-    
-    public var position: Position {
-        didSet {
-            graphics.receive(event: .memberChange(with: .position), from: self, payload: oldValue)
-        }
-    }
     
     public let elevation: GameTileElevation
 
@@ -26,10 +18,10 @@ public class GameTile: GameWorldMember
                 size: (width: Float, height: Float),
                 elevation: GameTileElevation)
     {
-        self.graphics = graphicsComponent
         self.size = size
-        self.position = .zero
         self.elevation = elevation
+        
+        super.init(graphics: graphicsComponent, position: .zero)
 
         GameTile.inited += 1
         #if DEBUG_VERBOSE
@@ -44,25 +36,5 @@ public class GameTile: GameWorldMember
         #endif
     }
     
-    public func update(_ dt: Float, in world: GameWorld) -> GameWorldMemberChanges {
-        graphics.update(with: self, dt: dt)
-        return .none
-    }
-    
 }
 
-extension GameTile: Equatable {
-    
-    public static func == (lhs: GameTile, rhs: GameTile) -> Bool {
-        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
-    }
-    
-}
-
-extension GameTile: Hashable {
-
-    public func hash(into hasher: inout Hasher) {
-         hasher.combine(ObjectIdentifier(self))
-    }
-    
-}

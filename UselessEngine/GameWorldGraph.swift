@@ -42,7 +42,7 @@ public class GameWorldGraph {
             for i in 0...upperX {
                 let x = Float(i) * nodeSpacing.dx
                 let y = Float(j) * nodeSpacing.dy
-                let checkPosition = Position(x: x, y: y, z: world.elevation(at: Position2d(x: x, y: y)))
+                let checkPosition = Position(x: x, y: y, z: world.terrain.elevation(at: Position2d(x: x, y: y)))
                 if world.terrain.tile(at: checkPosition) != nil
                     && !world.collisionGrid.hasObject(at: checkPosition, matchCriteria: checkCriteria)
                 {

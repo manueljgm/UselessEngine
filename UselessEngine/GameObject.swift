@@ -14,13 +14,12 @@ public class GameObject: GameWorldMember
     
     public private(set) var state: GameObjectState?
 
-    public let graphics: GameWorldMemberGraphicsComponent
     public let audio: GameObjectAudioComponent?
     public let physics: GameObjectPhysicsComponent
     public var input: GameObjectInputComponent?
     
     /// The object's position.
-    public var position: Position {
+    override public var position: Position {
         didSet {
             if (position != oldValue) {
                 changes.insert(.position)
@@ -50,25 +49,22 @@ public class GameObject: GameWorldMember
                 input inputComponent: GameObjectInputComponent? = nil)
     {
         state = nil
+
+        audio = audioComponent
+        physics = physicsComponent
+        input = inputComponent
+        
+        velocity = .zero
         
         observers = NSHashTable<AnyObject>.weakObjects()
         
-        audio = audioComponent
+        super.init(graphics: graphicsComponent)
         
-        graphics = graphicsComponent
-        defer {
-            add(observer: graphics)
-        }
+        add(observer: graphics)
+        add(observer: physics)
         
-        physics = physicsComponent
-        defer {
-            add(observer: physics)
-        }
-        
-        input = inputComponent
-        
+        // reset position for observers' sake
         position = .zero
-        velocity = .zero
         
         GameObject.inited += 1
         #if DEBUG_VERBOSE
@@ -85,9 +81,9 @@ public class GameObject: GameWorldMember
     
     // MARK: - Update
 
-    public func update(_ dt: Float, in world: GameWorld) -> GameWorldMemberChanges {
+    public override func update(_ dt: Float, in world: GameWorld) -> GameWorldMemberChanges {
         physics.update(with: self, in: world, dt: dt)
-        graphics.update(with: self, dt: dt)
+        graphics.update(with: self, in: world, dt: dt)
         state?.update(with: self, in: world, dt: dt)
         input?.update(with: self, dt: dt)
 
@@ -140,22 +136,6 @@ public class GameObject: GameWorldMember
     
     public func remove(observer: GameWorldMemberObserver) {
         observers.remove(observer)
-    }
-    
-}
-
-extension GameObject: Equatable {
-    
-    public static func == (lhs: GameObject, rhs: GameObject) -> Bool {
-        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
-    }
-    
-}
-
-extension GameObject: Hashable {
-
-    public func hash(into hasher: inout Hasher) {
-         hasher.combine(ObjectIdentifier(self))
     }
     
 }

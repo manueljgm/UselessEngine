@@ -19,21 +19,26 @@ public class GameWorld {
             inhabitants.forEach {
                 delegate?.gameWorld(self, added: $0)
             }
+            extras.forEach {
+                delegate?.gameWorld(self, added: $0)
+            }
         }
     }
     
     public var isPaused: Bool
-    
     public var gravity: Float
     public private(set) var size: (width: Float, height: Float)
-    public private(set) var terrain: GameWorldTerrain
-    public private(set) var checkpoints: [Position]
-    public private(set) var waitingRoom: Set<GameObject>
-    public private(set) var inhabitants: Set<GameObject>
-    public let collisionGrid: GameWorldCollisionGrid
+
+    public let terrain: GameWorldTerrain
     public let pathGraph: GameWorldGraph?
+    public let collisionGrid: GameWorldCollisionGrid
     
     private let collisionDelegate: GameWorldCollisionDelegate
+    
+    private var entering: Set<GameWorldMember>
+    private var inhabitants: Set<GameObject>
+    private var extras: Set<GameWorldMember>
+    private var exiting: Set<GameWorldMember>
 
     // MARK: - Init
     
@@ -47,10 +52,12 @@ public class GameWorld {
         self.isPaused = false
         self.gravity = gravity
         self.size = (.zero, .zero)
+        
+        self.entering = []
         self.terrain = GameWorldTerrain(tileSize: tileSize)
-        self.checkpoints = []
-        self.waitingRoom = []
         self.inhabitants = []
+        self.extras = []
+        self.exiting = []
 
         self.collisionGrid = GameWorldCollisionGrid(cellSize: collisionCellSize)
         self.collisionDelegate = collisionDelegate
@@ -71,65 +78,18 @@ public class GameWorld {
         print("GameWorld:deinit")
         #endif
     }
-    
-    // MARK: - Public Methods
 
-    public func add(gameTile: GameTile) -> Bool {
-        // add the tile to this world's terrain
-        let success = terrain.add(tile: gameTile)
-        if success {
-            // update all inhabitants for any elevation changes (there must be a more efficient way)
-            inhabitants.forEach {
-                $0.position.z = max($0.position.z, terrain.elevation(at: $0.position))
-            }
-            
-            size.width = max(size.width, gameTile.position.x + gameTile.size.width)
-            size.height = max(size.height, gameTile.position.y + gameTile.size.height)
-            
-            delegate?.gameWorld(self, added: gameTile)
-            
-            #if DEBUG_VERBOSE
-            print("GameTile added to GameWorld.")
-            #endif
-        }
-        
-        return success
-    }
-    
-    public func addCheckpoint(at position: Position) {
-        checkpoints.append(position)
-        checkpoints.sort(by: {
-            if $0.x < $1.x {
-                return true
-            } else if $0.x > $1.x {
-                return false
-            } else if $0.y < $0.y { // && $0.x == $1.x
-                return true
-            } else {
-                return false
-            }
-        })
-    }
-
-    public func queue(gameObject: GameObject) {
-        waitingRoom.insert(gameObject)
-    }
-    
-    public func remove(gameObject: GameObject) {
-        // remove the object from this world
-        collisionGrid.remove(gameObject: gameObject)
-        inhabitants.remove(gameObject)
-        waitingRoom.remove(gameObject)
-        
-        // unsubscribe from the object's notifications
-        gameObject.remove(observer: self)
-        
-        delegate?.gameWorld(self, removed: gameObject)
-    }
-    
     public func update(_ dt: Float, matchCriteria: (GameObject) -> Bool = { _ in return true }) {
         if isPaused {
             return
+        }
+
+        // update terrain
+        terrain.update(dt: dt, in: self)
+
+        // update extras
+        extras.forEach {
+            let _ = $0.update(dt, in: self)
         }
 
         // update all game objects
@@ -184,51 +144,102 @@ public class GameWorld {
                 }
             }
         }
-            
-        // update terrain
-        terrain.update(dt: dt, in: self)
-        
-        // process waiting room
-        processWaitingRoom()
+
+        // process exiting members
+        processExiting()
+
+        // process entering members
+        processEntering()
+    }
+    
+    public func add(member: GameWorldMember) {
+        entering.insert(member)
     }
 
-    public func elevation(at point: PlaneCoordinate) -> Float {
-        return terrain.elevation(at: point)
+    public func remove(member: GameWorldMember) {
+        exiting.insert(member)
     }
     
     // MARK: - Private Methods
     
-    private func add(gameObject: GameObject) {
-        // subscribe to the object's notifications
-        gameObject.add(observer: self)
-        
-        // add the object to this world's list of inhabitants
-        inhabitants.insert(gameObject)
+    private func add(gameTile: GameTile) {
+        // add the tile to this world's terrain
+        terrain.add(tile: gameTile)
 
-        // update the collision grid with this object
-        collisionGrid.update(for: gameObject)
-        
-        delegate?.gameWorld(self, added: gameObject)
-        
-        #if DEBUG_VERBOSE
-        print(String(format: "GameObject added to GameWorld at (x: %.2f, y: %.2f, z: %.2f).", gameObject.position.x, gameObject.position.y, gameObject.position.z))
-        #endif
+        // update all inhabitants for any elevation changes (there must be a more efficient way)
+        inhabitants.forEach {
+            $0.position.z = max($0.position.z, terrain.elevation(at: $0.position))
+        }
+            
+        size.width = max(size.width, gameTile.position.x + gameTile.size.width)
+        size.height = max(size.height, gameTile.position.y + gameTile.size.height)
     }
     
-    private func processWaitingRoom() {
-        while let waitingObject = waitingRoom.popFirst() {
-            add(gameObject: waitingObject)
+    private func add(gameObject: GameObject) {
+        // elevate the object if set below floor
+        gameObject.position.z = max(gameObject.position.z, terrain.elevation(at: gameObject.position))
+
+        // add the object to this world's list of inhabitants
+        inhabitants.insert(gameObject)
+        
+        // update the collision grid
+        collisionGrid.update(for: gameObject)
+
+        // subscribe to the object's notifications
+        gameObject.add(observer: self)
+    }
+    
+    private func processEntering() {
+        while let newMember = entering.popFirst() {
+            switch newMember {
+            case let tile as GameTile:
+                add(gameTile: tile)
+            case let object as GameObject:
+                add(gameObject: object)
+            default:
+                extras.insert(newMember)
+            }
+            
+            newMember.world = self
+            
+            delegate?.gameWorld(self, added: newMember)
+            
+            #if DEBUG_VERBOSE
+            let message: String
+            switch newMember {
+            case is GameTile:
+                message = String(format: "GameTile added to GameWorld at (x: %.2f, y: %.2f)", newMember.position.x, newMember.position.y)
+            default:
+                message = String(format: "GameWorldMember added to GameWorld at (x: %.2f, y: %.2f, z: %.2f)", newMember.position.x, newMember.position.y, newMember.position.z)
+            }
+            print(message)
+            #endif
         }
     }
     
-}
-
-extension GameWorld: Equatable {
+    private func processExiting() {
+        while let exitingMember = exiting.popFirst() {
+            switch exitingMember {
+            case is GameTile:
+                fatalError("Tile removal has not been implemented yet.")
+                // TODO: implement
+            case let object as GameObject:
+                // unsubscribe from the object's notifications
+                object.remove(observer: self)
+                // remove the object from this world
+                collisionGrid.remove(object)
+                inhabitants.remove(object)
+                entering.remove(object)
+            default:
+                extras.remove(exitingMember)
+            }
     
-    public static func ==(lhs: GameWorld, rhs: GameWorld) -> Bool {
-        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+            exitingMember.world = nil
+            
+            delegate?.gameWorld(self, removed: exitingMember)
+        }
     }
-    
+
 }
 
 extension GameWorld: GameWorldMemberObserver {

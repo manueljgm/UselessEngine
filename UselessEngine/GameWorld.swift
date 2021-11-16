@@ -168,7 +168,13 @@ public class GameWorld {
 
         // update all inhabitants for any elevation changes (there must be a more efficient way)
         inhabitants.forEach {
-            $0.position.z = max($0.position.z, terrain.elevation(at: $0.position))
+            let elevationAtPosition = terrain.elevation(at: $0.position)
+            if $0.position.z < elevationAtPosition {
+                // prevent premature notifications
+                $0.remove(observer: self)
+                $0.position.z = elevationAtPosition
+                $0.add(observer: self)
+            }
         }
             
         size.width = max(size.width, gameTile.position.x + gameTile.size.width)

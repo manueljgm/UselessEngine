@@ -55,8 +55,9 @@ public class GameWorldTerrain {
     // MARK: - Helper Methods
     
     private func gridPosition(from position: PlaneCoordinate) -> UnitPosition {
-        return UnitPosition(x: Int(round(position.x / tileSize.dx)),
-                            y: Int(round(position.y / tileSize.dy)))
+        let gridPosition = UnitPosition(x: Int(round(position.x / tileSize.dx)),
+                                        y: Int(round(position.y / tileSize.dy)))
+        return gridPosition
 
     }
     

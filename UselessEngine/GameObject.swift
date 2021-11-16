@@ -6,8 +6,8 @@
 //  Copyright (c) 2014 Useless Robot. All rights reserved.
 //
 
-public class GameObject: GameWorldMember
-{
+public class GameObject: GameWorldMember, GameWorldObserverSubject {
+    
     // MARK: - Properties
 
     private static var inited: Int = 0
@@ -18,23 +18,10 @@ public class GameObject: GameWorldMember
     public let physics: GameObjectPhysicsComponent
     public var input: GameObjectInputComponent?
     
-    /// The object's position.
-    override public var position: Position {
-        didSet {
-            if (position != oldValue) {
-                changes.insert(.position)
-                broadcast(event: .memberChange(with: .position), payload: oldValue)
-            }
-        }
-    }
-    
     /// The object's velocity.
     public var velocity: Vector {
         didSet {
-            if (velocity != oldValue) {
-                changes.insert(.velocity)
-                broadcast(event: .memberChange(with: .velocity), payload: oldValue)
-            }
+            velocityDidChange(from: oldValue)
         }
     }
 
@@ -136,6 +123,20 @@ public class GameObject: GameWorldMember
     
     public func remove(observer: GameWorldMemberObserver) {
         observers.remove(observer)
+    }
+    
+    internal override func positionDidChange(from oldValue: Position) {
+        if position != oldValue {
+            changes.insert(.position)
+            broadcast(event: .memberChange(with: .position), payload: oldValue)
+        }
+    }
+    
+    private func velocityDidChange(from oldValue: Vector) {
+        if velocity != oldValue {
+            changes.insert(.velocity)
+            broadcast(event: .memberChange(with: .velocity), payload: oldValue)
+        }
     }
     
 }

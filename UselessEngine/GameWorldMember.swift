@@ -14,7 +14,7 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
     
     public var position: Position {
         didSet {
-            graphics.receive(event: .memberChange(with: .position), from: self, payload: oldValue)
+            positionDidChange(from: oldValue)
         }
     }
     
@@ -31,6 +31,10 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
     public func update(_ dt: Float, in world: GameWorld) -> GameWorldMemberChanges {
         graphics.update(with: self, in: world, dt: dt)
         return .none
+    }
+    
+    internal func positionDidChange(from oldValue: Position) {
+        graphics.receive(event: .memberChange(with: .position), from: self, payload: oldValue)
     }
 
 }

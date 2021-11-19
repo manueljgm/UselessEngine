@@ -13,6 +13,10 @@ import SpriteKit
 // MARK: - Test Types
 
 fileprivate class TestWorldCollisionDelegate: GameWorldCollisionDelegate {
+    func intersect(_ gameObject: GameObject, with otherObject: GameObject) -> Hit? {
+        return nil
+    }
+    
     func isGameObject(_ gameObject: GameObject, contactableWith otherObject: GameObject) -> Bool {
         return false
     }

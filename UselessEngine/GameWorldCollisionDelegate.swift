@@ -8,6 +8,8 @@
 
 public protocol GameWorldCollisionDelegate {
 
+    func intersect(_ gameObject: GameObject, with otherObject: GameObject) -> Hit?
+    
     func isGameObject(_ gameObject: GameObject, contactableWith otherObject: GameObject) -> Bool
     
     func isGameObject(_ gameObject: GameObject, collidableWith otherObject: GameObject) -> Bool

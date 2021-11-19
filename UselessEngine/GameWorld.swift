@@ -110,8 +110,7 @@ public class GameWorld {
                 // resolve any collisions
                 collisionGrid.onNeighbors(of: gameObject) { otherObject in
                     // check for a hit
-                    if let hit = gameObject.physics.collision.contactAABB
-                        .intersect(otherObject.physics.collision.contactAABB) {
+                    if let hit = collisionDelegate.intersect(gameObject, with: otherObject) {
                         // a hit is detected so if contactable,
                         // handle the contact
                         if collisionDelegate.isGameObject(gameObject, contactableWith: otherObject) {
@@ -125,13 +124,13 @@ public class GameWorld {
                             let corrections = collisionDelegate.resolveCollision(on: gameObject, against: otherObject, for: hit)
                             // then call event handlers
                             gameObject.state?.handleCollision(between: gameObject,
-                                                                          and: otherObject,
-                                                                          withCorrection: corrections.thisCorrection,
-                                                                          in: self)
+                                                              and: otherObject,
+                                                              withCorrection: corrections.thisCorrection,
+                                                              in: self)
                             otherObject.state?.handleCollision(between: otherObject,
-                                                                         and: gameObject,
-                                                                         withCorrection: corrections.otherCorrection,
-                                                                         in: self)
+                                                               and: gameObject,
+                                                               withCorrection: corrections.otherCorrection,
+                                                               in: self)
                             // and update the collision grid for changes
                             if corrections.thisCorrection != .zero {
                                 collisionGrid.update(for: gameObject)
@@ -161,6 +160,8 @@ public class GameWorld {
     }
     
     // MARK: - Private Methods
+    
+    // MARK: World Member Management
     
     private func add(gameTile: GameTile) {
         // add the tile to this world's terrain

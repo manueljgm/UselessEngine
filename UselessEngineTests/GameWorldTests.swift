@@ -33,7 +33,7 @@ fileprivate class TestWorldCollisionDelegate: GameWorldCollisionDelegate {
 fileprivate class TestObjectGraphicsComponent: GameWorldMemberGraphicsComponent {
     var sprite: SKSpriteNode = SKSpriteNode()
     
-    func update(with owner: GameWorldMember, in world: GameWorld, dt: Float) {
+    func update(with owner: GameWorldMember, dt: Float) {
         // do nothing
     }
 }
@@ -63,7 +63,7 @@ fileprivate class TestObjectPhysicsComponent: GameObjectPhysicsComponent {
         distanceTraveled = 0.0
     }
     
-    func update(with owner: GameObject, in world: GameWorld, dt: Float) {
+    func update(with owner: GameObject, dt: Float) {
         // do nothing
     }
     

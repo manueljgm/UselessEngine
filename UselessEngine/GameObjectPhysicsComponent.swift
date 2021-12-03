@@ -18,8 +18,8 @@ public protocol GameObjectPhysicsComponent: GameWorldUpdateable, GameWorldMember
 
 extension GameObjectPhysicsComponent {
     
-    public func update(with gameObject: GameObject, in world: GameWorld, dt: Float) {
-        thrust?.update(with: gameObject, in: world, dt: dt)
+    public func update(with gameObject: GameObject, dt: Float) {
+        thrust?.update(with: gameObject, dt: dt)
     }
 
 }

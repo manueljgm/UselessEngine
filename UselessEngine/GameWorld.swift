@@ -85,11 +85,11 @@ public class GameWorld {
         }
 
         // update terrain
-        terrain.update(dt: dt, in: self)
+        terrain.update(dt: dt)
 
         // update extras
         extras.forEach {
-            let _ = $0.update(dt, in: self)
+            let _ = $0.update(dt)
         }
 
         // update all game objects
@@ -100,7 +100,7 @@ public class GameWorld {
             }
             
             // update the game object
-            let changesObserved = gameObject.update(dt, in: self)
+            let changesObserved = gameObject.update(dt)
 
             // if the object's position changed, check and resolve for boundaries or collisions
             if changesObserved.contains(.position) {
@@ -115,8 +115,8 @@ public class GameWorld {
                         // handle the contact
                         if collisionDelegate.isGameObject(gameObject, contactableWith: otherObject) {
                             // call event handlers
-                            gameObject.state?.handleContact(between: gameObject, and: otherObject, in: self)
-                            otherObject.state?.handleContact(between: otherObject, and: gameObject, in: self)
+                            gameObject.state?.handleContact(between: gameObject, and: otherObject)
+                            otherObject.state?.handleContact(between: otherObject, and: gameObject)
                         }
                         // and if collidable, handle collision
                         if collisionDelegate.isGameObject(gameObject, collidableWith: otherObject) {
@@ -125,12 +125,10 @@ public class GameWorld {
                             // then call event handlers
                             gameObject.state?.handleCollision(between: gameObject,
                                                               and: otherObject,
-                                                              withCorrection: corrections.thisCorrection,
-                                                              in: self)
+                                                              withCorrection: corrections.thisCorrection)
                             otherObject.state?.handleCollision(between: otherObject,
                                                                and: gameObject,
-                                                               withCorrection: corrections.otherCorrection,
-                                                               in: self)
+                                                               withCorrection: corrections.otherCorrection)
                             // and update the collision grid for changes
                             if corrections.thisCorrection != .zero {
                                 collisionGrid.update(for: gameObject)

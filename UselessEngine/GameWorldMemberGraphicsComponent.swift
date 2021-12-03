@@ -12,6 +12,6 @@ public protocol GameWorldMemberGraphicsComponent: GameWorldMemberObserver {
 
     var sprite: SKSpriteNode { get }
 
-    func update(with owner: GameWorldMember, in world: GameWorld, dt: Float)
+    func update(with owner: GameWorldMember, dt: Float)
 
 }

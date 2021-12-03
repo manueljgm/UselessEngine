@@ -28,8 +28,8 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
         }
     }
     
-    public func update(_ dt: Float, in world: GameWorld) -> GameWorldMemberChanges {
-        graphics.update(with: self, in: world, dt: dt)
+    public func update(_ dt: Float) -> GameWorldMemberChanges {
+        graphics.update(with: self, dt: dt)
         return .none
     }
     

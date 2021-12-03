@@ -33,9 +33,9 @@ public class GameWorldTerrain {
         tiles.insert(tile)
     }
     
-    public func update(dt: Float, in world: GameWorld) {
+    public func update(dt: Float) {
         tiles.forEach {
-            let _ = $0.update(dt, in: world)
+            let _ = $0.update(dt)
         }
     }
 

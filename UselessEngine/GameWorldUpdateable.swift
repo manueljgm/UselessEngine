@@ -8,13 +8,13 @@
 
 public protocol GameWorldUpdateable {
     
-    func update(with gameObject: GameObject, in world: GameWorld, dt: Float)
+    func update(with gameObject: GameObject, dt: Float)
     
 }
 
 extension GameWorldUpdateable {
     
-    public func update(with gameObject: GameObject, in world: GameWorld, dt: Float) {
+    public func update(with gameObject: GameObject, dt: Float) {
         
     }
     

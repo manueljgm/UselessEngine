@@ -68,10 +68,10 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
     
     // MARK: - Update
 
-    public override func update(_ dt: Float, in world: GameWorld) -> GameWorldMemberChanges {
-        physics.update(with: self, in: world, dt: dt)
-        graphics.update(with: self, in: world, dt: dt)
-        state?.update(with: self, in: world, dt: dt)
+    public override func update(_ dt: Float) -> GameWorldMemberChanges {
+        physics.update(with: self, dt: dt)
+        graphics.update(with: self, dt: dt)
+        state?.update(with: self, dt: dt)
         input?.update(with: self, dt: dt)
 
         defer {

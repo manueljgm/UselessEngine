@@ -8,29 +8,19 @@
 
 public protocol GameObjectCollisionDelegate {
     
-    func handleContact(between gameObject: GameObject,
-                       and otherObject: GameObject,
-                       in world: GameWorld)
+    func handleContact(between gameObject: GameObject, and otherObject: GameObject)
     
-    func handleCollision(between gameObject: GameObject,
-                         and otherObject: GameObject,
-                         withCorrection correctionOffset: Vector,
-                         in world: GameWorld)
+    func handleCollision(between gameObject: GameObject, and otherObject: GameObject, withCorrection correctionOffset: Vector)
     
 }
 
 extension GameObjectCollisionDelegate {
     
-    public func handleContact(between gameObject: GameObject,
-                       and otherObject: GameObject,
-                       in world: GameWorld) {
+    public func handleContact(between gameObject: GameObject, and otherObject: GameObject) {
         
     }
     
-    public func handleCollision(between gameObject: GameObject,
-                         and otherObject: GameObject,
-                         withCorrection correctionOffset: Vector,
-                         in world: GameWorld) {
+    public func handleCollision(between gameObject: GameObject, and otherObject: GameObject, withCorrection correctionOffset: Vector) {
         
     }
     

@@ -84,6 +84,12 @@ public class GameWorld {
             return
         }
 
+        // process exiting members
+        processExiting()
+
+        // process entering members
+        processEntering()
+        
         // update terrain
         terrain.update(dt: dt)
 
@@ -141,12 +147,6 @@ public class GameWorld {
                 }
             }
         }
-
-        // process exiting members
-        processExiting()
-
-        // process entering members
-        processEntering()
     }
     
     public func add(member: GameWorldMember) {
@@ -161,7 +161,7 @@ public class GameWorld {
     
     // MARK: World Member Management
     
-    private func add(gameTile: GameTile) {
+    private func lay(gameTile: GameTile) {
         // add the tile to this world's terrain
         terrain.add(tile: gameTile)
 
@@ -180,7 +180,7 @@ public class GameWorld {
         size.height = max(size.height, gameTile.position.y + gameTile.size.height)
     }
     
-    private func add(gameObject: GameObject) {
+    private func admit(gameObject: GameObject) {
         // elevate the object if set below floor
         gameObject.position.z = max(gameObject.position.z, terrain.elevation(at: gameObject.position))
 
@@ -196,11 +196,15 @@ public class GameWorld {
     
     private func processEntering() {
         while let newMember = entering.popFirst() {
+            guard newMember.world == nil else {
+                continue
+            }
+            
             switch newMember {
             case let tile as GameTile:
-                add(gameTile: tile)
+                lay(gameTile: tile)
             case let object as GameObject:
-                add(gameObject: object)
+                admit(gameObject: object)
             default:
                 extras.insert(newMember)
             }
@@ -208,6 +212,10 @@ public class GameWorld {
             newMember.world = self
             
             delegate?.gameWorld(self, added: newMember)
+            
+            newMember.children.forEach { child in
+                add(member: child)
+            }
             
             #if DEBUG_VERBOSE
             let message: String
@@ -229,6 +237,8 @@ public class GameWorld {
                 fatalError("Tile removal has not been implemented yet.")
                 // TODO: implement
             case let object as GameObject:
+                // remove from parent
+                object.removeFromParent()
                 // unsubscribe from the object's notifications
                 object.remove(observer: self)
                 // remove the object from this world
@@ -242,6 +252,10 @@ public class GameWorld {
             exitingMember.world = nil
             
             delegate?.gameWorld(self, removed: exitingMember)
+            
+            exitingMember.children.forEach { child in
+                remove(member: child)
+            }
         }
     }
 

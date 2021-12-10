@@ -9,8 +9,10 @@
 public class GameObject: GameWorldMember, GameWorldObserverSubject {
     
     // MARK: - Properties
-
+    
     private static var inited: Int = 0
+
+    public internal(set) weak var parent: GameWorldMember?
     
     public private(set) var state: GameObjectState?
 
@@ -21,12 +23,13 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
     /// The object's velocity.
     public var velocity: Vector {
         didSet {
-            velocityDidChange(from: oldValue)
+            if velocity != oldValue {
+                velocityDidChange(from: oldValue)
+            }
         }
     }
 
     private var changes: GameWorldMemberChanges = []
-    private var observers: NSHashTable<AnyObject>
     
     // MARK: - Init
     
@@ -42,12 +45,9 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
         input = inputComponent
         
         velocity = .zero
-        
-        observers = NSHashTable<AnyObject>.weakObjects()
-        
+
         super.init(graphics: graphicsComponent)
-        
-        add(observer: graphics)
+
         add(observer: physics)
         
         // reset position for observers' sake
@@ -69,17 +69,24 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
     // MARK: - Update
 
     public override func update(_ dt: Float) -> GameWorldMemberChanges {
+        // update components
         physics.update(with: self, dt: dt)
         graphics.update(with: self, dt: dt)
         state?.update(with: self, dt: dt)
         input?.update(with: self, dt: dt)
 
         defer {
+            // clear the change tracker once out of this update scope
             changes = .none
         }
         return changes
     }
     
+    public func removeFromParent() {
+        parent?.children.remove(self)
+        parent = nil
+    }
+
     // MARK: - State
 
     public func enter(state newState: GameObjectState) {
@@ -110,33 +117,19 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
     
     // MARK: - Events
     
-    public func add(observer: GameWorldMemberObserver) {
-        observers.add(observer)
-    }
-    
-    public func broadcast(event: GameWorldMemberEvent, payload: Any? = nil) {
+    override public func broadcast(event: GameWorldMemberEvent, payload: Any? = nil) {
         state?.receive(event: event, from: self, payload: payload)
-        observers.objectEnumerator().forEach { observer in
-            (observer as? GameWorldMemberObserver)?.receive(event: event, from: self, payload: payload)
-        }
-    }
-    
-    public func remove(observer: GameWorldMemberObserver) {
-        observers.remove(observer)
+        super.broadcast(event: event, payload: payload)
     }
     
     internal override func positionDidChange(from oldValue: Position) {
-        if position != oldValue {
-            changes.insert(.position)
-            broadcast(event: .memberChange(with: .position), payload: oldValue)
-        }
+        changes.insert(.position)
+        super.positionDidChange(from: oldValue)
     }
     
     private func velocityDidChange(from oldValue: Vector) {
-        if velocity != oldValue {
-            changes.insert(.velocity)
-            broadcast(event: .memberChange(with: .velocity), payload: oldValue)
-        }
+        changes.insert(.velocity)
+        broadcast(event: .memberChange(with: .velocity), payload: oldValue)
     }
     
 }

@@ -30,55 +30,6 @@ fileprivate class TestWorldCollisionDelegate: GameWorldCollisionDelegate {
     }
 }
 
-fileprivate class TestObjectGraphicsComponent: GameWorldMemberGraphicsComponent {
-    var sprite: SKSpriteNode = SKSpriteNode()
-    
-    func update(with owner: GameWorldMember, dt: Float) {
-        // do nothing
-    }
-}
-
-fileprivate class TestObjectPhysicsCollision: GameObjectCollisionComponent {
-    var categoryBitmask: GameObjectCollisionCategories = .all
-    var contactBitmask: GameObjectCollisionCategories = .all
-    var collisionBitmask: GameObjectCollisionCategories = .all
-    var contactAABB: AABB
-    init(aabb: AABB) {
-        contactAABB = aabb
-    }
-}
-
-fileprivate class TestObjectPhysicsComponent: GameObjectPhysicsComponent {
-    var mass: Float
-    var collision: GameObjectCollisionComponent
-    var gravityScale: Float
-    var thrust: GameObjectThrustComponent?
-    var distanceTraveled: Float
-    
-    init(aabb: AABB) {
-        mass = 1.0
-        collision = TestObjectPhysicsCollision(aabb: aabb)
-        gravityScale = 1.0
-        thrust = nil
-        distanceTraveled = 0.0
-    }
-    
-    func update(with owner: GameObject, dt: Float) {
-        // do nothing
-    }
-    
-    func receive(event: GameWorldMemberEvent, from sender: GameWorldMember, payload: Any?) {
-        switch event {
-        case .memberChange(let changes):
-            if changes.contains(.position) {
-                collision.contactAABB.position = sender.position
-            }
-        default:
-            break
-        }
-    }
-}
-
 fileprivate class TestTileElevation: GameTileElevation {
     func getElevation(atPoint point: PlaneCoordinate) -> Float {
         return .zero
@@ -114,7 +65,7 @@ class GameWorldTests: XCTestCase {
         for x in 0...100 {
             for y in 0...10 {
                 if Int.random(in: 0...9) != 7 {
-                    let tile = GameTile(graphics: TestObjectGraphicsComponent(),
+                    let tile = GameTile(graphics: TestMemberGraphicsComponent(),
                                         size: (width: tileSize.dx, height: tileSize.dy),
                                         elevation: TestTileElevation())
                     tile.position = Position(x: tileSize.dx * Float(x), y: tileSize.dy * Float(y))
@@ -132,14 +83,28 @@ class GameWorldTests: XCTestCase {
 
     
     func testGameWorldCollisionRayCheck() throws {
-        let testObject1 = GameObject(graphics: TestObjectGraphicsComponent(),
-                                    physics: TestObjectPhysicsComponent(aabb: AABB(halfwidths: Vector(dx: 0.55, dy: 0.55, dz: 0.55))),
-                                    input: nil)
+        let testObject1 = GameObject(graphics: TestMemberGraphicsComponent(),
+                                     physics: TestObjectPhysicsComponent(mass: 1.0,
+                                                                         collision: TestObjectCollisionComponent(categoryBitmask: .all,
+                                                                                                                 contactBitmask: .all,
+                                                                                                                 collisionBitmask: .all,
+                                                                                                                 contactAABB: AABB(halfwidths: Vector(dx: 0.55, dy: 0.55, dz: 0.55))),
+                                                                         gravityScale: 1.0,
+                                                                         thrust: nil,
+                                                                         distanceTraveled: 0.0),
+                                     input: nil)
         testObject1.position = Position(x: 3, y: 3)
         testWorld.add(member: testObject1)
         
-        let testObject2 = GameObject(graphics: TestObjectGraphicsComponent(),
-                                     physics: TestObjectPhysicsComponent(aabb: AABB(halfwidths: Vector(dx: 0.5, dy: 0.5, dz: 0.5))),
+        let testObject2 = GameObject(graphics: TestMemberGraphicsComponent(),
+                                     physics: TestObjectPhysicsComponent(mass: 1.0,
+                                                                         collision: TestObjectCollisionComponent(categoryBitmask: .all,
+                                                                                                                 contactBitmask: .all,
+                                                                                                                 collisionBitmask: .all,
+                                                                                                                 contactAABB: AABB(halfwidths: Vector(dx: 0.5, dy: 0.5, dz: 0.5))),
+                                                                         gravityScale: 1.0,
+                                                                         thrust: nil,
+                                                                         distanceTraveled: 0.0),
                                      input: nil)
         testObject2.position = Position(x: 6, y: 6)
         testWorld.add(member: testObject2)

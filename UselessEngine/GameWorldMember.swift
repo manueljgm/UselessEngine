@@ -12,6 +12,7 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
 
     public var graphics: GameWorldMemberGraphicsComponent
     
+    // The member's position.
     public var position: Position {
         didSet {
             if position != oldValue {
@@ -78,6 +79,12 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
     }
 
     internal func positionDidChange(from oldValue: Position) {
+        children.forEach { child in
+            child.position = Position(x: self.position.x + child.relativePosition.x,
+                                      y: self.position.y + child.relativePosition.y,
+                                      z: self.position.z + child.relativePosition.z)
+        }
+        
         broadcast(event: .memberChange(with: .position), payload: oldValue)
     }
 

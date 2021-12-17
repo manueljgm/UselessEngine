@@ -6,19 +6,41 @@
 //  Copyright (c) 2014 Useless Robot. All rights reserved.
 //
 
+import UIKit
+
 public class GameObject: GameWorldMember, GameWorldObserverSubject {
     
     // MARK: - Properties
-    
-    private static var inited: Int = 0
 
-    public internal(set) weak var parent: GameWorldMember?
+    internal private(set) static var inited: Int = 0
+    
+    public internal(set) weak var parent: GameWorldMember? {
+        didSet {
+            if parent != oldValue {
+                parentDidChange(from: oldValue)
+            }
+        }
+    }
     
     public private(set) var state: GameObjectState?
 
     public let audio: GameObjectAudioComponent?
     public let physics: GameObjectPhysicsComponent
     public var input: GameObjectInputComponent?
+    
+    /// The object's relative position to its parent.
+    public var relativePosition: Position {
+        get {
+            return _relativePosition
+        }
+        set {
+            if newValue != _relativePosition {
+                let oldValue = _relativePosition
+                _relativePosition = newValue
+                relativePositionDidChange(from: oldValue)
+            }
+        }
+    }
     
     /// The object's velocity.
     public var velocity: Vector {
@@ -29,7 +51,8 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
         }
     }
 
-    private var changes: GameWorldMemberChanges = []
+    private var _relativePosition: Position
+    private var _changes: GameWorldMemberChanges
     
     // MARK: - Init
     
@@ -44,7 +67,10 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
         physics = physicsComponent
         input = inputComponent
         
+        _relativePosition = .zero
         velocity = .zero
+        
+        _changes = []
 
         super.init(graphics: graphicsComponent)
 
@@ -77,9 +103,9 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
 
         defer {
             // clear the change tracker once out of this update scope
-            changes = .none
+            _changes = .none
         }
-        return changes
+        return _changes
     }
     
     public func removeFromParent() {
@@ -93,7 +119,7 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
         state?.willExit(with: self)
         state = newState
         state?.enter(with: self)
-        changes.insert(.state)
+        _changes.insert(.state)
         observers.objectEnumerator().forEach { observer in
             (observer as? GameWorldMemberObserver)?.receive(event: .memberChange(with: .state), from: self, payload: nil)
         }
@@ -109,7 +135,7 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
         state?.willExit(with: self)
         state = state?.fallbackState
         state?.reenter(with: self)
-        changes.insert(.state)
+        _changes.insert(.state)
         observers.objectEnumerator().forEach { observer in
             (observer as? GameWorldMemberObserver)?.receive(event: .memberChange(with: .state), from: self, payload: nil)
         }
@@ -117,18 +143,44 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
     
     // MARK: - Events
     
-    override public func broadcast(event: GameWorldMemberEvent, payload: Any? = nil) {
+    public override func broadcast(event: GameWorldMemberEvent, payload: Any? = nil) {
         state?.receive(event: event, from: self, payload: payload)
         super.broadcast(event: event, payload: payload)
     }
     
+    internal func parentDidChange(from oldValue: GameWorldMember?) {
+        guard let parent = parent else {
+            _relativePosition = .zero
+            return
+        }
+        
+        // update absolute position
+        position = Position(x: parent.position.x + relativePosition.x,
+                            y: parent.position.y + relativePosition.y,
+                            z: parent.position.z + relativePosition.z)
+    }
+    
+    internal func relativePositionDidChange(from oldValue: Position) {
+        // update absolute position
+        let parentPosition = parent?.position ?? .zero
+        position = Position(x: parentPosition.x + relativePosition.x,
+                            y: parentPosition.y + relativePosition.y,
+                            z: parentPosition.z + relativePosition.z)
+    }
+    
     internal override func positionDidChange(from oldValue: Position) {
-        changes.insert(.position)
+        if let parent = parent {
+            _relativePosition = Position(x: position.x - parent.position.x,
+                                         y: position.y - parent.position.y,
+                                         z: position.z - parent.position.z)
+        }
+
+        _changes.insert(.position)
         super.positionDidChange(from: oldValue)
     }
     
     private func velocityDidChange(from oldValue: Vector) {
-        changes.insert(.velocity)
+        _changes.insert(.velocity)
         broadcast(event: .memberChange(with: .velocity), payload: oldValue)
     }
     

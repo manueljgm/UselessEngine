@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
-public struct AABB {
+public struct AABB: Codable {
     
     /// AABB position
     public var position: Position {
@@ -34,6 +34,15 @@ public struct AABB {
     public private(set) var maximum: Position!
     
     private static let epsilon: Float = 1e-6
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        position = try container.decode(Position.self, forKey: .position)
+        halfwidths = try container.decode(Vector.self, forKey: .halfwidths)
+        anchorPosition = try container.decode(Vector.self, forKey: .anchorPosition)
+        
+        updateRelativePositions()
+    }
     
     public init(position: Position = .zero,
                 halfwidths: Vector,

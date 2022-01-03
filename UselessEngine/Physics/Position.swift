@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
-public struct Position: PlaneCoordinate {
+public struct Position: PlaneCoordinate, Codable {
     
     public static let zero: Position = Position(x: .zero, y: .zero)
     

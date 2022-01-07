@@ -25,15 +25,16 @@ public class GameWorld {
         }
     }
     
-    public var isPaused: Bool
-    public var gravity: Float
-    public private(set) var size: (width: Float, height: Float)
+    public let configuration: GameWorldConfiguration
+    
+    public var isTimeFrozen: Bool
 
+    public private(set) var size: (width: Float, height: Float)
     public let terrain: GameWorldTerrain
     public let pathGraph: GameWorldGraph?
     public let collisionGrid: GameWorldCollisionGrid
     
-    private let collisionDelegate: GameWorldCollisionDelegate
+    private let collisionDelegate: GameWorldCollisionDelegate // TODO: Move into GameWorldCollisionGrid
     
     private var entering: Set<GameWorldMember>
     private var inhabitants: Set<GameObject>
@@ -43,23 +44,22 @@ public class GameWorld {
     // MARK: - Init
     
     /// Initializes a game world.
-    public init(gravity: Float,
-                tileSize: Vector2d,
-                collisionCellSize: Vector2d,
+    public init(configuration: GameWorldConfiguration,
                 collisionDelegate: GameWorldCollisionDelegate,
                 pathGraphDelegate: GameWorldGraphDelegate? = nil) {
         
-        self.isPaused = false
-        self.gravity = gravity
+        self.configuration = configuration
+        
+        self.isTimeFrozen = false
         self.size = (.zero, .zero)
         
         self.entering = []
-        self.terrain = GameWorldTerrain(tileSize: tileSize)
+        self.terrain = GameWorldTerrain(tileSize: self.configuration.tileSize)
         self.inhabitants = []
         self.extras = []
         self.exiting = []
 
-        self.collisionGrid = GameWorldCollisionGrid(cellSize: collisionCellSize)
+        self.collisionGrid = GameWorldCollisionGrid(cellSize: self.configuration.collisionCellSize)
         self.collisionDelegate = collisionDelegate
 
         if let pathGraphDelegate = pathGraphDelegate {
@@ -80,7 +80,7 @@ public class GameWorld {
     }
 
     public func update(_ dt: Float, matchCriteria: (GameObject) -> Bool = { _ in return true }) {
-        if isPaused {
+        if isTimeFrozen {
             return
         }
 

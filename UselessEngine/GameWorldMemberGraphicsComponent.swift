@@ -10,7 +10,7 @@ import SpriteKit
 
 public protocol GameWorldMemberGraphicsComponent: GameWorldMemberObserver {
 
-    var sprite: SKSpriteNode { get }
+    var sprite: SKSpriteNode { get } // TODO: Consider replacing with SKTexture
 
     func update(with owner: GameWorldMember, dt: Float)
 

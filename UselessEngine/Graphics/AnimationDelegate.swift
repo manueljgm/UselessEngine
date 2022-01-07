@@ -6,8 +6,6 @@
 //  Copyright © 2021 Useless Robot. All rights reserved.
 //
 
-import Foundation
-
 public protocol AnimationDelegate: AnyObject {
     
     func didFinish(animation: Animation)

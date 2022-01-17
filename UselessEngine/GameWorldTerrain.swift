@@ -6,8 +6,6 @@
 //  Copyright © 2021 Useless Robot. All rights reserved.
 //
 
-import Foundation
-
 public class GameWorldTerrain {
 
     public private(set) var tileSize: Vector2d
@@ -22,7 +20,7 @@ public class GameWorldTerrain {
     }
     
     public func add(tile: GameTile) {
-        let gridPositionKey = gridPosition(from: tile.position)
+        let gridPositionKey = gridPosition(from: tile.position, componentPreprocessor: round)
         
         if let preexistingTile = tileByGridPosition[gridPositionKey] {
             tiles.remove(preexistingTile)
@@ -40,7 +38,8 @@ public class GameWorldTerrain {
     }
 
     public func tile(at position: PlaneCoordinate) -> GameTile? {
-        return tileByGridPosition[gridPosition(from: position)]
+        let gridPositionKey = gridPosition(from: position, componentPreprocessor: floor)
+        return tileByGridPosition[gridPositionKey]
     }
     
     public func elevation(at point: PlaneCoordinate) -> Float {
@@ -54,9 +53,11 @@ public class GameWorldTerrain {
 
     // MARK: - Helper Methods
     
-    private func gridPosition(from position: PlaneCoordinate) -> UnitPosition {
-        let gridPosition = UnitPosition(x: Int(round(position.x / tileSize.dx)),
-                                        y: Int(round(position.y / tileSize.dy)))
+    private func gridPosition(from position: PlaneCoordinate,
+                              componentPreprocessor preprocess: (Float) -> Float) -> UnitPosition
+    {
+        let gridPosition = UnitPosition(x: Int(preprocess(position.x / tileSize.dx)),
+                                        y: Int(preprocess(position.y / tileSize.dy)))
         return gridPosition
 
     }

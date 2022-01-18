@@ -13,7 +13,6 @@ public struct GameWorldConfiguration {
     public let tileSize: Vector2d
     public let collisionCellSize: Vector2d
     public let gravity: Float
-
     public var sunAngleInDegrees: Float {
         get {
             return _sunAngleInDegrees

@@ -31,10 +31,10 @@ public class GameWorld {
 
     public private(set) var size: (width: Float, height: Float)
     public let terrain: GameWorldTerrain
-    public let pathGraph: GameWorldGraph?
     public let collisionGrid: GameWorldCollisionGrid
+    public let pathGraph: GameWorldGraph?
     
-    private let collisionDelegate: GameWorldCollisionDelegate // TODO: Move into GameWorldCollisionGrid
+    private let collisionDelegate: GameWorldCollisionDelegate // TODO: Consider merging with GameWorldCollisionGrid
     
     private var entering: Set<GameWorldMember>
     private var inhabitants: Set<GameObject>

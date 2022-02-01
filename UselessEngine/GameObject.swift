@@ -21,6 +21,7 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
             }
         }
     }
+    public var hasParent: Bool { parent != nil }
     
     public private(set) var state: GameObjectState?
 
@@ -52,7 +53,6 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
     }
 
     private var _relativePosition: Position
-    private var _changes: GameWorldMemberChanges
     
     // MARK: - Init
     
@@ -69,8 +69,6 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
         
         _relativePosition = .zero
         velocity = .zero
-        
-        _changes = []
 
         super.init(graphics: graphicsComponent)
 
@@ -94,18 +92,14 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
     
     // MARK: - Update
 
-    public override func update(_ dt: Float) -> GameWorldMemberChanges {
+    public override func update(_ dt: Float) {
+        // base update
+        super.update(dt)
+        
         // update components
         physics.update(with: self, dt: dt)
-        graphics.update(with: self, dt: dt)
         state?.update(with: self, dt: dt)
         input?.update(with: self, dt: dt)
-
-        defer {
-            // clear the change tracker once out of this update scope
-            _changes = .none
-        }
-        return _changes
     }
     
     public func removeFromParent() {
@@ -119,7 +113,6 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
         state?.willExit(with: self)
         state = newState
         state?.enter(with: self)
-        _changes.insert(.state)
         observers.objectEnumerator().forEach { observer in
             (observer as? GameWorldMemberObserver)?.receive(event: .memberChange(with: .state), from: self, payload: nil)
         }
@@ -135,7 +128,6 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
         state?.willExit(with: self)
         state = state?.fallbackState
         state?.reenter(with: self)
-        _changes.insert(.state)
         observers.objectEnumerator().forEach { observer in
             (observer as? GameWorldMemberObserver)?.receive(event: .memberChange(with: .state), from: self, payload: nil)
         }
@@ -175,12 +167,10 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
                                          z: position.z - parent.position.z)
         }
 
-        _changes.insert(.position)
         super.positionDidChange(from: oldValue)
     }
     
     private func velocityDidChange(from oldValue: Vector) {
-        _changes.insert(.velocity)
         broadcast(event: .memberChange(with: .velocity), payload: oldValue)
     }
     

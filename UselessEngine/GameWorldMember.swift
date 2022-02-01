@@ -9,6 +9,7 @@
 public class GameWorldMember: NSObject, GameWorldPositionable {
 
     public internal(set) weak var world: GameWorld?
+    public var inWorld: Bool { world != nil }
 
     public var graphics: GameWorldMemberGraphicsComponent
     
@@ -25,12 +26,15 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
 
     internal var observers: NSHashTable<AnyObject>
     
+    internal var isActive: Bool
+    
     public init(graphics: GameWorldMemberGraphicsComponent, position: Position = .zero) {
         self.graphics = graphics
         self.position = .zero
         self.children = []
         self.observers = NSHashTable<AnyObject>.weakObjects()
-
+        self.isActive = false
+        
         super.init()
         
         add(observer: graphics)
@@ -40,17 +44,22 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
             self.position = position
         }
     }
-    
-    public func update(_ dt: Float) -> GameWorldMemberChanges {
+
+    public func update(_ dt: Float) {
+        // update flag to represent that this member is now active
+        isActive = true
+
+        // update children
+        children.forEach {
+            $0.update(dt)
+        }
+        
         // update graphics
         graphics.update(with: self, dt: dt)
-
-        // there are no significant changes to report
-        return .none
     }
 
     public func add(child: GameObject) -> Bool {
-        guard child.parent == nil else {
+        if child.inWorld || child.hasParent {
             return false
         }
         

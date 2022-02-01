@@ -12,10 +12,13 @@ public class GameWorldCollisionGrid {
     private var lastKnownCellsBelowGameObject: [GameObject: Set<UnitPosition>]
     private var gameObjectsOnCell: [UnitPosition: Set<GameObject>]
 
-    internal init(cellSize: Vector2d) {
+    private var delegate: GameWorldCollisionDelegate
+    
+    internal init(cellSize: Vector2d, delegate: GameWorldCollisionDelegate) {
         self.collisionCellSize = cellSize
         self.lastKnownCellsBelowGameObject = [:]
         self.gameObjectsOnCell = [:]
+        self.delegate = delegate
     }
 
     public func onNeighbors(of gameObject: GameObject, doAction: (GameObject) -> Void) {
@@ -30,8 +33,8 @@ public class GameWorldCollisionGrid {
     
     public func nextObject(between startPosition: Position,
                            and endPosition: Position,
-                           matchCriteria match: (GameObject) -> Bool = { _ in return true }) -> (object: GameObject, distance: Vector)?
-    {
+                           matchCriteria match: (GameObject) -> Bool = { _ in return true })
+    -> (object: GameObject, distance: Vector)? {
         let x0 = startPosition.x / collisionCellSize.dx
         let y0 = startPosition.y / collisionCellSize.dy
         let x1 = endPosition.x / collisionCellSize.dx
@@ -101,8 +104,8 @@ public class GameWorldCollisionGrid {
     }
     
     public func hasObject(at position: Position,
-                          matchCriteria match: (GameObject) -> Bool = { _ in return true }) -> Bool
-    {
+                          matchCriteria match: (GameObject) -> Bool = { _ in return true })
+    -> Bool {
         let cellPosition = UnitPosition(x: Int(floor((position.x) / collisionCellSize.dx)),
                                         y: Int(floor((position.y) / collisionCellSize.dy)))
 
@@ -116,28 +119,48 @@ public class GameWorldCollisionGrid {
     
     public func hasObject(between startPosition: Position,
                           and endPosition: Position,
-                          matchCriteria match: (GameObject) -> Bool = { _ in return true }) -> Bool
-    {
+                          matchCriteria match: (GameObject) -> Bool = { _ in return true })
+    -> Bool {
         return nextObject(between: startPosition, and: endPosition, matchCriteria: match) != nil
     }
     
     // MARK: - Helper Methods
-
-    internal func update(for gameObject: GameObject) {
-        let currentPositions = currentCellPositions(below: gameObject.physics.collision.contactAABB)
+    
+    public func resolve(for gameObject: GameObject) {
+        updateCellPositions(for: gameObject)
         
-        let lastKnownPositions = lastKnownCellsBelowGameObject[gameObject] ?? []
-        lastKnownPositions.subtracting(currentPositions).forEach { formerCellPosition in
-            remove(gameObject, from: formerCellPosition)
+        // resolve any collisions
+        onNeighbors(of: gameObject) { otherObject in
+            // check for a hit
+            if let hit = delegate.intersect(gameObject, with: otherObject) {
+                // a hit is detected so if contactable,
+                // handle the contact
+                if delegate.isGameObject(gameObject, contactableWith: otherObject) {
+                    // call event handlers
+                    gameObject.state?.handleContact(between: gameObject, and: otherObject)
+                    otherObject.state?.handleContact(between: otherObject, and: gameObject)
+                }
+                // and if collidable, handle collision
+                if delegate.isGameObject(gameObject, collidableWith: otherObject) {
+                    // resolve the collision by correcting positions
+                    let corrections = delegate.resolveCollision(on: gameObject, against: otherObject, for: hit)
+                    // then call event handlers
+                    gameObject.state?.handleCollision(between: gameObject,
+                                                      and: otherObject,
+                                                      withCorrection: corrections.thisCorrection)
+                    otherObject.state?.handleCollision(between: otherObject,
+                                                       and: gameObject,
+                                                       withCorrection: corrections.otherCorrection)
+                    // and update the collision grid for changes
+                    if corrections.thisCorrection != .zero {
+                        updateCellPositions(for: gameObject)
+                    }
+                    if corrections.otherCorrection != .zero {
+                        updateCellPositions(for: otherObject)
+                    }
+                }
+            }
         }
-            
-        currentPositions.subtracting(lastKnownPositions).forEach { newCellPosition in
-            var gameObjects = gameObjectsOnCell[newCellPosition] ?? []
-            gameObjects.insert(gameObject)
-            gameObjectsOnCell[newCellPosition] = gameObjects
-        }
-        
-        lastKnownCellsBelowGameObject[gameObject] = currentPositions
     }
     
     internal func remove(_ gameObject: GameObject, from cellPosition: UnitPosition? = nil) {
@@ -177,6 +200,23 @@ public class GameWorldCollisionGrid {
         }
 
         return gridPositions
+    }
+    
+    private func updateCellPositions(for gameObject: GameObject) {
+        let currentPositions = currentCellPositions(below: gameObject.physics.collision.contactAABB)
+        
+        let lastKnownPositions = lastKnownCellsBelowGameObject[gameObject] ?? []
+        lastKnownPositions.subtracting(currentPositions).forEach { formerCellPosition in
+            remove(gameObject, from: formerCellPosition)
+        }
+        
+        currentPositions.subtracting(lastKnownPositions).forEach { newCellPosition in
+            var gameObjects = gameObjectsOnCell[newCellPosition] ?? []
+            gameObjects.insert(gameObject)
+            gameObjectsOnCell[newCellPosition] = gameObjects
+        }
+        
+        lastKnownCellsBelowGameObject[gameObject] = currentPositions
     }
     
 }

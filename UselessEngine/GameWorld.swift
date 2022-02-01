@@ -8,6 +8,10 @@
 
 import UselessCommon
 
+public enum GameWorldError: Error {
+    case collisionCellSizeNotGreaterThanZero
+}
+
 public class GameWorld {
     
     public weak var delegate: GameWorldDelegate? {
@@ -33,9 +37,7 @@ public class GameWorld {
     public let terrain: GameWorldTerrain
     public let collisionGrid: GameWorldCollisionGrid
     public let pathGraph: GameWorldGraph?
-    
-    private let collisionDelegate: GameWorldCollisionDelegate // TODO: Consider merging with GameWorldCollisionGrid
-    
+
     private var entering: Set<GameWorldMember>
     private var inhabitants: Set<GameObject>
     private var extras: Set<GameWorldMember>
@@ -46,7 +48,11 @@ public class GameWorld {
     /// Initializes a game world.
     public init(configuration: GameWorldConfiguration,
                 collisionDelegate: GameWorldCollisionDelegate,
-                pathGraphDelegate: GameWorldGraphDelegate? = nil) {
+                pathGraphDelegate: GameWorldGraphDelegate? = nil) throws
+    {
+        guard configuration.collisionCellSize.dx > 0.0 && configuration.collisionCellSize.dy > 0.0 else {
+            throw GameWorldError.collisionCellSizeNotGreaterThanZero
+        }
         
         self.configuration = configuration
         
@@ -59,8 +65,8 @@ public class GameWorld {
         self.extras = []
         self.exiting = []
 
-        self.collisionGrid = GameWorldCollisionGrid(cellSize: self.configuration.collisionCellSize)
-        self.collisionDelegate = collisionDelegate
+        self.collisionGrid = GameWorldCollisionGrid(cellSize: self.configuration.collisionCellSize,
+                                                    delegate: collisionDelegate)
 
         if let pathGraphDelegate = pathGraphDelegate {
             self.pathGraph = GameWorldGraph(graphDelegate: pathGraphDelegate)
@@ -78,74 +84,39 @@ public class GameWorld {
         print("GameWorld:deinit")
         #endif
     }
-
-    public func update(_ dt: Float, matchCriteria: (GameObject) -> Bool = { _ in return true }) {
+    
+    public func update(_ dt: Float, matchCriteria: (GameWorldMember) -> Bool = { _ in return true }) {
         if isTimeFrozen {
             return
         }
 
-        // process exiting members
-        processExiting()
-
-        // process entering members
-        processEntering()
+        // process entering and exiting members
+        processMembers()
         
         // update terrain
         terrain.update(dt: dt)
 
         // update extras
-        extras.forEach {
-            let _ = $0.update(dt)
-        }
-
-        // update all game objects
-        inhabitants.forEach { gameObject in
-            // match the game object
-            guard matchCriteria(gameObject) else {
+        extras.forEach { extra in
+            // match the update criteria
+            guard extra.isActive || matchCriteria(extra) else {
                 return
             }
-            
-            // update the game object
-            let changesObserved = gameObject.update(dt)
+            // update the extra
+            extra.update(dt)
+        }
 
-            // if the object's position changed, check and resolve for boundaries or collisions
-            if changesObserved.contains(.position) {
-                // update the collision grid for position changes
-                collisionGrid.update(for: gameObject)
-
-                // resolve any collisions
-                collisionGrid.onNeighbors(of: gameObject) { otherObject in
-                    // check for a hit
-                    if let hit = collisionDelegate.intersect(gameObject, with: otherObject) {
-                        // a hit is detected so if contactable,
-                        // handle the contact
-                        if collisionDelegate.isGameObject(gameObject, contactableWith: otherObject) {
-                            // call event handlers
-                            gameObject.state?.handleContact(between: gameObject, and: otherObject)
-                            otherObject.state?.handleContact(between: otherObject, and: gameObject)
-                        }
-                        // and if collidable, handle collision
-                        if collisionDelegate.isGameObject(gameObject, collidableWith: otherObject) {
-                            // resolve the collision by correcting positions
-                            let corrections = collisionDelegate.resolveCollision(on: gameObject, against: otherObject, for: hit)
-                            // then call event handlers
-                            gameObject.state?.handleCollision(between: gameObject,
-                                                              and: otherObject,
-                                                              withCorrection: corrections.thisCorrection)
-                            otherObject.state?.handleCollision(between: otherObject,
-                                                               and: gameObject,
-                                                               withCorrection: corrections.otherCorrection)
-                            // and update the collision grid for changes
-                            if corrections.thisCorrection != .zero {
-                                collisionGrid.update(for: gameObject)
-                            }
-                            if corrections.otherCorrection != .zero {
-                                collisionGrid.update(for: otherObject)
-                            }
-                        }
-                    }
-                }
+        // update inhabitants
+        inhabitants.forEach { gameObject in
+            // match the update criteria
+            guard gameObject.isActive || matchCriteria(gameObject) else {
+                return
             }
+            // update the game object
+            gameObject.update(dt)
+
+            // resolve any collisions
+            collisionGrid.resolve(for: gameObject)
         }
     }
     
@@ -155,6 +126,14 @@ public class GameWorld {
 
     public func remove(member: GameWorldMember) {
         exiting.insert(member)
+    }
+    
+    public func processMembers() {
+        // process exiting members
+        processExiting()
+        
+        // process entering members
+        processEntering()
     }
     
     // MARK: - Private Methods
@@ -181,14 +160,16 @@ public class GameWorld {
     }
     
     private func admit(gameObject: GameObject) {
+        if !gameObject.hasParent {
+            // add the object to this world's list of inhabitants
+            inhabitants.insert(gameObject)
+        }
+
         // elevate the object if set below floor
         gameObject.position.z = max(gameObject.position.z, terrain.elevation(at: gameObject.position))
-
-        // add the object to this world's list of inhabitants
-        inhabitants.insert(gameObject)
         
-        // update the collision grid
-        collisionGrid.update(for: gameObject)
+        // resolve any collisions
+        collisionGrid.resolve(for: gameObject)
 
         // subscribe to the object's notifications
         gameObject.add(observer: self)
@@ -196,7 +177,8 @@ public class GameWorld {
     
     private func processEntering() {
         while let newMember = entering.popFirst() {
-            guard newMember.world == nil else {
+            if newMember.inWorld {
+                // this member is already in a world so ignore it
                 continue
             }
             
@@ -208,14 +190,12 @@ public class GameWorld {
             default:
                 extras.insert(newMember)
             }
-            
             newMember.world = self
-            
-            delegate?.gameWorld(self, added: newMember)
-            
             newMember.children.forEach { child in
                 add(member: child)
             }
+            
+            delegate?.gameWorld(self, added: newMember)
             
             #if DEBUG_VERBOSE
             let message: String

@@ -56,11 +56,13 @@ class GameWorldTests: XCTestCase {
         
         let tileSize = Vector2d(dx: 2.0, dy: 2.0)
         
-        testWorld = GameWorld(gravity: -9.8,
-                              tileSize: tileSize,
-                              collisionCellSize: Vector2d(dx: 1.0, dy: 1.0),
-                              collisionDelegate: TestWorldCollisionDelegate(),
-                              pathGraphDelegate: TestGameWorldGraphDelegate())
+        let testWorldConfiguration = GameWorldConfiguration(tileSize: tileSize,
+                                                            collisionCellSize: Vector2d(dx: 1.0, dy: 1.0),
+                                                            gravity: -9.8,
+                                                            sunAngleInDegrees: 90.0)
+        testWorld = try! GameWorld(configuration: testWorldConfiguration,
+                                   collisionDelegate: TestWorldCollisionDelegate(),
+                                   pathGraphDelegate: TestGameWorldGraphDelegate())
         
         for x in 0...100 {
             for y in 0...10 {

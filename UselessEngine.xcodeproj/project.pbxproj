@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1A09542527BAD63E00457D59 /* UselessCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A09542427BAD62A00457D59 /* UselessCommon.framework */; };
+		1A09542627BAD63E00457D59 /* UselessCommon.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1A09542427BAD62A00457D59 /* UselessCommon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1A2010CD25B377DA00776B52 /* GameWorldCollisionGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A2010CC25B377DA00776B52 /* GameWorldCollisionGrid.swift */; };
 		1A317E2425BA8305004358E3 /* GameWorldMemberChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A317E2325BA8305004358E3 /* GameWorldMemberChanges.swift */; };
 		1A317E4125BE195B004358E3 /* GameWorldPositionable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A317E4025BE195B004358E3 /* GameWorldPositionable.swift */; };
@@ -47,8 +49,6 @@
 		1A42FBD525B7CB980040D481 /* GameWorldGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A42FBD425B7CB980040D481 /* GameWorldGraph.swift */; };
 		1A4AB7392616A50600712D3D /* VectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4AB7382616A50600712D3D /* VectorTests.swift */; };
 		1A56A1D526D9969900428F62 /* AnimationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A56A1D426D9969900428F62 /* AnimationDelegate.swift */; };
-		1A58E504278A102300038F22 /* UselessCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A4AE29824C28D9C001E7A00 /* UselessCommon.framework */; };
-		1A58E505278A102300038F22 /* UselessCommon.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1A4AE29824C28D9C001E7A00 /* UselessCommon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1A5993D02592E7DB006E4AC4 /* GameWorldGraphNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5993CF2592E7DB006E4AC4 /* GameWorldGraphNode.swift */; };
 		1A5BDF29267E88D100E96D04 /* GameObjectAudioComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5BDF28267E88D100E96D04 /* GameObjectAudioComponent.swift */; };
 		1A5FB9EF24DAE3AE0025BE93 /* AnimationFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5FB9EE24DAE3AE0025BE93 /* AnimationFrame.swift */; };
@@ -71,19 +71,19 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		1A09542327BAD62A00457D59 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1A09541F27BAD62A00457D59 /* UselessCommon.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1A04E86024C1D82700081D46;
+			remoteInfo = UselessCommon;
+		};
 		1A42FBBC25B67AE60040D481 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 1A32FC0F24C1E33800CE3B0F /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 1A32FC1724C1E33800CE3B0F;
 			remoteInfo = UselessEngine;
-		};
-		1A4AE29724C28D9C001E7A00 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 1A4AE29324C28D9C001E7A00 /* UselessCommon.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1A04E86024C1D82700081D46;
-			remoteInfo = UselessCommon;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -94,7 +94,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				1A58E505278A102300038F22 /* UselessCommon.framework in Embed Frameworks */,
+				1A09542627BAD63E00457D59 /* UselessCommon.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -102,6 +102,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1A09541F27BAD62A00457D59 /* UselessCommon.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = UselessCommon.xcodeproj; path = ../UselessCommon/UselessCommon.xcodeproj; sourceTree = "<group>"; };
 		1A2010CC25B377DA00776B52 /* GameWorldCollisionGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldCollisionGrid.swift; sourceTree = "<group>"; };
 		1A317E2325BA8305004358E3 /* GameWorldMemberChanges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldMemberChanges.swift; sourceTree = "<group>"; };
 		1A317E4025BE195B004358E3 /* GameWorldPositionable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldPositionable.swift; sourceTree = "<group>"; };
@@ -144,7 +145,6 @@
 		1A42FBBA25B67AE60040D481 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1A42FBD425B7CB980040D481 /* GameWorldGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldGraph.swift; sourceTree = "<group>"; };
 		1A4AB7382616A50600712D3D /* VectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VectorTests.swift; sourceTree = "<group>"; };
-		1A4AE29324C28D9C001E7A00 /* UselessCommon.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = UselessCommon.xcodeproj; path = ../UselessCommon/UselessCommon.xcodeproj; sourceTree = "<group>"; };
 		1A56A1D426D9969900428F62 /* AnimationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationDelegate.swift; sourceTree = "<group>"; };
 		1A5993CF2592E7DB006E4AC4 /* GameWorldGraphNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldGraphNode.swift; sourceTree = "<group>"; };
 		1A5BDF28267E88D100E96D04 /* GameObjectAudioComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameObjectAudioComponent.swift; sourceTree = "<group>"; };
@@ -172,7 +172,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1A58E504278A102300038F22 /* UselessCommon.framework in Frameworks */,
+				1A09542527BAD63E00457D59 /* UselessCommon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -187,6 +187,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1A09542027BAD62A00457D59 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1A09542427BAD62A00457D59 /* UselessCommon.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		1A32FC0E24C1E33800CE3B0F = {
 			isa = PBXGroup;
 			children = (
@@ -297,17 +305,9 @@
 		1A4AE29224C28D9C001E7A00 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				1A4AE29324C28D9C001E7A00 /* UselessCommon.xcodeproj */,
+				1A09541F27BAD62A00457D59 /* UselessCommon.xcodeproj */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		1A4AE29424C28D9C001E7A00 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				1A4AE29824C28D9C001E7A00 /* UselessCommon.framework */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		1A933BAA27682BF400781E06 /* TestObjects */ = {
@@ -403,8 +403,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 1A4AE29424C28D9C001E7A00 /* Products */;
-					ProjectRef = 1A4AE29324C28D9C001E7A00 /* UselessCommon.xcodeproj */;
+					ProductGroup = 1A09542027BAD62A00457D59 /* Products */;
+					ProjectRef = 1A09541F27BAD62A00457D59 /* UselessCommon.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -416,11 +416,11 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		1A4AE29824C28D9C001E7A00 /* UselessCommon.framework */ = {
+		1A09542427BAD62A00457D59 /* UselessCommon.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = UselessCommon.framework;
-			remoteRef = 1A4AE29724C28D9C001E7A00 /* PBXContainerItemProxy */;
+			remoteRef = 1A09542327BAD62A00457D59 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -577,7 +577,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -635,7 +635,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -705,7 +705,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = W8DNYX3CN5;
 				INFOPLIST_FILE = UselessEngineTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -725,7 +724,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = W8DNYX3CN5;
 				INFOPLIST_FILE = UselessEngineTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

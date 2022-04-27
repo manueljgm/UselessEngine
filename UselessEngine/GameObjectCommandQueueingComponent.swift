@@ -6,16 +6,16 @@
 //  Copyright © 2015 Useless Robot. All rights reserved.
 //
 
-public class GameObjectCommandQueueingComponent: GameObjectInputComponent {
+open class GameObjectCommandQueueingComponent: GameObjectInputComponent {
 
     /// Queued input commands.
-    private var commandQueue: [(command: GameObjectCommand, payload: AnyObject?)] = []
+    public private(set) var commandQueue: [(command: GameObjectCommand, payload: AnyObject?)] = []
     
     public init() {
 
     }
 
-    public final func queue(command: GameObjectCommand, payload: AnyObject?) {
+    public func queue(command: GameObjectCommand, payload: AnyObject?) {
         if (command.priority == .urgent) {
             // if urgent, override all commands
             commandQueue = [(command, payload)]
@@ -27,7 +27,7 @@ public class GameObjectCommandQueueingComponent: GameObjectInputComponent {
         }
     }
     
-    public func update(with gameObject: GameObject, dt: Float) {
+    open func update(with gameObject: GameObject, dt: Float) {
         if let tuple = commandQueue.popLast() {
             gameObject.state?.handle(command: tuple.command, on: gameObject, payload: tuple.payload)
         }

@@ -10,8 +10,8 @@ import SpriteKit
 
 public protocol GameWorldMemberGraphicsComponent: GameWorldMemberObserver {
 
-    var sprite: SKSpriteNode { get } // TODO: Consider replacing with SKTexture
-
+    var sprite: SKSpriteNode { get }
+    
     func update(with owner: GameWorldMember, dt: Float)
-
+  
 }

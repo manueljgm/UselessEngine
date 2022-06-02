@@ -58,7 +58,8 @@
 		1A933BAE2768312500781E06 /* TestObjectPhysicsComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A933BAD2768312500781E06 /* TestObjectPhysicsComponent.swift */; };
 		1A933BB02768315F00781E06 /* TestObjectCollisionComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A933BAF2768315F00781E06 /* TestObjectCollisionComponent.swift */; };
 		1AB525FC25F70F0B00CDC6B0 /* GameWorldGraphDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AB525FB25F70F0B00CDC6B0 /* GameWorldGraphDelegate.swift */; };
-		1AC46F0527849FB1003C56ED /* GameWorldConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC46F0427849FB1003C56ED /* GameWorldConfiguration.swift */; };
+		1ABB1F84281B771D00935201 /* GameWorldMemberCustomAttributeKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ABB1F83281B771D00935201 /* GameWorldMemberCustomAttributeKey.swift */; };
+		1ABB1F8C281B861B00935201 /* GameWorldCustomAttributeKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ABB1F8B281B861B00935201 /* GameWorldCustomAttributeKey.swift */; };
 		1AC5A5F926705170001830F6 /* GameObjectStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC5A5F826705170001830F6 /* GameObjectStateTests.swift */; };
 		1AC6463124CBC4CE007D8C21 /* Boost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC6463024CBC4CE007D8C21 /* Boost.swift */; };
 		1ACEEFED25CB920700095943 /* AABBTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ACEEFEC25CB920700095943 /* AABBTests.swift */; };
@@ -155,7 +156,8 @@
 		1A933BAD2768312500781E06 /* TestObjectPhysicsComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestObjectPhysicsComponent.swift; sourceTree = "<group>"; };
 		1A933BAF2768315F00781E06 /* TestObjectCollisionComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestObjectCollisionComponent.swift; sourceTree = "<group>"; };
 		1AB525FB25F70F0B00CDC6B0 /* GameWorldGraphDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldGraphDelegate.swift; sourceTree = "<group>"; };
-		1AC46F0427849FB1003C56ED /* GameWorldConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldConfiguration.swift; sourceTree = "<group>"; };
+		1ABB1F83281B771D00935201 /* GameWorldMemberCustomAttributeKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldMemberCustomAttributeKey.swift; sourceTree = "<group>"; };
+		1ABB1F8B281B861B00935201 /* GameWorldCustomAttributeKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldCustomAttributeKey.swift; sourceTree = "<group>"; };
 		1AC5A5F826705170001830F6 /* GameObjectStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameObjectStateTests.swift; sourceTree = "<group>"; };
 		1AC6463024CBC4CE007D8C21 /* Boost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Boost.swift; sourceTree = "<group>"; };
 		1ACEEFEC25CB920700095943 /* AABBTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AABBTests.swift; sourceTree = "<group>"; };
@@ -232,6 +234,8 @@
 				1A32FC3524C1E36500CE3B0F /* GameTileElevation.swift */,
 				1A32FC2E24C1E36500CE3B0F /* GameTile.swift */,
 				1A317E7A25C24BB0004358E3 /* GameWorldTerrain.swift */,
+				1ABB1F83281B771D00935201 /* GameWorldMemberCustomAttributeKey.swift */,
+				1A32FC2A24C1E36400CE3B0F /* GameObjectState.swift */,
 				1A5BDF28267E88D100E96D04 /* GameObjectAudioComponent.swift */,
 				1AF4E07F26D4207700DA47C5 /* GameObjectThrustComponent.swift */,
 				1A32FC4024C1E36600CE3B0F /* GameObjectCollisionCategories.swift */,
@@ -241,9 +245,8 @@
 				1A32FC3824C1E36500CE3B0F /* GameObjectCommand.swift */,
 				1A32FC2924C1E36400CE3B0F /* GameObjectInputComponent.swift */,
 				1A32FC4824C1E36600CE3B0F /* GameObjectCommandQueueingComponent.swift */,
-				1A32FC2A24C1E36400CE3B0F /* GameObjectState.swift */,
 				1A32FC4924C1E36700CE3B0F /* GameObject.swift */,
-				1AC46F0427849FB1003C56ED /* GameWorldConfiguration.swift */,
+				1ABB1F8B281B861B00935201 /* GameWorldCustomAttributeKey.swift */,
 				1A32FC2424C1E36400CE3B0F /* GameWorldCollisionDelegate.swift */,
 				1A2010CC25B377DA00776B52 /* GameWorldCollisionGrid.swift */,
 				1A5993CF2592E7DB006E4AC4 /* GameWorldGraphNode.swift */,
@@ -449,7 +452,6 @@
 			files = (
 				1A32FC6324C1E36700CE3B0F /* GameObjectCommand.swift in Sources */,
 				1A317E2425BA8305004358E3 /* GameWorldMemberChanges.swift in Sources */,
-				1AC46F0527849FB1003C56ED /* GameWorldConfiguration.swift in Sources */,
 				1A32FC7224C1E36700CE3B0F /* Position2d.swift in Sources */,
 				1A32FC7524C1E36700CE3B0F /* UnitPosition.swift in Sources */,
 				1AB525FC25F70F0B00CDC6B0 /* GameWorldGraphDelegate.swift in Sources */,
@@ -473,6 +475,7 @@
 				1A32FC7824C1E36700CE3B0F /* GameObjectPhysicsComponent.swift in Sources */,
 				1A32FC5C24C1E36700CE3B0F /* Vector.swift in Sources */,
 				1A56A1D526D9969900428F62 /* AnimationDelegate.swift in Sources */,
+				1ABB1F84281B771D00935201 /* GameWorldMemberCustomAttributeKey.swift in Sources */,
 				1A32FC5B24C1E36700CE3B0F /* Hit.swift in Sources */,
 				1A32FC7424C1E36700CE3B0F /* GameObject.swift in Sources */,
 				1AF171E52791118700689F44 /* GameWorldFactory.swift in Sources */,
@@ -480,6 +483,7 @@
 				1A32FC6B24C1E36700CE3B0F /* GameObjectCollisionCategories.swift in Sources */,
 				1A32FC6924C1E36700CE3B0F /* GameWorldMemberEvent.swift in Sources */,
 				1A32FC6C24C1E36700CE3B0F /* GameWorldMember.swift in Sources */,
+				1ABB1F8C281B861B00935201 /* GameWorldCustomAttributeKey.swift in Sources */,
 				1A32FC5F24C1E36700CE3B0F /* GameWorld.swift in Sources */,
 				1AD1C61526D5CDDD0000FD61 /* GameObjectCollisionDelegate.swift in Sources */,
 				1A32FC7024C1E36700CE3B0F /* GameObjectCollisionComponent.swift in Sources */,

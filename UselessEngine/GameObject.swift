@@ -22,13 +22,13 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
         }
     }
     public var hasParent: Bool { parent != nil }
-    
+
     public private(set) var state: GameObjectState?
 
     public let audio: GameObjectAudioComponent?
     public let physics: GameObjectPhysicsComponent
     public var input: GameObjectInputComponent?
-    
+
     /// The object's relative position to its parent.
     public var relativePosition: Position {
         get {
@@ -69,14 +69,14 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
         
         _relativePosition = .zero
         velocity = .zero
-
+        
         super.init(graphics: graphicsComponent)
 
         add(observer: physics)
         
         // reset position for observers' sake
         position = .zero
-        
+
         GameObject.inited += 1
         #if DEBUG_VERBOSE
         print(String(format: "GameObject:init; %d exist", GameObject.inited))

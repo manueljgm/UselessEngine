@@ -6,10 +6,9 @@
 //  Copyright (c) 2014 Useless Robot. All rights reserved.
 //
 
-public protocol GameObjectInputComponent: AnyObject {
+public protocol GameObjectInputComponent: GameWorldUpdateable {
 
     func queue(command: GameObjectCommand, payload: AnyObject?)
-    func update(with gameObject: GameObject, dt: Float)
 
 }
 

@@ -16,20 +16,9 @@ public class GameWorld {
     
     public weak var delegate: GameWorldDelegate? {
         didSet {
-            // update delegate with world's tiles and objects
-            terrain.tiles.forEach {
-                delegate?.gameWorld(self, added: $0)
-            }
-            inhabitants.forEach {
-                delegate?.gameWorld(self, added: $0)
-            }
-            extras.forEach {
-                delegate?.gameWorld(self, added: $0)
-            }
+            delegateDidSet()
         }
     }
-    
-    public let configuration: GameWorldConfiguration
     
     public var isTimeFrozen: Bool
 
@@ -38,6 +27,8 @@ public class GameWorld {
     public let collisionGrid: GameWorldCollisionGrid
     public let pathGraph: GameWorldGraph?
 
+    public var customAttributes: [GameWorldCustomAttributeKey: Float]
+    
     private var entering: Set<GameWorldMember>
     private var inhabitants: Set<GameObject>
     private var extras: Set<GameWorldMember>
@@ -46,26 +37,25 @@ public class GameWorld {
     // MARK: - Init
     
     /// Initializes a game world.
-    public init(configuration: GameWorldConfiguration,
+    public init(tileSize: Vector2d,
+                collisionCellSize: Vector2d,
                 collisionDelegate: GameWorldCollisionDelegate,
                 pathGraphDelegate: GameWorldGraphDelegate? = nil) throws
     {
-        guard configuration.collisionCellSize.dx > 0.0 && configuration.collisionCellSize.dy > 0.0 else {
+        guard collisionCellSize.dx > 0.0 && collisionCellSize.dy > 0.0 else {
             throw GameWorldError.collisionCellSizeNotGreaterThanZero
         }
-        
-        self.configuration = configuration
-        
+
         self.isTimeFrozen = false
         self.size = (.zero, .zero)
         
         self.entering = []
-        self.terrain = GameWorldTerrain(tileSize: self.configuration.tileSize)
+        self.terrain = GameWorldTerrain(tileSize: tileSize)
         self.inhabitants = []
         self.extras = []
         self.exiting = []
 
-        self.collisionGrid = GameWorldCollisionGrid(cellSize: self.configuration.collisionCellSize,
+        self.collisionGrid = GameWorldCollisionGrid(cellSize: collisionCellSize,
                                                     delegate: collisionDelegate)
 
         if let pathGraphDelegate = pathGraphDelegate {
@@ -74,6 +64,8 @@ public class GameWorld {
             self.pathGraph = nil
         }
 
+        customAttributes = [:]
+        
         #if DEBUG_VERBOSE
         print("GameWorld:init")
         #endif
@@ -117,6 +109,8 @@ public class GameWorld {
 
             // resolve any collisions
             collisionGrid.resolve(for: gameObject)
+            
+            delegate?.gameWorld(self, updated: gameObject)
         }
     }
     
@@ -236,6 +230,19 @@ public class GameWorld {
             exitingMember.children.forEach { child in
                 remove(member: child)
             }
+        }
+    }
+    
+    private func delegateDidSet() {
+        // update delegate with world's tiles and objects
+        terrain.tiles.forEach {
+            delegate?.gameWorld(self, added: $0)
+        }
+        inhabitants.forEach {
+            delegate?.gameWorld(self, added: $0)
+        }
+        extras.forEach {
+            delegate?.gameWorld(self, added: $0)
         }
     }
 

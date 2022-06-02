@@ -11,7 +11,7 @@ import SpriteKit
 public protocol GameWorldMemberGraphicsComponent: GameWorldMemberObserver {
 
     var sprite: SKSpriteNode { get }
-    
+
     func update(with owner: GameWorldMember, dt: Float)
-  
+
 }

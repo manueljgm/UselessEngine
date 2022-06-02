@@ -22,6 +22,8 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
         }
     }
 
+    public var extraAttributes: [GameWorldMemberCustomAttributeKey: Int]
+
     public internal(set) var children: Set<GameObject>
 
     internal var observers: NSHashTable<AnyObject>
@@ -31,6 +33,7 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
     public init(graphics: GameWorldMemberGraphicsComponent, position: Position = .zero) {
         self.graphics = graphics
         self.position = .zero
+        self.extraAttributes = [:]
         self.children = []
         self.observers = NSHashTable<AnyObject>.weakObjects()
         self.isActive = false

@@ -26,13 +26,13 @@ public class GameWorld {
     public let terrain: GameWorldTerrain
     public let collisionGrid: GameWorldCollisionGrid
     public let pathGraph: GameWorldGraph?
-
-    public var customAttributes: [GameWorldCustomAttributeKey: Float]
     
     private var entering: Set<GameWorldMember>
     private var inhabitants: Set<GameObject>
     private var extras: Set<GameWorldMember>
     private var exiting: Set<GameWorldMember>
+
+    private var customAttributes: [GameWorldCustomAttributeKey: Float]
 
     // MARK: - Init
     
@@ -75,6 +75,14 @@ public class GameWorld {
         #if DEBUG_VERBOSE
         print("GameWorld:deinit")
         #endif
+    }
+    
+    public func set(_ value: Float, for key: GameWorldCustomAttributeKey) {
+        customAttributes[key] = value
+    }
+    
+    public func value(for key: GameWorldCustomAttributeKey) -> Float {
+        return customAttributes[key] ?? 0.0
     }
     
     public func update(_ dt: Float, matchCriteria: (GameWorldMember) -> Bool = { _ in return true }) {

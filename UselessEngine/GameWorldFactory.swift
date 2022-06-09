@@ -8,6 +8,7 @@
 
 public protocol GameWorldFactory {
     associatedtype RawMaterial
-    func makeTiles(from rawMaterial: RawMaterial) throws -> [GameTile]
-    func makeMembers(from rawMaterial: RawMaterial) throws -> [GameObject]
+    func tileSize() -> Vector2d
+    func makeTiles() throws -> [GameTile]
+    func makeMembers() throws -> [GameObject]
 }

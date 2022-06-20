@@ -22,21 +22,21 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
         }
     }
 
-    public var extraAttributes: [GameWorldMemberCustomAttributeKey: Int]
-
     public internal(set) var children: Set<GameObject>
 
     internal var observers: NSHashTable<AnyObject>
     
     internal var isActive: Bool
     
+    private var customAttributes: [GameWorldMemberCustomAttributeKey: Int]
+    
     public init(graphics: GameWorldMemberGraphicsComponent, position: Position = .zero) {
         self.graphics = graphics
         self.position = .zero
-        self.extraAttributes = [:]
         self.children = []
         self.observers = NSHashTable<AnyObject>.weakObjects()
         self.isActive = false
+        self.customAttributes = [:]
         
         super.init()
         
@@ -48,6 +48,15 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
         }
     }
 
+    public func set(_ value: Int, for key: GameWorldMemberCustomAttributeKey) {
+        customAttributes[key] = value
+        broadcast(event: .attributeChange(for: key), payload: value)
+    }
+    
+    public func value(for key: GameWorldMemberCustomAttributeKey) -> Int {
+        return customAttributes[key] ?? 0
+    }
+    
     public func update(_ dt: Float) {
         // update flag to represent that this member is now active
         isActive = true

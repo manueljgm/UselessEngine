@@ -8,12 +8,6 @@
 
 public protocol GameObjectState: GameWorldUpdateable, GameWorldMemberObserver, GameObjectCollisionDelegate {
 
-    @available(*, deprecated)
-    var id: UUID { get }
-    
-    @available(*, deprecated)
-    var isOutOfAction: Bool { get }
-    
     var fallbackState: GameObjectState? { get set }
 
     func enter(with gameObject: GameObject)

@@ -6,12 +6,19 @@
 //  Copyright © 2015 Useless Robot. All rights reserved.
 //
 
-public protocol GameObjectCollisionComponent: AnyObject {
+public class GameObjectCollisionComponent {
     
-    var categoryBitmask: GameObjectCollisionCategories { get }
-    var contactBitmask: GameObjectCollisionCategories { get set }
-    var collisionBitmask: GameObjectCollisionCategories { get set }
+    public let categoryBitmask: GameObjectCollisionCategories
+    public var contactBitmask: GameObjectCollisionCategories
+    public var collisionBitmask: GameObjectCollisionCategories
     
-    var contactAABB: AABB { get set }
+    public var contactAABB: AABB
     
+    public init(categoryBitmask: GameObjectCollisionCategories, contactBitmask: GameObjectCollisionCategories, collisionBitmask: GameObjectCollisionCategories, contactAABB: AABB) {
+        self.categoryBitmask = categoryBitmask
+        self.contactBitmask = contactBitmask
+        self.collisionBitmask = collisionBitmask
+        self.contactAABB = contactAABB
+    }
+
 }

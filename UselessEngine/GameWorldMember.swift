@@ -9,11 +9,9 @@
 public class GameWorldMember: NSObject, GameWorldPositionable {
 
     public internal(set) weak var world: GameWorld?
-    public var inWorld: Bool { world != nil }
-
     public var graphics: GameWorldMemberGraphicsComponent
-    
-    // The member's position.
+
+    /// The member's absolute position in the world.
     public var position: Position {
         didSet {
             if position != oldValue {
@@ -23,19 +21,21 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
     }
 
     public internal(set) var children: Set<GameObject>
-
-    internal var observers: NSHashTable<AnyObject>
     
     internal var isActive: Bool
+    internal var inWorld: Bool { world != nil }
+    internal var observers: NSHashTable<AnyObject>
     
-    private var customAttributes: [GameWorldMemberCustomAttributeKey: Int]
+    private var flags: GameWorldMemberFlags
+    private var customAttributes: [GameWorldMemberCustomAttributeKey: Float]
     
     public init(graphics: GameWorldMemberGraphicsComponent, position: Position = .zero) {
         self.graphics = graphics
         self.position = .zero
         self.children = []
-        self.observers = NSHashTable<AnyObject>.weakObjects()
         self.isActive = false
+        self.observers = NSHashTable<AnyObject>.weakObjects()
+        self.flags = []
         self.customAttributes = [:]
         
         super.init()
@@ -47,13 +47,25 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
             self.position = position
         }
     }
+    
+    public func set(flags newFlags: GameWorldMemberFlags) {
+        flags.formUnion(newFlags)
+    }
+    
+    public func contains(flags checkFlags: GameWorldMemberFlags) -> Bool {
+        return flags.contains(checkFlags)
+    }
 
-    public func set(_ value: Int, for key: GameWorldMemberCustomAttributeKey) {
+    public func clear(flags oldFlags: GameWorldMemberFlags) {
+        flags.remove(oldFlags)
+    }    
+
+    public func set(_ value: Float, for key: GameWorldMemberCustomAttributeKey) {
         customAttributes[key] = value
         broadcast(event: .attributeChange(for: key), payload: value)
     }
     
-    public func value(for key: GameWorldMemberCustomAttributeKey) -> Int {
+    public func value(for key: GameWorldMemberCustomAttributeKey) -> Float {
         return customAttributes[key] ?? 0
     }
     

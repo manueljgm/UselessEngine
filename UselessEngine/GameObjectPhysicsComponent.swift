@@ -12,7 +12,6 @@ public protocol GameObjectPhysicsComponent: GameWorldUpdateable, GameWorldMember
     var collision: GameObjectCollisionComponent { get }
     var gravityScale: Float { get set }
     var thrust: GameObjectThrustComponent? { get }
-    var distanceTraveled: Float { get } // in m
 
 }
 
@@ -20,6 +19,7 @@ extension GameObjectPhysicsComponent {
     
     public func update(with gameObject: GameObject, dt: Float) {
         thrust?.update(with: gameObject, dt: dt)
+        collision.contactAABB.position = gameObject.position
     }
 
 }

@@ -14,7 +14,6 @@ class TestObjectPhysicsComponent: GameObjectPhysicsComponent {
     var collision: GameObjectCollisionComponent
     var gravityScale: Float
     var thrust: GameObjectThrustComponent?
-    var distanceTraveled: Float
     
     init(mass: Float,
          collision: GameObjectCollisionComponent,
@@ -26,7 +25,6 @@ class TestObjectPhysicsComponent: GameObjectPhysicsComponent {
         self.collision = collision
         self.gravityScale = gravityScale
         self.thrust = thrust
-        self.distanceTraveled = distanceTraveled
     }
     
     func receive(event: GameWorldMemberEvent, from sender: GameWorldMember, payload: Any?) {

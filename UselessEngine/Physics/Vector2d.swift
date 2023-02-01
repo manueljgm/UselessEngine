@@ -6,7 +6,7 @@
 //  Copyright © 2015 Useless Robot. All rights reserved.
 //
 
-public struct Vector2d {
+public struct Vector2d: Codable {
 
     public static let zero: Vector2d = Vector2d(dx: 0.0, dy: 0.0)
     

@@ -18,8 +18,8 @@ public protocol GameObjectPhysicsComponent: GameWorldUpdateable, GameWorldMember
 extension GameObjectPhysicsComponent {
     
     public func update(with gameObject: GameObject, dt: Float) {
-        thrust?.update(with: gameObject, dt: dt)
         collision.contactAABB.position = gameObject.position
+        thrust?.update(with: gameObject, dt: dt)
     }
 
 }

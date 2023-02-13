@@ -9,8 +9,5 @@
 public protocol GameObjectThrustComponent: GameWorldUpdateable, AnyObject {
     
     var value: Vector { get set }
-    var boost: Boost? { get set }
-
-    func setDrag(to coefficient: Float)
 
 }

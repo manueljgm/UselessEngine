@@ -20,16 +20,6 @@ public class GameWorldCollisionGrid {
         self.gameObjectsOnCell = [:]
         self.delegate = delegate
     }
-
-    public func onNeighbors(of gameObject: GameObject, doAction: (GameObject) -> Void) {
-        lastKnownCellsBelowGameObject[gameObject]?.forEach { cellPosition in
-            gameObjectsOnCell[cellPosition]?.forEach { otherObject in
-                if otherObject != gameObject {
-                    doAction(otherObject)
-                }
-            }
-        }
-    }
     
     public func nextObject(between startPosition: Position,
                            and endPosition: Position,
@@ -126,11 +116,38 @@ public class GameWorldCollisionGrid {
     
     // MARK: - Helper Methods
     
-    public func resolve(for gameObject: GameObject) {
+    func onNeighbors(of gameObject: GameObject, doAction: (GameObject) -> Void) {
+        lastKnownCellsBelowGameObject[gameObject]?.forEach { cellPosition in
+            gameObjectsOnCell[cellPosition]?.forEach { otherObject in
+                if otherObject != gameObject {
+                    doAction(otherObject)
+                }
+            }
+        }
+    }
+    
+    func resolve(for gameObject: GameObject) {
+        // update game object's cell positions
         updateCellPositions(for: gameObject)
         
+        guard gameObject.isActive else {
+            return
+        }
+
+        // track hit tested objects
+        var hitTested = [Int: Set<Int>]()
+        hitTested[gameObject.hash] = []
+
         // resolve any collisions
         onNeighbors(of: gameObject) { otherObject in
+            guard gameObject.isActive
+                    && otherObject.isActive
+                    && !(hitTested[gameObject.hash]?.contains(otherObject.hash) ?? false)
+                    && !(hitTested[otherObject.hash]?.contains(gameObject.hash) ?? false)
+            else {
+                return
+            }
+
             // check for a hit
             if let hit = delegate.intersect(gameObject, with: otherObject) {
                 // a hit is detected so if contactable,
@@ -160,6 +177,8 @@ public class GameWorldCollisionGrid {
                     }
                 }
             }
+
+            hitTested[gameObject.hash]?.insert(otherObject.hash)
         }
     }
     

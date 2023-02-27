@@ -118,6 +118,7 @@ public class GameWorld {
             // resolve any collisions
             collisionGrid.resolve(for: gameObject)
             
+            // notify delegate of game object's update
             delegate?.gameWorld(self, updated: gameObject)
         }
     }
@@ -127,6 +128,7 @@ public class GameWorld {
     }
 
     public func remove(member: GameWorldMember) {
+        member.isActive = false
         exiting.insert(member)
     }
     

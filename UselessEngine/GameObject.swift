@@ -100,9 +100,15 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
         physics.update(with: self, dt: dt)
         state?.update(with: self, dt: dt)
         input?.update(with: self, dt: dt)
+        
+        // resolve any collisions
+        world?.collisionGrid.resolve(for: self)
+        
+        // notify update to observers
+        broadcast(event: .memberUpdate)
     }
     
-    public func removeFromParent() {
+    internal func removeFromParent() {
         parent?.children.remove(self)
         parent = nil
     }
@@ -113,9 +119,8 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
         state?.willExit(with: self)
         state = newState
         state?.enter(with: self)
-        observers.objectEnumerator().forEach { observer in
-            (observer as? GameWorldMemberObserver)?.receive(event: .memberChange(with: .state), from: self, payload: nil)
-        }
+        // call super to skip notification to self's state
+        super.broadcast(event: .memberChange(with: .state))
     }
     
     public func push(state newState: GameObjectState) {
@@ -128,9 +133,8 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
         state?.willExit(with: self)
         state = state?.fallbackState
         state?.reenter(with: self)
-        observers.objectEnumerator().forEach { observer in
-            (observer as? GameWorldMemberObserver)?.receive(event: .memberChange(with: .state), from: self, payload: nil)
-        }
+        // call super to skip notification to self's state
+        super.broadcast(event: .memberChange(with: .state))
     }
     
     // MARK: - Events

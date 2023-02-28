@@ -9,6 +9,7 @@
 public enum GameWorldMemberEvent: Equatable {
 
     case memberChange(with: GameWorldMemberChanges)
+    case memberUpdate
     case memberEvent(byId: UUID)
     case attributeChange(for: GameWorldMemberCustomAttributeKey)
     

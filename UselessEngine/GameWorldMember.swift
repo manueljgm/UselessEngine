@@ -24,7 +24,7 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
     
     internal var isActive: Bool
     internal var inWorld: Bool { world != nil }
-    internal var observers: NSHashTable<AnyObject>
+    internal var observers: [GameWorldMemberObserver]
     
     private var flags: GameWorldMemberFlags
     private var customAttributes: [GameWorldMemberCustomAttributeKey: Float]
@@ -34,7 +34,7 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
         self.position = .zero
         self.children = []
         self.isActive = false
-        self.observers = NSHashTable<AnyObject>.weakObjects()
+        self.observers = []
         self.flags = []
         self.customAttributes = [:]
         
@@ -98,17 +98,17 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
     // MARK: - Events
     
     public func add(observer: GameWorldMemberObserver) {
-        observers.add(observer)
+        observers.append(observer)
     }
     
     public func broadcast(event: GameWorldMemberEvent, payload: Any? = nil) {
-        observers.objectEnumerator().forEach { observer in
-            (observer as? GameWorldMemberObserver)?.receive(event: event, from: self, payload: payload)
+        observers.forEach { observer in
+            observer.receive(event: event, from: self, payload: payload)
         }
     }
     
     public func remove(observer: GameWorldMemberObserver) {
-        observers.remove(observer)
+        observers.removeAll(where: { $0 === observer })
     }
 
     internal func positionDidChange(from oldValue: Position) {

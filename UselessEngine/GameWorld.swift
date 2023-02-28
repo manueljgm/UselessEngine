@@ -114,12 +114,6 @@ public class GameWorld {
             }
             // update the game object
             gameObject.update(dt)
-
-            // resolve any collisions
-            collisionGrid.resolve(for: gameObject)
-            
-            // notify delegate of game object's update
-            delegate?.gameWorld(self, updated: gameObject)
         }
     }
     
@@ -131,15 +125,7 @@ public class GameWorld {
         member.isActive = false
         exiting.insert(member)
     }
-    
-    public func processMembers() {
-        // process exiting members
-        processExiting()
-        
-        // process entering members
-        processEntering()
-    }
-    
+
     // MARK: - Private Methods
     
     // MARK: World Member Management
@@ -148,17 +134,7 @@ public class GameWorld {
         // add the tile to this world's terrain
         terrain.add(tile: gameTile)
 
-        // update all inhabitants for any elevation changes (there must be a more efficient way)
-        inhabitants.forEach {
-            let elevationAtPosition = terrain.elevation(at: $0.position)
-            if $0.position.z < elevationAtPosition {
-                // prevent premature notifications
-                $0.remove(observer: self)
-                $0.position.z = elevationAtPosition
-                $0.add(observer: self)
-            }
-        }
-            
+        // update the size of this world
         size.width = max(size.width, gameTile.position.x + gameTile.size.width)
         size.height = max(size.height, gameTile.position.y + gameTile.size.height)
     }
@@ -168,12 +144,6 @@ public class GameWorld {
             // add the object to this world's list of inhabitants
             inhabitants.insert(gameObject)
         }
-
-        // elevate the object if set below floor
-        gameObject.position.z = max(gameObject.position.z, terrain.elevation(at: gameObject.position))
-        
-        // resolve any collisions
-        collisionGrid.resolve(for: gameObject)
 
         // subscribe to the object's notifications
         gameObject.add(observer: self)
@@ -243,6 +213,14 @@ public class GameWorld {
         }
     }
     
+    private func processMembers() {
+        // process exiting members
+        processExiting()
+        
+        // process entering members
+        processEntering()
+    }
+    
     private func delegateDidSet() {
         // update delegate with world's tiles and objects
         terrain.tiles.forEach {
@@ -261,7 +239,15 @@ public class GameWorld {
 extension GameWorld: GameWorldMemberObserver {
     
     public func receive(event: GameWorldMemberEvent, from sender: GameWorldMember, payload: Any?) {
-        delegate?.receive(event: event, from: sender, payload: payload)
+        switch event {
+        case .memberUpdate:
+            if let gameObject = sender as? GameObject {
+                delegate?.gameWorld(self, updated: gameObject)
+            }
+        default:
+            delegate?.receive(event: event, from: sender, payload: payload)
+        }
+        
     }
     
 }

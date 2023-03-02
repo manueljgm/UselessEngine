@@ -126,6 +126,14 @@ public class GameWorld {
         exiting.insert(member)
     }
 
+    public func processMembers() {
+        // process exiting members
+        processExiting()
+        
+        // process entering members
+        processEntering()
+    }    
+    
     // MARK: - Private Methods
     
     // MARK: World Member Management
@@ -212,15 +220,7 @@ public class GameWorld {
             }
         }
     }
-    
-    private func processMembers() {
-        // process exiting members
-        processExiting()
-        
-        // process entering members
-        processEntering()
-    }
-    
+
     private func delegateDidSet() {
         // update delegate with world's tiles and objects
         terrain.tiles.forEach {

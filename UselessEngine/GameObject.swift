@@ -22,6 +22,11 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
         }
     }
     public var hasParent: Bool { parent != nil }
+    public var lockToParent: Bool {
+        didSet {
+            relativePositionDidChange(from: relativePosition)
+        }
+    }
 
     public private(set) var state: GameObjectState?
 
@@ -61,6 +66,8 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
                 physics physicsComponent: GameObjectPhysicsComponent,
                 input inputComponent: GameObjectInputComponent? = nil)
     {
+        lockToParent = true
+        
         state = nil
 
         audio = audioComponent
@@ -145,7 +152,7 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
     }
     
     internal func parentDidChange(from oldValue: GameWorldMember?) {
-        guard let parent = parent else {
+        guard lockToParent, let parent = parent else {
             _relativePosition = .zero
             return
         }
@@ -158,14 +165,14 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
     
     internal func relativePositionDidChange(from oldValue: Position) {
         // update absolute position
-        let parentPosition = parent?.position ?? .zero
+        let parentPosition = lockToParent ? parent?.position ?? .zero : .zero
         position = Position(x: parentPosition.x + relativePosition.x,
                             y: parentPosition.y + relativePosition.y,
                             z: parentPosition.z + relativePosition.z)
     }
     
     internal override func positionDidChange(from oldValue: Position) {
-        if let parent = parent {
+        if lockToParent, let parent = parent {
             _relativePosition = Position(x: position.x - parent.position.x,
                                          y: position.y - parent.position.y,
                                          z: position.z - parent.position.z)

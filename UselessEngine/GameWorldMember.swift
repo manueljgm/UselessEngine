@@ -112,7 +112,7 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
     }
 
     internal func positionDidChange(from oldValue: Position) {
-        children.forEach { child in
+        children.filter({ $0.lockToParent }).forEach { child in
             child.position = Position(x: self.position.x + child.relativePosition.x,
                                       y: self.position.y + child.relativePosition.y,
                                       z: self.position.z + child.relativePosition.z)

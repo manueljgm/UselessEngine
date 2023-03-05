@@ -24,7 +24,7 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
     public var hasParent: Bool { parent != nil }
     public var lockToParent: Bool {
         didSet {
-            relativePositionDidChange(from: relativePosition)
+            positionDidChange(from: position)
         }
     }
 
@@ -176,6 +176,8 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
             _relativePosition = Position(x: position.x - parent.position.x,
                                          y: position.y - parent.position.y,
                                          z: position.z - parent.position.z)
+        } else {
+            _relativePosition = position
         }
 
         super.positionDidChange(from: oldValue)

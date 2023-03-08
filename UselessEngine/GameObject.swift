@@ -115,6 +115,11 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
         broadcast(event: .memberUpdate)
     }
     
+    public func dismiss() {
+        removeFromParent()
+        world?.remove(member: self)
+    }
+    
     internal func removeFromParent() {
         parent?.children.remove(self)
         parent = nil

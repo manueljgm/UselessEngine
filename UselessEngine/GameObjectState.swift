@@ -20,9 +20,17 @@ public protocol GameObjectState: GameWorldUpdateable, GameWorldMemberObserver, G
 extension GameObjectState {
 
     public func handle(command: GameObjectCommand, on gameObject: GameObject, payload: AnyObject?) {
-
+        fallbackState?.handle(command: command, on: gameObject, payload: payload)
     }
 
+    public func handleContact(between gameObject: GameObject, and otherObject: GameObject) {
+        fallbackState?.handleContact(between: gameObject, and: otherObject)
+    }
+    
+    public func handleCollision(between gameObject: GameObject, and otherObject: GameObject, withCorrection correctionOffset: Vector) {
+        fallbackState?.handleCollision(between: gameObject, and: otherObject, withCorrection: correctionOffset)
+    }
+    
     public func willExit(with gameObject: GameObject) {
         
     }

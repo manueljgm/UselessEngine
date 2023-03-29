@@ -138,6 +138,7 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
     public func push(state newState: GameObjectState) {
         let newState = newState
         newState.fallbackState = state
+        state?.willFallback(with: self)
         state = newState
         state?.enter(with: self)
         // call super to skip notification to self's state

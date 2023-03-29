@@ -12,8 +12,9 @@ public protocol GameObjectState: GameWorldUpdateable, GameWorldMemberObserver, G
 
     func enter(with gameObject: GameObject)
     func handle(command: GameObjectCommand, on gameObject: GameObject, payload: AnyObject?)
-    func willExit(with gameObject: GameObject)
+    func willFallback(with gameObject: GameObject)
     func reenter(with gameObject: GameObject)
+    func willExit(with gameObject: GameObject)
     
 }
 
@@ -31,11 +32,15 @@ extension GameObjectState {
         fallbackState?.handleCollision(between: gameObject, and: otherObject, withCorrection: correctionOffset)
     }
     
-    public func willExit(with gameObject: GameObject) {
+    public func willFallback(with gameObject: GameObject) {
         
     }
 
     public func reenter(with gameObject: GameObject) {
+        
+    }
+
+    public func willExit(with gameObject: GameObject) {
         
     }
 

@@ -29,6 +29,8 @@ public class GameWorldTerrain {
     
         tileByGridPosition[gridPositionKey] = tile
         tiles.insert(tile)
+        
+        tile.isActive = true
     }
     
     public func update(dt: Float) {

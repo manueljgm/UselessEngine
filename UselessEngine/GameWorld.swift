@@ -26,7 +26,7 @@ public class GameWorld {
     public let terrain: GameWorldTerrain
     public let collisionGrid: GameWorldCollisionGrid
     public let pathGraph: GameWorldGraph?
-    
+
     private var entering: Set<GameWorldMember>
     private var inhabitants: Set<GameObject>
     private var extras: Set<GameWorldMember>
@@ -85,21 +85,19 @@ public class GameWorld {
         return customAttributes[key] ?? 0.0
     }
     
-    public func update(_ dt: Float, matchCriteria: (GameWorldMember) -> Bool = { _ in return true }) {
+    public func update(_ dt: Float) {
         if isTimeFrozen {
             return
         }
 
-        // process entering and exiting members
         processMembers()
-        
+
         // update terrain
         terrain.update(dt: dt)
 
         // update extras
         extras.forEach { extra in
-            // match the update criteria
-            guard extra.isActive || matchCriteria(extra) else {
+            guard extra.isActive else {
                 return
             }
             // update the extra
@@ -108,8 +106,7 @@ public class GameWorld {
 
         // update inhabitants
         inhabitants.forEach { gameObject in
-            // match the update criteria
-            guard gameObject.isActive || matchCriteria(gameObject) else {
+            guard gameObject.isActive else {
                 return
             }
             // update the game object
@@ -118,7 +115,11 @@ public class GameWorld {
     }
     
     public func add(member: GameWorldMember) {
-        entering.insert(member)
+        if let tile = member as? GameTile {
+            processEntering(member: tile)
+        } else {
+            entering.insert(member)
+        }
     }
 
     public func remove(member: GameWorldMember) {
@@ -148,6 +149,8 @@ public class GameWorld {
     }
     
     private func admit(gameObject: GameObject) {
+        delegate?.gameWorld(self, willAdd: gameObject)
+        
         if !gameObject.hasParent {
             // add the object to this world's list of inhabitants
             inhabitants.insert(gameObject)
@@ -155,41 +158,8 @@ public class GameWorld {
 
         // subscribe to the object's notifications
         gameObject.add(observer: self)
-    }
-    
-    private func processEntering() {
-        while let newMember = entering.popFirst() {
-            if newMember.inWorld {
-                // this member is already in a world so ignore it
-                continue
-            }
-            
-            switch newMember {
-            case let tile as GameTile:
-                lay(gameTile: tile)
-            case let object as GameObject:
-                admit(gameObject: object)
-            default:
-                extras.insert(newMember)
-            }
-            newMember.world = self
-            newMember.children.forEach { child in
-                add(member: child)
-            }
-            
-            delegate?.gameWorld(self, added: newMember)
-            
-            #if DEBUG_VERBOSE
-            let message: String
-            switch newMember {
-            case is GameTile:
-                message = String(format: "GameTile added to GameWorld at (x: %.2f, y: %.2f)", newMember.position.x, newMember.position.y)
-            default:
-                message = String(format: "GameWorldMember added to GameWorld at (x: %.2f, y: %.2f, z: %.2f)", newMember.position.x, newMember.position.y, newMember.position.z)
-            }
-            print(message)
-            #endif
-        }
+        
+        gameObject.isActive = true
     }
     
     private func processExiting() {
@@ -218,6 +188,46 @@ public class GameWorld {
             exitingMember.children.forEach { child in
                 remove(member: child)
             }
+        }
+    }
+    
+    private func processEntering(member newMember: GameWorldMember) {
+        guard !newMember.inWorld else {
+            // this member is already in a world so ignore it
+            return
+        }
+        
+        switch newMember {
+        case let tile as GameTile:
+            lay(gameTile: tile)
+        case let object as GameObject:
+            admit(gameObject: object)
+        default:
+            extras.insert(newMember)
+            newMember.isActive = true
+        }
+        newMember.world = self
+        newMember.children.forEach { child in
+            processEntering(member: child)
+        }
+        
+        delegate?.gameWorld(self, added: newMember)
+        
+        #if DEBUG_VERBOSE
+        let message: String
+        switch newMember {
+        case is GameTile:
+            message = String(format: "GameTile added to GameWorld at (x: %.2f, y: %.2f)", newMember.position.x, newMember.position.y)
+        default:
+            message = String(format: "GameWorldMember added to GameWorld at (x: %.2f, y: %.2f, z: %.2f)", newMember.position.x, newMember.position.y, newMember.position.z)
+        }
+        print(message)
+        #endif
+    }
+    
+    private func processEntering() {
+        while let newMember = entering.popFirst() {
+            processEntering(member: newMember)
         }
     }
 

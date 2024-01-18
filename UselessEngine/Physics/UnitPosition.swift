@@ -6,10 +6,6 @@
 //  Copyright © 2017 Useless Robot. All rights reserved.
 //
 
-public enum UnitPositionError: Error {
-    case unitPositionComponentMaxExceeded
-}
-
 public struct UnitPosition: Hashable {
     
     public static let zero: UnitPosition = UnitPosition(x: 0, y: 0)

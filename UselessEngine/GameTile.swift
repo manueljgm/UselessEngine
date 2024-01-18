@@ -6,16 +6,18 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
+public typealias GameTileSize = (width: Float, height: Float)
+
 public class GameTile: GameWorldMember {
     
-    public let size: (width: Float, height: Float)
+    public let size: GameTileSize
     
     public let elevation: GameTileElevation
 
     private static var inited: Int = 0
     
     public init(graphics graphicsComponent: GameWorldMemberGraphicsComponent,
-                size: (width: Float, height: Float),
+                size: GameTileSize,
                 elevation: GameTileElevation)
     {
         self.size = size

@@ -6,6 +6,8 @@
 //  Copyright © 2018 Useless Robot. All rights reserved.
 //
 
+import Foundation
+
 public class GameWorldMember: NSObject, GameWorldPositionable {
 
     public internal(set) weak var world: GameWorld?
@@ -24,7 +26,7 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
     
     internal var isActive: Bool
     internal var inWorld: Bool { world != nil }
-    internal var observers: [GameWorldMemberObserver]
+    internal var observers: NSHashTable<AnyObject>
     
     private var flags: GameWorldMemberFlags
     private var customAttributes: [GameWorldMemberCustomAttributeKey: Float]
@@ -34,7 +36,7 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
         self.position = .zero
         self.children = []
         self.isActive = false
-        self.observers = []
+        self.observers = NSHashTable<AnyObject>.weakObjects()
         self.flags = []
         self.customAttributes = [:]
         
@@ -98,17 +100,17 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
     // MARK: - Events
     
     public func add(observer: GameWorldMemberObserver) {
-        observers.append(observer)
+        observers.add(observer)
     }
     
     public func broadcast(event: GameWorldMemberEvent, payload: Any? = nil) {
-        observers.forEach { observer in
-            observer.receive(event: event, from: self, payload: payload)
+        observers.allObjects.forEach { observer in
+            (observer as? GameWorldMemberObserver)?.receive(event: event, from: self, payload: payload)
         }
     }
     
     public func remove(observer: GameWorldMemberObserver) {
-        observers.removeAll(where: { $0 === observer })
+        observers.remove(observer)
     }
 
     internal func positionDidChange(from oldValue: Position) {

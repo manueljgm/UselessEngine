@@ -56,11 +56,8 @@ class GameWorldTests: XCTestCase {
         
         let tileSize = Vector2d(dx: 2.0, dy: 2.0)
         
-        let testWorldConfiguration = GameWorldConfiguration(tileSize: tileSize,
-                                                            collisionCellSize: Vector2d(dx: 1.0, dy: 1.0),
-                                                            gravity: -9.8,
-                                                            sunAngleInDegrees: 90.0)
-        testWorld = try! GameWorld(configuration: testWorldConfiguration,
+        testWorld = try! GameWorld(tileSize: tileSize,
+                                   collisionCellSize: Vector2d(dx: 1.0, dy: 1.0),
                                    collisionDelegate: TestWorldCollisionDelegate(),
                                    pathGraphDelegate: TestGameWorldGraphDelegate())
         
@@ -87,7 +84,7 @@ class GameWorldTests: XCTestCase {
     func testGameWorldCollisionRayCheck() throws {
         let testObject1 = GameObject(graphics: TestMemberGraphicsComponent(),
                                      physics: TestObjectPhysicsComponent(mass: 1.0,
-                                                                         collision: TestObjectCollisionComponent(categoryBitmask: .all,
+                                                                         collision: GameObjectCollisionComponent(categoryBitmask: .all,
                                                                                                                  contactBitmask: .all,
                                                                                                                  collisionBitmask: .all,
                                                                                                                  contactAABB: AABB(halfwidths: Vector(dx: 0.55, dy: 0.55, dz: 0.55))),
@@ -100,7 +97,7 @@ class GameWorldTests: XCTestCase {
         
         let testObject2 = GameObject(graphics: TestMemberGraphicsComponent(),
                                      physics: TestObjectPhysicsComponent(mass: 1.0,
-                                                                         collision: TestObjectCollisionComponent(categoryBitmask: .all,
+                                                                         collision: GameObjectCollisionComponent(categoryBitmask: .all,
                                                                                                                  contactBitmask: .all,
                                                                                                                  collisionBitmask: .all,
                                                                                                                  contactAABB: AABB(halfwidths: Vector(dx: 0.5, dy: 0.5, dz: 0.5))),

@@ -57,7 +57,6 @@
 		1A933BA82767D6FC00781E06 /* GameObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A933BA72767D6FC00781E06 /* GameObjectTests.swift */; };
 		1A933BAC27682C3D00781E06 /* TestMemberGraphicsComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A933BAB27682C3D00781E06 /* TestMemberGraphicsComponent.swift */; };
 		1A933BAE2768312500781E06 /* TestObjectPhysicsComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A933BAD2768312500781E06 /* TestObjectPhysicsComponent.swift */; };
-		1A933BB02768315F00781E06 /* TestObjectCollisionComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A933BAF2768315F00781E06 /* TestObjectCollisionComponent.swift */; };
 		1AB525FC25F70F0B00CDC6B0 /* GameWorldGraphDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AB525FB25F70F0B00CDC6B0 /* GameWorldGraphDelegate.swift */; };
 		1ABB1F84281B771D00935201 /* GameWorldMemberCustomAttributeKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ABB1F83281B771D00935201 /* GameWorldMemberCustomAttributeKey.swift */; };
 		1ABB1F8C281B861B00935201 /* GameWorldCustomAttributeKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ABB1F8B281B861B00935201 /* GameWorldCustomAttributeKey.swift */; };
@@ -155,7 +154,6 @@
 		1A933BA72767D6FC00781E06 /* GameObjectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameObjectTests.swift; sourceTree = "<group>"; };
 		1A933BAB27682C3D00781E06 /* TestMemberGraphicsComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestMemberGraphicsComponent.swift; sourceTree = "<group>"; };
 		1A933BAD2768312500781E06 /* TestObjectPhysicsComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestObjectPhysicsComponent.swift; sourceTree = "<group>"; };
-		1A933BAF2768315F00781E06 /* TestObjectCollisionComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestObjectCollisionComponent.swift; sourceTree = "<group>"; };
 		1AB525FB25F70F0B00CDC6B0 /* GameWorldGraphDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldGraphDelegate.swift; sourceTree = "<group>"; };
 		1ABB1F83281B771D00935201 /* GameWorldMemberCustomAttributeKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldMemberCustomAttributeKey.swift; sourceTree = "<group>"; };
 		1ABB1F8B281B861B00935201 /* GameWorldCustomAttributeKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldCustomAttributeKey.swift; sourceTree = "<group>"; };
@@ -317,7 +315,6 @@
 			isa = PBXGroup;
 			children = (
 				1A933BAB27682C3D00781E06 /* TestMemberGraphicsComponent.swift */,
-				1A933BAF2768315F00781E06 /* TestObjectCollisionComponent.swift */,
 				1A933BAD2768312500781E06 /* TestObjectPhysicsComponent.swift */,
 			);
 			path = TestObjects;
@@ -514,7 +511,6 @@
 				1A4AB7392616A50600712D3D /* VectorTests.swift in Sources */,
 				1ADC0D3C25DCBACB0085CCEE /* GameWorldTests.swift in Sources */,
 				1A933BAC27682C3D00781E06 /* TestMemberGraphicsComponent.swift in Sources */,
-				1A933BB02768315F00781E06 /* TestObjectCollisionComponent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

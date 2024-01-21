@@ -23,7 +23,7 @@ class GameObjectTests: XCTestCase {
         let parent = GameWorldMember(graphics: TestMemberGraphicsComponent())
         let child = GameObject(graphics: TestMemberGraphicsComponent(),
                                physics: TestObjectPhysicsComponent(mass: 1.0,
-                                                                   collision: TestObjectCollisionComponent(categoryBitmask: .none,
+                                                                   collision: GameObjectCollisionComponent(categoryBitmask: .none,
                                                                                                            contactBitmask: .none,
                                                                                                            collisionBitmask: .none,
                                                                                                            contactAABB: AABB(halfwidths: Vector(dx: 1.0, dy: 1.0, dz: 1.0))),
@@ -32,7 +32,7 @@ class GameObjectTests: XCTestCase {
                                                                    distanceTraveled: 0.0))
         let grandchild = GameObject(graphics: TestMemberGraphicsComponent(),
                                     physics: TestObjectPhysicsComponent(mass: 1.0,
-                                                                        collision: TestObjectCollisionComponent(categoryBitmask: .none,
+                                                                        collision: GameObjectCollisionComponent(categoryBitmask: .none,
                                                                                                                 contactBitmask: .none,
                                                                                                                 collisionBitmask: .none,
                                                                                                                 contactAABB: AABB(halfwidths: Vector(dx: 1.0, dy: 1.0, dz: 1.0))),

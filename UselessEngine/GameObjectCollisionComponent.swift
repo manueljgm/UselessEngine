@@ -8,7 +8,7 @@
 
 public class GameObjectCollisionComponent {
     
-    public let categoryBitmask: GameObjectCollisionCategories
+    public var categoryBitmask: GameObjectCollisionCategories
     public var contactBitmask: GameObjectCollisionCategories
     public var collisionBitmask: GameObjectCollisionCategories
     

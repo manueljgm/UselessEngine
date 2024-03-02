@@ -10,8 +10,8 @@ public struct UnitPosition: Hashable {
     
     public static let zero: UnitPosition = UnitPosition(x: 0, y: 0)
 
-    public let x: Int
-    public let y: Int
+    public var x: Int
+    public var y: Int
     
     public init(x: Int, y: Int) {
         self.x = x

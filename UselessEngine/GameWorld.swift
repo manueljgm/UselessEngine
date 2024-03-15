@@ -37,7 +37,7 @@ public class GameWorld {
     // MARK: - Init
     
     /// Initializes a game world.
-    public init(tileSize: Vector2d,
+    public init(tileSize: GameTileSize,
                 collisionCellSize: Vector2d,
                 collisionDelegate: GameWorldCollisionDelegate,
                 pathGraphDelegate: GameWorldGraphDelegate? = nil) throws
@@ -165,9 +165,9 @@ public class GameWorld {
     private func processExiting() {
         while let exitingMember = exiting.popFirst() {
             switch exitingMember {
-            case is GameTile:
-                fatalError("Tile removal has not been implemented yet.")
-                // TODO: implement
+            case let tile as GameTile:
+                // remove from terrain
+                terrain.remove(tile: tile)
             case let object as GameObject:
                 // remove from parent
                 object.removeFromParent()

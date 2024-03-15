@@ -50,28 +50,32 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
         }
     }
     
-    public func set(flags newFlags: GameWorldMemberFlags) {
+    final public func set(flags newFlags: GameWorldMemberFlags) {
         flags.formUnion(newFlags)
     }
     
-    public func contains(flags checkFlags: GameWorldMemberFlags) -> Bool {
+    final public func contains(flags checkFlags: GameWorldMemberFlags) -> Bool {
         return flags.contains(checkFlags)
     }
 
-    public func clear(flags oldFlags: GameWorldMemberFlags) {
+    final public func clear(flags oldFlags: GameWorldMemberFlags) {
         flags.remove(oldFlags)
     }    
 
-    public func set(_ value: Float, for key: GameWorldMemberCustomAttributeKey) {
+    final public func set(_ value: Float, for key: GameWorldMemberCustomAttributeKey) {
         customAttributes[key] = value
         broadcast(event: .attributeChange(for: key), payload: value)
     }
     
-    public func value(for key: GameWorldMemberCustomAttributeKey) -> Float {
+    final public func value(for key: GameWorldMemberCustomAttributeKey) -> Float {
         return customAttributes[key] ?? 0
     }
     
-    public func update(_ dt: Float) {
+    public func onUpdate(_ dt: Float) {
+        // placeholder for overrides
+    }
+    
+    final public func update(_ dt: Float) {
         // update flag to represent that this member is now active
         isActive = true
 
@@ -82,9 +86,15 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
         
         // update graphics
         graphics.update(with: self, dt: dt)
+        
+        // placeholder for overrides
+        onUpdate(dt)
+
+        // notify update to observers
+        broadcast(event: .memberUpdate)
     }
 
-    public func add(child: GameObject) -> Bool {
+    final public func add(child: GameObject) -> Bool {
         if child.inWorld || child.hasParent {
             return false
         }
@@ -99,7 +109,7 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
     
     // MARK: - Events
     
-    public func add(observer: GameWorldMemberObserver) {
+    final public func add(observer: GameWorldMemberObserver) {
         observers.add(observer)
     }
     
@@ -109,7 +119,7 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
         }
     }
     
-    public func remove(observer: GameWorldMemberObserver) {
+    final public func remove(observer: GameWorldMemberObserver) {
         observers.remove(observer)
     }
 

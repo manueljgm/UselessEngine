@@ -99,10 +99,7 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
     
     // MARK: - Update
 
-    public override func update(_ dt: Float) {
-        // base update
-        super.update(dt)
-        
+    public override func onUpdate(_ dt: Float) {
         // update components
         physics.update(with: self, dt: dt)
         state?.update(with: self, dt: dt)
@@ -110,9 +107,6 @@ public class GameObject: GameWorldMember, GameWorldObserverSubject {
         
         // resolve any collisions
         world?.collisionGrid.resolve(for: self)
-        
-        // notify update to observers
-        broadcast(event: .memberUpdate)
     }
     
     public func dismiss() {

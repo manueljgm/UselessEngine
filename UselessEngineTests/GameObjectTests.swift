@@ -120,8 +120,8 @@ class GameObjectTests: XCTestCase {
         XCTAssert(child.position == Position(x: parent.position.x + childOffset.x,
                                              y: parent.position.y + childOffset.y,
                                              z: parent.position.z + childOffset.z))
-        // assert that the child's relative position updated to zero
-        XCTAssert(child.relativePosition == .zero)
+        // assert that the child's relative position updated to an anchor of .zero
+        XCTAssert(child.relativePosition == child.position)
         // assert that the grandchild's position did not change
         XCTAssert(grandchild.position == Position(x: child.position.x + grandchildOffset.x,
                                                   y: child.position.y + grandchildOffset.y,

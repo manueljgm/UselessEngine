@@ -54,7 +54,7 @@ class GameWorldTests: XCTestCase {
     
     override func setUpWithError() throws {
         
-        let tileSize = Vector2d(dx: 2.0, dy: 2.0)
+        let tileSize = GameTileSize(width: 2.0, height: 2.0)
         
         testWorld = try! GameWorld(tileSize: tileSize,
                                    collisionCellSize: Vector2d(dx: 1.0, dy: 1.0),
@@ -65,9 +65,9 @@ class GameWorldTests: XCTestCase {
             for y in 0...10 {
                 if Int.random(in: 0...9) != 7 {
                     let tile = GameTile(graphics: TestMemberGraphicsComponent(),
-                                        size: (width: tileSize.dx, height: tileSize.dy),
+                                        size: (width: tileSize.width, height: tileSize.height),
                                         elevation: TestTileElevation())
-                    tile.position = Position(x: tileSize.dx * Float(x), y: tileSize.dy * Float(y))
+                    tile.position = Position(x: tileSize.width * Float(x), y: tileSize.height * Float(y))
                     let _ = testWorld.add(member: tile)
                 }
             }

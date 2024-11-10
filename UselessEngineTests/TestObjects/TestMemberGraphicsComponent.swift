@@ -12,9 +12,11 @@ import UselessEngine
 class TestMemberGraphicsComponent: GameWorldMemberGraphicsComponent {
     
     var sprite: SKSpriteNode
-    
+    var transform: (Position) -> (point: CGPoint, zIndex: CGFloat)
+
     init() {
         sprite = SKSpriteNode()
+        transform = { pos in return (.zero, 0.0) }
     }
     
     func update(with owner: GameWorldMember, dt: Float) {

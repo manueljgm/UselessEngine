@@ -6,11 +6,29 @@
 //  Copyright © 2018 Useless Robot. All rights reserved.
 //
 
-import Foundation
-
 public class GameWorldMember: NSObject, GameWorldPositionable {
 
+    // MARK: - Properties
+    
     public internal(set) weak var world: GameWorld?
+    
+    public internal(set) weak var parent: GameWorldMember? {
+        didSet {
+            if parent != oldValue {
+                parentDidChange(from: oldValue)
+            }
+        }
+    }
+    
+    public var hasParent: Bool { parent != nil }
+    
+    /// Set to false to free positioning from parent.
+    public var anchorToParent: Bool {
+        didSet {
+            positionDidChange(from: position)
+        }
+    }
+
     public var graphics: GameWorldMemberGraphicsComponent
 
     /// The member's absolute position in the world.
@@ -22,17 +40,38 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
         }
     }
 
-    public internal(set) var children: Set<GameObject>
+    /// The member's relative position to its parent.
+    public var relativePosition: Position {
+        get {
+            return _relativePosition
+        }
+        set {
+            if newValue != _relativePosition {
+                let oldValue = _relativePosition
+                _relativePosition = newValue
+                relativePositionDidChange(from: oldValue)
+            }
+        }
+    }
+
+    public internal(set) var children: Set<GameWorldMember>
     
     internal var isActive: Bool
     internal var inWorld: Bool { world != nil }
     internal var observers: NSHashTable<AnyObject>
-    
+
     private var flags: GameWorldMemberFlags
     private var customAttributes: [GameWorldMemberCustomAttributeKey: Float]
+
+    private var _relativePosition: Position
+
+    // MARK: - Init
     
     public init(graphics: GameWorldMemberGraphicsComponent, position: Position = .zero) {
+        anchorToParent = true
+        
         self.graphics = graphics
+        _relativePosition = .zero
         self.position = .zero
         self.children = []
         self.isActive = false
@@ -94,7 +133,7 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
         broadcast(event: .memberUpdate)
     }
 
-    final public func add(child: GameObject) -> Bool {
+    final public func add(child: GameWorldMember) -> Bool {
         if child.inWorld || child.hasParent {
             return false
         }
@@ -107,10 +146,24 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
         return true
     }
     
+    final public func dismiss() {
+        removeFromParent()
+        world?.remove(member: self)
+    }
+    
+    internal func removeFromParent() {
+        parent?.children.remove(self)
+        parent = nil
+    }
+    
     // MARK: - Events
     
     final public func add(observer: GameWorldMemberObserver) {
         observers.add(observer)
+    }
+    
+    final public func remove(observer: GameWorldMemberObserver) {
+        observers.remove(observer)
     }
     
     public func broadcast(event: GameWorldMemberEvent, payload: Any? = nil) {
@@ -119,18 +172,49 @@ public class GameWorldMember: NSObject, GameWorldPositionable {
         }
     }
     
-    final public func remove(observer: GameWorldMemberObserver) {
-        observers.remove(observer)
+    private func parentDidChange(from oldValue: GameWorldMember?) {
+        if let parent = parent, anchorToParent {
+            // update absolute position
+            position = Position(x: parent.position.x + relativePosition.x,
+                                y: parent.position.y + relativePosition.y,
+                                z: parent.position.z + relativePosition.z)
+        } else {
+            // update relative position to anchor of .zero
+            _relativePosition = position
+        }
     }
+    
+    private func positionDidChange(from oldValue: Position) {
+        if let parent = parent, anchorToParent {
+            _relativePosition = Position(x: position.x - parent.position.x,
+                                         y: position.y - parent.position.y,
+                                         z: position.z - parent.position.z)
+        } else {
+            _relativePosition = position
+        }
 
-    internal func positionDidChange(from oldValue: Position) {
-        children.filter({ $0.lockToParent }).forEach { child in
+        children.filter(\.anchorToParent).forEach { child in
             child.position = Position(x: self.position.x + child.relativePosition.x,
                                       y: self.position.y + child.relativePosition.y,
                                       z: self.position.z + child.relativePosition.z)
         }
         
         broadcast(event: .memberChange(with: .position), payload: oldValue)
+    }
+    
+    private func relativePositionDidChange(from oldValue: Position) {
+        // get anchor position
+        var anchorPosition: Position
+        if let parent = parent, anchorToParent {
+            anchorPosition = parent.position
+        } else {
+            anchorPosition = .zero
+        }
+        
+        // update absolute position
+        position = Position(x: anchorPosition.x + relativePosition.x,
+                            y: anchorPosition.y + relativePosition.y,
+                            z: anchorPosition.z + relativePosition.z)
     }
 
 }

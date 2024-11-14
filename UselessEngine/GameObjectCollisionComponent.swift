@@ -8,7 +8,7 @@
 
 public class GameObjectCollisionComponent {
     
-    public private(set) var categoryBitmask: GameObjectCollisionCategories
+    public let categoryBitmask: GameObjectCollisionCategories
     
     public var contactBitmask: GameObjectCollisionCategories {
         return isContactEnabled ? _contactBitmask : .none

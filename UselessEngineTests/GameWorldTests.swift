@@ -36,16 +36,6 @@ fileprivate class TestTileElevation: GameTileElevation {
     }
 }
 
-fileprivate class TestGameWorldGraphDelegate: GameWorldGraphDelegate {
-    func cost(from origin: GameWorldGraphNode, to destination: GameWorldGraphNode) -> Float {
-        return 1.0
-    }
-    
-    func heuristic(from origin: GameWorldGraphNode, to goal: GameWorldGraphNode) -> Float {
-        return goal.worldPosition.x - origin.worldPosition.x + goal.worldPosition.y - goal.worldPosition.y
-    }
-}
-
 // MARK: - Tests
 
 class GameWorldTests: XCTestCase {
@@ -58,8 +48,7 @@ class GameWorldTests: XCTestCase {
         
         testWorld = try! GameWorld(tileSize: tileSize,
                                    collisionCellSize: Vector2d(dx: 1.0, dy: 1.0),
-                                   collisionDelegate: TestWorldCollisionDelegate(),
-                                   pathGraphDelegate: TestGameWorldGraphDelegate())
+                                   collisionDelegate: TestWorldCollisionDelegate())
         
         for x in 0...100 {
             for y in 0...10 {
@@ -117,24 +106,5 @@ class GameWorldTests: XCTestCase {
         
         XCTAssert(result != nil)
     }
-    
-    func testGameWorldGraph() throws {
-        let testWorldGraph = GameWorldGraph(graphDelegate: TestGameWorldGraphDelegate())
-        try? testWorldGraph.generate(for: testWorld, nodeSpacing: (dx: 0.25, dy: 0.25))
-        guard let node = testWorldGraph.node(at: UnitPosition(x: 1, y: 1)) else
-        {
-            XCTAssert(false)
-            return
-        }
-        XCTAssert(node.neighbors.count > 0)
-    }
 
-    func testGameWorldPath() throws {
-        let testWorldGraph = GameWorldGraph(graphDelegate: TestGameWorldGraphDelegate())
-        try? testWorldGraph.generate(for: testWorld, nodeSpacing: (dx: 1.0, dy: 1.0))
-        var path: [Position] = []
-        path = testWorldGraph.path(from: Position(x: 1, y: 1), to: Position(x: 50, y: 3))
-        XCTAssert(path.count > 0)
-    }
-    
 }

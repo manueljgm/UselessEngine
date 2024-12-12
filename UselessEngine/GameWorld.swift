@@ -27,7 +27,6 @@ public class GameWorld {
     public let terrain: GameWorldTerrain
     public var size: (width: Float, height: Float) = (.zero, .zero)
     public let collisionGrid: GameWorldCollisionGrid
-    public let pathGraph: GameWorldGraph?
     
     private var enteringMembers: [any GameWorldPositionable] = []
     private var updatingGameObjects: Set<GameObject> = []
@@ -38,11 +37,7 @@ public class GameWorld {
     // MARK: - Init
     
     /// Initializes a game world.
-    public init(tileSize: GameTileSize,
-                collisionCellSize: Vector2d,
-                collisionDelegate: GameWorldCollisionDelegate,
-                pathGraphDelegate: GameWorldGraphDelegate? = nil) throws
-    {
+    public init(tileSize: GameTileSize, collisionCellSize: Vector2d, collisionDelegate: GameWorldCollisionDelegate) throws {
         guard collisionCellSize.dx > 0.0 && collisionCellSize.dy > 0.0 else {
             throw GameWorldError.collisionCellSizeNotGreaterThanZero
         }
@@ -50,12 +45,6 @@ public class GameWorld {
         terrain = GameWorldTerrain(tileSize: tileSize)
         collisionGrid = GameWorldCollisionGrid(cellSize: collisionCellSize,
                                                     delegate: collisionDelegate)
-
-        if let pathGraphDelegate = pathGraphDelegate {
-            pathGraph = GameWorldGraph(graphDelegate: pathGraphDelegate)
-        } else {
-            pathGraph = nil
-        }
         
         #if DEBUG_VERBOSE
         print("GameWorld:init")

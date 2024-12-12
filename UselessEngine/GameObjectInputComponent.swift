@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Useless Robot. All rights reserved.
 //
 
-public protocol GameObjectInputComponent: GameWorldUpdateable {
+public protocol GameObjectInputComponent: GameObjectUpdateable {
 
     func queue(command: GameObjectCommand, payload: AnyObject?)
 

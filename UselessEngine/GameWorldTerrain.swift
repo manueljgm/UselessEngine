@@ -6,38 +6,17 @@
 //  Copyright © 2021 Useless Robot. All rights reserved.
 //
 
+internal enum GameWorldTerrainError: Error {
+    case tileExistsAtPosition(GameTile)
+}
+
+
 public class GameWorldTerrain {
 
     public private(set) var tileSize: GameTileSize
     public private(set) var tiles: Set<GameTile>
-    
+
     private var tileLayout: [UnitPosition: GameTile]
-    
-    public init(tileSize: GameTileSize) {
-        self.tileSize = tileSize
-        self.tiles = []
-        self.tileLayout = [:]
-    }
-    
-    public func add(tile: GameTile) {
-        let gridPositionKey = gridPosition(from: tile.position, componentPreprocessor: round)
-        
-        if let preexistingTile = tileLayout[gridPositionKey] {
-            tiles.remove(preexistingTile)
-            preexistingTile.world?.remove(member: preexistingTile)
-        }
-    
-        tileLayout[gridPositionKey] = tile
-        tiles.insert(tile)
-        
-        tile.isActive = true
-    }
-    
-    public func update(dt: Float) {
-        tiles.forEach {
-            let _ = $0.update(dt)
-        }
-    }
 
     public func tile(at position: PlaneCoordinate) -> GameTile? {
         let gridPositionKey = gridPosition(from: position, componentPreprocessor: floor)
@@ -53,11 +32,34 @@ public class GameWorldTerrain {
         return tile.elevation.getElevation(atPoint: checkPoint)
     }
     
-    public func remove(tile: GameTile) {
+    internal init(tileSize: GameTileSize) {
+        self.tileSize = tileSize
+        self.tiles = []
+        self.tileLayout = [:]
+    }
+
+    internal func add(tile: GameTile) throws {
+        let gridPositionKey = gridPosition(from: tile.position, componentPreprocessor: round)
+        
+        if let preexistingTile = tileLayout[gridPositionKey] {
+            throw GameWorldTerrainError.tileExistsAtPosition(preexistingTile)
+        }
+    
+        tileLayout[gridPositionKey] = tile
+        tiles.insert(tile)
+    }
+    
+    internal func remove(tile: GameTile) {
         tiles.remove(tile)
         tileLayout.removeValue(forKey: gridPosition(from: tile.position, componentPreprocessor: round))
     }
 
+    internal func update(dt: Float) {
+        tiles.forEach {
+            $0.update(dt)
+        }
+    }
+    
     // MARK: - Helper Methods
     
     private func gridPosition(from position: PlaneCoordinate,

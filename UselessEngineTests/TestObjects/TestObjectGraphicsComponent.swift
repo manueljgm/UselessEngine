@@ -9,7 +9,7 @@
 import SpriteKit
 import UselessEngine
 
-class TestMemberGraphicsComponent: GameWorldMemberGraphicsComponent {
+class TestObjectGraphicsComponent: GameWorldMemberGraphicsComponent {
     
     var sprite: SKSpriteNode
     var transform: (Position) -> (point: CGPoint, zIndex: CGFloat)
@@ -18,8 +18,8 @@ class TestMemberGraphicsComponent: GameWorldMemberGraphicsComponent {
         sprite = SKSpriteNode()
         transform = { pos in return (.zero, 0.0) }
     }
-    
-    func update(with owner: GameWorldMember, dt: Float) {
+
+    func update(with owner: GameObject, dt: Float) {
         // do nothing
     }
     

@@ -10,13 +10,28 @@ public struct GameWorldMemberChanges: OptionSet {
 
     public let rawValue: Int
     
+    public static let none = GameWorldMemberChanges([])
+    public static let state = GameWorldMemberChanges.createFlag()
+    public static let position = GameWorldMemberChanges.createFlag()
+    public static let velocity = GameWorldMemberChanges.createFlag()
+    
+    private static var nextFlagIndex: Int = 0
+    private static var maxFlagIndex: Int = 63
+    
     public init(rawValue: Int) {
         self.rawValue = rawValue
     }
     
-    public static let none = GameWorldMemberChanges([])
-    public static let state = GameWorldMemberChanges(rawValue: 1 << 0)
-    public static let position = GameWorldMemberChanges(rawValue: 1 << 1)
-    public static let velocity = GameWorldMemberChanges(rawValue: 1 << 2)
+    public static func createFlag() -> GameWorldMemberChanges {
+        guard nextFlagIndex <= maxFlagIndex else {
+            return .none
+        }
+        
+        defer {
+            nextFlagIndex += 1
+        }
+        
+        return GameWorldMemberChanges(rawValue: 1 << nextFlagIndex)
+    }
 
 }

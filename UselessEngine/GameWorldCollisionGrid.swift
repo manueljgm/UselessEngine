@@ -69,11 +69,11 @@ public class GameWorldCollisionGrid {
         let ray = Ray(position: startPosition, direction: endPosition - startPosition)
         for _ in stride(from: n, to: 0, by: -1) {
             var nearestResult: (GameObject?, Vector) = (nil, Vector(dx: .infinity, dy: .infinity, dz: .infinity))
-            gameObjectsOnCell[UnitPosition(x: x, y: y)]?.forEach { gameObject in
-                if match(gameObject), let intersectDistance = gameObject.physics.collision.contactAABB.intersect(ray, ignoringZ: true) {
+            gameObjectsOnCell[UnitPosition(x: x, y: y)]?.forEach { candidate in
+                if match(candidate), let intersectDistance = candidate.physics?.collision.contactAABB.intersect(ray, ignoringZ: true) {
                     if intersectDistance.magnitude < nearestResult.1.magnitude {
                         // store the closer match
-                        nearestResult = (gameObject, intersectDistance)
+                        nearestResult = (candidate, intersectDistance)
                     }
                 }
             }
@@ -99,12 +99,14 @@ public class GameWorldCollisionGrid {
         let cellPosition = UnitPosition(x: Int(floor((position.x) / collisionCellSize.dx)),
                                         y: Int(floor((position.y) / collisionCellSize.dy)))
 
-        guard let gameObjects = gameObjectsOnCell[cellPosition], gameObjects.count > 0 else {
+        guard let matchCandidates = gameObjectsOnCell[cellPosition], matchCandidates.count > 0 else {
             return false
         }
 
-        let match = gameObjects.contains(where: { match($0) && $0.physics.collision.contactAABB.contains(position) })
-        return match
+        let matchFound = matchCandidates.contains { candidate in
+            match(candidate) && candidate.physics?.collision.contactAABB.contains(position) ?? false
+        }
+        return matchFound
     }
     
     public func hasObject(between startPosition: Position,
@@ -135,15 +137,15 @@ public class GameWorldCollisionGrid {
         }
 
         // track hit tested objects
-        var hitTested = [Int: Set<Int>]()
-        hitTested[gameObject.hash] = []
+        var hitTested = [GameObject: Set<GameObject>]()
+        hitTested[gameObject] = []
 
         // resolve any collisions
         onNeighbors(of: gameObject) { otherObject in
             guard gameObject.isActive
                     && otherObject.isActive
-                    && !(hitTested[gameObject.hash]?.contains(otherObject.hash) ?? false)
-                    && !(hitTested[otherObject.hash]?.contains(gameObject.hash) ?? false)
+                    && !(hitTested[gameObject]?.contains(otherObject) ?? false)
+                    && !(hitTested[otherObject]?.contains(gameObject) ?? false)
             else {
                 return
             }
@@ -178,7 +180,7 @@ public class GameWorldCollisionGrid {
                 }
             }
 
-            hitTested[gameObject.hash]?.insert(otherObject.hash)
+            hitTested[gameObject]?.insert(otherObject)
         }
     }
     
@@ -222,7 +224,11 @@ public class GameWorldCollisionGrid {
     }
     
     private func updateCellPositions(for gameObject: GameObject) {
-        let currentPositions = currentCellPositions(below: gameObject.physics.collision.contactAABB)
+        guard let gameObjectPhysics = gameObject.physics else {
+            return
+        }
+        
+        let currentPositions = currentCellPositions(below: gameObjectPhysics.collision.contactAABB)
         
         let lastKnownPositions = lastKnownCellsBelowGameObject[gameObject] ?? []
         lastKnownPositions.subtracting(currentPositions).forEach { formerCellPosition in

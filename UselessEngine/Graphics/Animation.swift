@@ -11,7 +11,7 @@ import UselessCommon
 
 public class Animation {
     
-    public private(set) weak var target: GameWorldMember?
+    public private(set) weak var target: (any GameWorldPositionable)?
     public let targetSprite: SKSpriteNode
     
     public private(set) var positionIndex: Int {
@@ -54,16 +54,16 @@ public class Animation {
         self.init(target: nil, targetSprite: targetSprite, frames: frames, repeats: isRepeating)
     }
     
-    public convenience init(target: GameWorldMember, frames: [AnimationFrame], repeats isRepeating: Bool) {
+    public convenience init(target: any GameWorldPositionable, frames: [AnimationFrame], repeats isRepeating: Bool) {
         self.init(target: target, targetSprite: target.graphics.sprite, frames: frames, repeats: isRepeating)
     }
     
-    public convenience init(target: GameWorldMember, textures: [SKTexture], repeats: Bool) {
+    public convenience init(target: any GameWorldPositionable, textures: [SKTexture], repeats: Bool) {
         let frames = textures.map { AnimationFrame(texture: $0) }
         self.init(target: target, frames: frames, repeats: repeats)
     }
     
-    private init(target: GameWorldMember?, targetSprite: SKSpriteNode, frames: [AnimationFrame], repeats isRepeating: Bool) {
+    private init(target: (any GameWorldPositionable)?, targetSprite: SKSpriteNode, frames: [AnimationFrame], repeats isRepeating: Bool) {
         self.target = target
         self.targetSprite = targetSprite
 

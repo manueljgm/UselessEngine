@@ -8,8 +8,10 @@
 
 import SpriteKit
 
-public protocol GameWorldMemberGraphicsComponent: GameWorldMemberObserver {
+public protocol GameWorldMemberGraphicsComponent<GameWorldMember>: GameWorldMemberObserver {
 
+    associatedtype GameWorldMember: GameWorldPositionable
+    
     var sprite: SKSpriteNode { get }
     var transform: (_ position: Position) -> (point: CGPoint, zIndex: CGFloat) { get set }
 

@@ -20,8 +20,8 @@ class GameObjectTests: XCTestCase {
     }
 
     func testParentChildRelationship() throws {
-        let parent = GameWorldMember(graphics: TestMemberGraphicsComponent())
-        let child = GameObject(graphics: TestMemberGraphicsComponent(),
+        let parent = GameObject(graphics: TestObjectGraphicsComponent())
+        let child = GameObject(graphics: TestObjectGraphicsComponent(),
                                physics: TestObjectPhysicsComponent(mass: 1.0,
                                                                    collision: GameObjectCollisionComponent(categoryBitmask: .none,
                                                                                                            contactBitmask: .none,
@@ -30,7 +30,7 @@ class GameObjectTests: XCTestCase {
                                                                    gravityScale: 1.0,
                                                                    thrust: nil,
                                                                    distanceTraveled: 0.0))
-        let grandchild = GameObject(graphics: TestMemberGraphicsComponent(),
+        let grandchild = GameObject(graphics: TestObjectGraphicsComponent(),
                                     physics: TestObjectPhysicsComponent(mass: 1.0,
                                                                         collision: GameObjectCollisionComponent(categoryBitmask: .none,
                                                                                                                 contactBitmask: .none,

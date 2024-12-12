@@ -8,13 +8,13 @@
 
 public protocol GameWorldMemberObserver: AnyObject {
 
-    func receive(event: GameWorldMemberEvent, from sender: GameWorldMember, payload: Any?)
+    func receive(event: GameWorldMemberEvent, from sender: any GameWorldPositionable, payload: Any?)
 
 }
 
 extension GameWorldMemberObserver {
     
-    public func receive(event: GameWorldMemberEvent, from sender: GameWorldMember, payload: Any?) {
+    public func receive(event: GameWorldMemberEvent, from sender: any GameWorldPositionable, payload: Any?) {
         
     }
     

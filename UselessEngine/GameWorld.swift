@@ -13,6 +13,8 @@ public enum GameWorldError: Error {
 }
 
 public class GameWorld {
+
+    // MARK: - Properties
     
     public weak var delegate: GameWorldDelegate? {
         didSet {
@@ -20,20 +22,19 @@ public class GameWorld {
         }
     }
     
-    public var isTimeFrozen: Bool
+    public var isTimeFrozen: Bool = false
 
-    public private(set) var size: (width: Float, height: Float)
     public let terrain: GameWorldTerrain
+    public var size: (width: Float, height: Float) = (.zero, .zero)
     public let collisionGrid: GameWorldCollisionGrid
     public let pathGraph: GameWorldGraph?
+    
+    private var enteringMembers: [any GameWorldPositionable] = []
+    private var updatingGameObjects: Set<GameObject> = []
+    private var exitingMembers: [any GameWorldPositionable] = []
 
-    private var entering: Set<GameWorldMember>
-    private var inhabitants: Set<GameObject>
-    private var extras: Set<GameWorldMember>
-    private var exiting: Set<GameWorldMember>
-
-    private var customAttributes: [GameWorldCustomAttributeKey: Float]
-
+    private var customAttributes: [GameWorldCustomAttributeKey: Float] = [:]
+    
     // MARK: - Init
     
     /// Initializes a game world.
@@ -46,25 +47,15 @@ public class GameWorld {
             throw GameWorldError.collisionCellSizeNotGreaterThanZero
         }
 
-        self.isTimeFrozen = false
-        self.size = (.zero, .zero)
-        
-        self.entering = []
-        self.terrain = GameWorldTerrain(tileSize: tileSize)
-        self.inhabitants = []
-        self.extras = []
-        self.exiting = []
-
-        self.collisionGrid = GameWorldCollisionGrid(cellSize: collisionCellSize,
+        terrain = GameWorldTerrain(tileSize: tileSize)
+        collisionGrid = GameWorldCollisionGrid(cellSize: collisionCellSize,
                                                     delegate: collisionDelegate)
 
         if let pathGraphDelegate = pathGraphDelegate {
-            self.pathGraph = GameWorldGraph(graphDelegate: pathGraphDelegate)
+            pathGraph = GameWorldGraph(graphDelegate: pathGraphDelegate)
         } else {
-            self.pathGraph = nil
+            pathGraph = nil
         }
-
-        customAttributes = [:]
         
         #if DEBUG_VERBOSE
         print("GameWorld:init")
@@ -77,6 +68,28 @@ public class GameWorld {
         #endif
     }
     
+    // MARK: - Public Methods
+    
+    // MARK: Membership
+
+    public func add(_ tile: GameTile) {
+        // install thie tile to this world immediately
+        install(enteringMember: tile)
+    }
+
+    public func stageEntry(of gameObject: GameObject) {
+        // queue object to be added to this world
+        enteringMembers.append(gameObject)
+    }
+    
+    public func stageExit(of member: any GameWorldPositionable) {
+        (member as? GameObject)?.isActive = false
+        // queue object to be removed from this world
+        exitingMembers.append(member)
+    }
+    
+    // MARK: Attributes
+    
     public func set(_ value: Float, for key: GameWorldCustomAttributeKey) {
         customAttributes[key] = value
     }
@@ -85,27 +98,24 @@ public class GameWorld {
         return customAttributes[key] ?? 0.0
     }
     
+    // MARK: Update
+    
     public func update(_ dt: Float) {
         if isTimeFrozen {
             return
         }
 
-        processMembers()
+        // process exiting members
+        processExiting()
+        
+        // process entering members
+        processEntering()
 
         // update terrain
         terrain.update(dt: dt)
 
-        // update extras
-        extras.forEach { extra in
-            guard extra.isActive else {
-                return
-            }
-            // update the extra
-            extra.update(dt)
-        }
-
         // update inhabitants
-        inhabitants.forEach { gameObject in
+        updatingGameObjects.forEach { gameObject in
             guard gameObject.isActive else {
                 return
             }
@@ -114,120 +124,146 @@ public class GameWorld {
         }
     }
     
-    public func add(member: GameWorldMember) {
-        if let tile = member as? GameTile {
-            processEntering(member: tile)
-        } else {
-            entering.insert(member)
-        }
-    }
-
-    public func remove(member: GameWorldMember) {
-        member.isActive = false
-        exiting.insert(member)
-    }
-
-    public func processMembers() {
-        // process exiting members
-        processExiting()
-        
-        // process entering members
-        processEntering()
-    }    
-    
     // MARK: - Private Methods
     
-    // MARK: World Member Management
-    
-    private func lay(gameTile: GameTile) {
-        // add the tile to this world's terrain
-        terrain.add(tile: gameTile)
-
-        // update the size of this world
-        size.width = max(size.width, gameTile.position.x + gameTile.size.width)
-        size.height = max(size.height, gameTile.position.y + gameTile.size.height)
+    private func install(_ tile: GameTile, replacingPreexisting replacePreexisting: Bool = true) {
+        // try adding the tile to this world's terrain
+        do {
+            // add the tile to the world's terrain
+            try terrain.add(tile: tile)
+            // associate this world
+            tile.set(world: self)
+            // update the size of this world
+            size.width = max(size.width, tile.position.x + tile.size.width)
+            size.height = max(size.height, tile.position.y + tile.size.height)
+            // and notify the delegate
+            delegate?.gameWorld(self, added: tile)
+        } catch GameWorldTerrainError.tileExistsAtPosition(let preexistingTile) {
+            print("WARNING: An attempt was made to add a tile over an existing tile in this world.")
+            if replacePreexisting {
+                print("An attempt will be made to swap it out.")
+                uninstall(preexistingTile)
+                // try to install the tile only one more time
+                install(tile, replacingPreexisting: false)
+                return
+            } else {
+                print("This attempt will be ignored.")
+            }
+        } catch {
+            print("WARNING: An attempt to add a tile to this world apparently failed.")
+        }
     }
     
-    private func admit(gameObject: GameObject) {
+    private func install(_ gameObject: GameObject) {
+        // notify the delegate of the pending addition
         delegate?.gameWorld(self, willAdd: gameObject)
         
-        if !gameObject.hasParent {
-            // add the object to this world's list of inhabitants
-            inhabitants.insert(gameObject)
+        if !gameObject.hasParent() {
+            // children are updated by the parent so add the object to the update list only if parentless
+            updatingGameObjects.insert(gameObject)
+        }
+
+        // set this world as the object's world
+        gameObject.set(world: self)
+        
+        // also accept any children
+        gameObject.children.forEach { childObject in
+            install(childObject)
         }
 
         // subscribe to the object's notifications
         gameObject.add(observer: self)
         
+        // and set the object as active
         gameObject.isActive = true
+        
+        // and notify the delegate of the add
+        delegate?.gameWorld(self, added: gameObject)
     }
     
-    private func processExiting() {
-        while let exitingMember = exiting.popFirst() {
-            switch exitingMember {
-            case let tile as GameTile:
-                // remove from terrain
-                terrain.remove(tile: tile)
-            case let object as GameObject:
-                // remove from parent
-                object.removeFromParent()
-                // unsubscribe from the object's notifications
-                object.remove(observer: self)
-                // remove the object from this world
-                collisionGrid.remove(object)
-                inhabitants.remove(object)
-                entering.remove(object)
-            default:
-                extras.remove(exitingMember)
-            }
-    
-            exitingMember.world = nil
-            
-            delegate?.gameWorld(self, removed: exitingMember)
-            
-            exitingMember.children.forEach { child in
-                remove(member: child)
-            }
-        }
-    }
-    
-    private func processEntering(member newMember: GameWorldMember) {
-        guard !newMember.inWorld else {
+    private func install(enteringMember newMember: any GameWorldPositionable) {
+        if newMember.inWorld() {
             // this member is already in a world so ignore it
+            print("WARNING: An attempt was made to add a new member to this world that is already associated with a world.")
             return
         }
         
+        #if DEBUG_VERBOSE
+        var message: String = ""
+        #endif
+        
         switch newMember {
         case let tile as GameTile:
-            lay(gameTile: tile)
-        case let object as GameObject:
-            admit(gameObject: object)
+            install(tile)
+            #if DEBUG_VERBOSE
+            message = String(format: "GameTile added to GameWorld at (x: %.2f, y: %.2f)", newMember.position.x, newMember.position.y)
+            #endif
+        case let gameObject as GameObject:
+            install(gameObject)
+            #if DEBUG_VERBOSE
+            message = String(format: "GameObject added to GameWorld at (x: %.2f, y: %.2f, z: %.2f)", newMember.position.x, newMember.position.y, newMember.position.z)
+            #endif
         default:
-            extras.insert(newMember)
-            newMember.isActive = true
+            break
         }
-        newMember.world = self
-        newMember.children.forEach { child in
-            processEntering(member: child)
-        }
-        
-        delegate?.gameWorld(self, added: newMember)
         
         #if DEBUG_VERBOSE
-        let message: String
-        switch newMember {
-        case is GameTile:
-            message = String(format: "GameTile added to GameWorld at (x: %.2f, y: %.2f)", newMember.position.x, newMember.position.y)
-        default:
-            message = String(format: "GameWorldMember added to GameWorld at (x: %.2f, y: %.2f, z: %.2f)", newMember.position.x, newMember.position.y, newMember.position.z)
-        }
         print(message)
         #endif
     }
     
+    private func uninstall(_ tile: GameTile) {
+        // remove from terrain
+        terrain.remove(tile: tile)
+        // and check for match with this world, just to be sure
+        if tile.world === self {
+            tile.set(world: nil)
+        }
+        
+        // finally, notify the delegate
+        delegate?.gameWorld(self, removed: tile)
+    }
+    
+    private func uninstall(_ gameObject: GameObject) {
+        // unsubscribe from the object's notifications
+        gameObject.remove(observer: self)
+        
+        // orphan the object
+        gameObject.removeFromParent()
+        
+        // queue children for removal
+        gameObject.children.forEach { objectChild in
+            stageExit(of: objectChild)
+        }
+        
+        // remove any associations with this world
+        collisionGrid.remove(gameObject)
+        updatingGameObjects.remove(gameObject)
+        // check for match with this world, just to be sure
+        if gameObject.world === self {
+            gameObject.set(world: nil)
+        }
+        
+        // and notify the delegate
+        delegate?.gameWorld(self, removed: gameObject)
+    }
+    
     private func processEntering() {
-        while let newMember = entering.popFirst() {
-            processEntering(member: newMember)
+        while let newMember = enteringMembers.popLast() {
+            install(enteringMember: newMember)
+        }
+    }
+    
+    private func processExiting() {
+        while let exitingMember = exitingMembers.popLast() {
+            switch exitingMember {
+            case let tile as GameTile:
+                uninstall(tile)
+            case let gameObject as GameObject:
+                uninstall(gameObject)
+            default:
+                fatalError("Exiting GameWorldPositionable is not supported.")
+            }
         }
     }
 
@@ -236,28 +272,10 @@ public class GameWorld {
         terrain.tiles.forEach {
             delegate?.gameWorld(self, added: $0)
         }
-        inhabitants.forEach {
-            delegate?.gameWorld(self, added: $0)
-        }
-        extras.forEach {
+        // and objects
+        updatingGameObjects.forEach {
             delegate?.gameWorld(self, added: $0)
         }
     }
 
-}
-
-extension GameWorld: GameWorldMemberObserver {
-    
-    public func receive(event: GameWorldMemberEvent, from sender: GameWorldMember, payload: Any?) {
-        switch event {
-        case .memberUpdate:
-            if let gameObject = sender as? GameObject {
-                delegate?.gameWorld(self, updated: gameObject)
-            }
-        default:
-            delegate?.receive(event: event, from: sender, payload: payload)
-        }
-        
-    }
-    
 }

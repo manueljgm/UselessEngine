@@ -64,11 +64,11 @@ class GameWorldTests: XCTestCase {
         for x in 0...100 {
             for y in 0...10 {
                 if Int.random(in: 0...9) != 7 {
-                    let tile = GameTile(graphics: TestMemberGraphicsComponent(),
+                    let tile = GameTile(graphics: TestTileGraphicsComponent(),
                                         size: (width: tileSize.width, height: tileSize.height),
                                         elevation: TestTileElevation())
                     tile.position = Position(x: tileSize.width * Float(x), y: tileSize.height * Float(y))
-                    let _ = testWorld.add(member: tile)
+                    let _ = testWorld.add(tile)
                 }
             }
         }
@@ -82,7 +82,7 @@ class GameWorldTests: XCTestCase {
 
     
     func testGameWorldCollisionRayCheck() throws {
-        let testObject1 = GameObject(graphics: TestMemberGraphicsComponent(),
+        let testObject1 = GameObject(graphics: TestObjectGraphicsComponent(),
                                      physics: TestObjectPhysicsComponent(mass: 1.0,
                                                                          collision: GameObjectCollisionComponent(categoryBitmask: .all,
                                                                                                                  contactBitmask: .all,
@@ -93,9 +93,9 @@ class GameWorldTests: XCTestCase {
                                                                          distanceTraveled: 0.0),
                                      input: nil)
         testObject1.position = Position(x: 3, y: 3)
-        testWorld.add(member: testObject1)
+        testWorld.stageEntry(of: testObject1)
         
-        let testObject2 = GameObject(graphics: TestMemberGraphicsComponent(),
+        let testObject2 = GameObject(graphics: TestObjectGraphicsComponent(),
                                      physics: TestObjectPhysicsComponent(mass: 1.0,
                                                                          collision: GameObjectCollisionComponent(categoryBitmask: .all,
                                                                                                                  contactBitmask: .all,
@@ -106,7 +106,7 @@ class GameWorldTests: XCTestCase {
                                                                          distanceTraveled: 0.0),
                                      input: nil)
         testObject2.position = Position(x: 6, y: 6)
-        testWorld.add(member: testObject2)
+        testWorld.stageEntry(of: testObject2)
 
         testWorld.update(0.0)
         

@@ -6,7 +6,7 @@
 //  Copyright © 2021 Useless Robot. All rights reserved.
 //
 
-public protocol GameObjectThrustComponent: GameWorldUpdateable, AnyObject {
+public protocol GameObjectThrustComponent: GameObjectUpdateable, AnyObject {
     
     var value: Vector { get set }
 

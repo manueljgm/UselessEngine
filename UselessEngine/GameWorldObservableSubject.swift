@@ -1,12 +1,12 @@
 //
-//  GameWorldObserverSubject.swift
+//  GameWorldObservableSubject.swift
 //  UselessEngine
 //
 //  Created by Manny Martins on 10/26/21.
 //  Copyright © 2021 Useless Robot. All rights reserved.
 //
 
-protocol GameWorldObserverSubject {
+public protocol GameWorldObservableSubject {
 
     func add(observer: GameWorldMemberObserver)
     func broadcast(event: GameWorldMemberEvent, payload: Any?)

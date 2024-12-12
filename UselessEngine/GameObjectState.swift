@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
-public protocol GameObjectState: GameWorldUpdateable, GameWorldMemberObserver, GameObjectCollisionDelegate {
+public protocol GameObjectState: GameObjectUpdateable, GameWorldMemberObserver, GameObjectCollisionDelegate {
 
     var fallbackState: GameObjectState? { get set }
 

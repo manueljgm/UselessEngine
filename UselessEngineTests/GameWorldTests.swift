@@ -57,7 +57,7 @@ class GameWorldTests: XCTestCase {
                                         size: (width: tileSize.width, height: tileSize.height),
                                         elevation: TestTileElevation())
                     tile.position = Position(x: tileSize.width * Float(x), y: tileSize.height * Float(y))
-                    let _ = testWorld.add(tile)
+                    testWorld.add(tile)
                 }
             }
         }

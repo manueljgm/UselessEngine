@@ -164,6 +164,7 @@ public class GameObject: GameWorldPositionable, GameWorldObservableSubject {
         return parent != nil
     }
 
+    @discardableResult
     public func add(child: GameObject) -> Bool {
         if child.inWorld() || child.hasParent() {
             return false

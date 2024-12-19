@@ -52,7 +52,7 @@ class GameObjectTests: XCTestCase {
         // assert that the parent's position is updated
         XCTAssert(parent.position == parentPosition)
 
-        let _ = parent.add(child: child)
+        parent.add(child: child)
         // assert that the parent has one child
         XCTAssert(parent.children.count == 1)
         // assert that the child's parent is the parent object
@@ -60,7 +60,7 @@ class GameObjectTests: XCTestCase {
         // assert that the child's position is the parent's position since its relative position is zero
         XCTAssert(child.position == parentPosition)
         
-        let _ = child.add(child: grandchild)
+        child.add(child: grandchild)
         // assert that the child has one child
         XCTAssert(child.children.count == 1)
         // assert that grandchild's parent is the child object

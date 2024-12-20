@@ -65,6 +65,9 @@ public class GameObject: GameWorldPositionable, GameWorldObservableSubject {
     /// The object's children.
     public internal(set) var children: Set<GameObject> = []
 
+    /// Unique identifier shared across this object and its ancestors, siblings, and descendants.
+    public internal(set) var familyId: UUID = UUID()
+    
     // MARK: Components
 
     public var graphics: any GameWorldMemberGraphicsComponent<GameObject>
@@ -163,7 +166,7 @@ public class GameObject: GameWorldPositionable, GameWorldObservableSubject {
     public func hasParent() -> Bool {
         return parent != nil
     }
-
+    
     @discardableResult
     public func add(child: GameObject) -> Bool {
         if child.inWorld() || child.hasParent() {
@@ -259,7 +262,45 @@ public class GameObject: GameWorldPositionable, GameWorldObservableSubject {
     
     // MARK: - Private Methods
     
+    private func traverseFamily(andDo action: (GameObject) -> Void) {
+        var rootParent = self
+        while let nextParent = rootParent.parent {
+            rootParent = nextParent
+        }
+        
+        // keeps track of visited nodes
+        var visited = Set<UUID>()
+        // queue for breadth-first search traversal
+        var queue = [GameObject]()
+
+        queue.append(rootParent)
+        while !queue.isEmpty {
+            let currentNode = queue.removeFirst()
+            
+            // if the node is already visited, skip it to avoid cycles
+            if visited.contains(currentNode.id) {
+                continue
+            }
+
+            // do whatever action
+            action(currentNode)
+            
+            // mark the current node as visited
+            visited.insert(currentNode.id)
+            
+            // queue any unvisited children
+            for child in currentNode.children {
+                if !visited.contains(child.id) {
+                    queue.append(child)
+                }
+            }
+        }
+    }
+    
     private func parentDidChange(from oldValue: GameObject?) {
+        let newFamilyID = UUID()
+        traverseFamily { $0.familyId = newFamilyID }
+        
         if let parent = parent, anchorToParent {
             // update absolute position
             position = Position(x: parent.position.x + relativePosition.x,

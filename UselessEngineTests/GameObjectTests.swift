@@ -40,12 +40,17 @@ class GameObjectTests: XCTestCase {
                                                                         thrust: nil,
                                                                         distanceTraveled: 0.0))
         
-        // assert that the parent's positions is zero
+        // assert that the parent's position is zero
         XCTAssert(parent.position == .zero)
-        // assert that the child's positions is zero
+        // assert that the child's position is zero
         XCTAssert(child.position == .zero)
-        // assert that the grandchild's positions is zero
+        // assert that the grandchild's position is zero
         XCTAssert(grandchild.position == .zero)
+        
+        // assert that the family ids don't match yet
+        XCTAssert(parent.familyId != child.familyId)
+        XCTAssert(parent.familyId != grandchild.familyId)
+        XCTAssert(child.familyId != grandchild.familyId)
         
         var parentPosition = Position(x: 1.0, y: 2.0, z: 3.0)
         parent.position = parentPosition
@@ -59,6 +64,10 @@ class GameObjectTests: XCTestCase {
         XCTAssert(child.parent == parent)
         // assert that the child's position is the parent's position since its relative position is zero
         XCTAssert(child.position == parentPosition)
+        // assert that the family ids match correctly
+        XCTAssert(parent.familyId == child.familyId)
+        XCTAssert(parent.familyId != grandchild.familyId)
+        XCTAssert(child.familyId != grandchild.familyId)
         
         child.add(child: grandchild)
         // assert that the child has one child
@@ -67,6 +76,10 @@ class GameObjectTests: XCTestCase {
         XCTAssert(grandchild.parent == child)
         // assert that the grandchild's position is the grandparent's position since its relative position is zero
         XCTAssert(grandchild.position == parentPosition)
+        // assert that the family ids match correctly
+        XCTAssert(parent.familyId == child.familyId)
+        XCTAssert(parent.familyId == grandchild.familyId)
+        XCTAssert(child.familyId == grandchild.familyId)
         
         let childOffset = Position(x: -1.0, y: -2.0, z: -3.0)
         child.relativePosition = childOffset
@@ -126,6 +139,10 @@ class GameObjectTests: XCTestCase {
         XCTAssert(grandchild.position == Position(x: child.position.x + grandchildOffset.x,
                                                   y: child.position.y + grandchildOffset.y,
                                                   z: child.position.z + grandchildOffset.z))
+        // assert that the family ids match correctly
+        XCTAssert(parent.familyId != child.familyId)
+        XCTAssert(parent.familyId != grandchild.familyId)
+        XCTAssert(child.familyId == grandchild.familyId)
         
         grandchild.position = child.position
         // assert that the grandchild's relative position updated to zero
@@ -140,6 +157,10 @@ class GameObjectTests: XCTestCase {
         XCTAssert(grandchild.parent == nil)
         // assert that the grandchild's position is still the child object's position
         XCTAssert(grandchild.position == child.position)
+        // assert that the family ids match correctly
+        XCTAssert(parent.familyId != child.familyId)
+        XCTAssert(parent.familyId != grandchild.familyId)
+        XCTAssert(child.familyId != grandchild.familyId)
     }
 
 }

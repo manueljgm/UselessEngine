@@ -28,6 +28,10 @@ public class GameWorld {
     public var size: (width: Float, height: Float) = (.zero, .zero)
     public let collisionGrid: GameWorldCollisionGrid
     
+    public var gameObjects: Set<GameObject> {
+        return updatingGameObjects
+    }
+    
     private var enteringMembers: [any GameWorldPositionable] = []
     private var updatingGameObjects: Set<GameObject> = []
     private var exitingMembers: [any GameWorldPositionable] = []

@@ -56,7 +56,12 @@ public class GameWorldTerrain {
 
     internal func update(dt: Float) {
         tiles.forEach {
+            // update the tile
             $0.update(dt)
+            // notify the tile's world of the update event
+            if let world = $0.world {
+                world.delegate?.gameWorld(world, updated: $0)
+            }
         }
     }
     

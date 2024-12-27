@@ -11,6 +11,7 @@ public protocol GameWorldDelegate: GameWorldMemberObserver {
     func gameWorld(_ gameWorld: GameWorld, willAdd member: any GameWorldPositionable)
     func gameWorld(_ gameWorld: GameWorld, added member: any GameWorldPositionable)
     func gameWorld(_ gameWorld: GameWorld, removed member: any GameWorldPositionable)
+    func gameWorld(_ gameWorld: GameWorld, updated gameTile: GameTile)
     func gameWorld(_ gameWorld: GameWorld, updated gameObject: GameObject)
     
 }
@@ -18,6 +19,10 @@ public protocol GameWorldDelegate: GameWorldMemberObserver {
 extension GameWorldDelegate {
     
     public func gameWorld(_ gameWorld: GameWorld, willAdd member: any GameWorldPositionable) {
+        
+    }
+
+    public func gameWorld(_ gameWorld: GameWorld, updated gameTile: GameTile) {
         
     }
     

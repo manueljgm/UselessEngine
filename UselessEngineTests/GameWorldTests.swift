@@ -69,6 +69,19 @@ class GameWorldTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
+    func testGameWorldTerrainNearestChecks() throws {
+        let checkPosition = Position(x: 50.0, y: 50.0)
+        let result = testWorld.terrain.nearestTile(to: checkPosition)
+        XCTAssert(result != nil && result!.position.x <= checkPosition.x && result!.position.y <= 20.0)
+        
+        let checkPosition2 = Position(x: -50.0, y: -50.0)
+        let result2 = testWorld.terrain.nearestTile(to: checkPosition2)
+        XCTAssert(result2 != nil && result2!.position.x >= 0.0 && result2!.position.y >= 0.0)
+
+        let checkPosition3 = Position(x: 300.0, y: 10.0)
+        let result3 = testWorld.terrain.nearestTile(to: checkPosition3)
+        XCTAssert(result3 != nil && result3!.position.x <= 200.0 && result3!.position.y <= checkPosition3.y)
+    }
     
     func testGameWorldCollisionRayCheck() throws {
         let testObject1 = GameObject(graphics: TestObjectGraphicsComponent(),

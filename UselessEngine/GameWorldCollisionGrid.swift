@@ -116,6 +116,14 @@ public class GameWorldCollisionGrid {
         return nextObject(between: startPosition, and: endPosition, matchCriteria: match) != nil
     }
     
+    public func isGameObject(_ gameObject: GameObject, contactableWith otherObject: GameObject) -> Bool {
+        return delegate.isGameObject(gameObject, contactableWith: otherObject)
+    }
+    
+    public func isGameObject(_ gameObject: GameObject, collidableWith otherObject: GameObject) -> Bool {
+        return delegate.isGameObject(gameObject, collidableWith: otherObject)
+    }
+    
     // MARK: - Helper Methods
     
     func onNeighbors(of gameObject: GameObject, doAction: (GameObject) -> Void) {

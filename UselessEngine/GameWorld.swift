@@ -47,8 +47,7 @@ public class GameWorld {
         }
 
         terrain = GameWorldTerrain(tileSize: tileSize)
-        collisionGrid = GameWorldCollisionGrid(cellSize: collisionCellSize,
-                                                    delegate: collisionDelegate)
+        collisionGrid = GameWorldCollisionGrid(cellSize: collisionCellSize, delegate: collisionDelegate)
         
         #if DEBUG_VERBOSE
         print("GameWorld:init")

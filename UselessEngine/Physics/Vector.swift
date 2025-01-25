@@ -37,6 +37,8 @@ public struct Vector: Codable {
         }
     }
     
+    private static let epsilon: Float = 1e-6
+    
     public init(dx: Float, dy: Float, dz: Float = .zero) {
         self.dx = dx
         self.dy = dy
@@ -85,7 +87,7 @@ public struct Vector: Codable {
     
     public mutating func normalize() {
         let m = magnitude
-        if m < 1e-12 {
+        if m < Self.epsilon {
             return
         }
         
@@ -96,7 +98,7 @@ public struct Vector: Codable {
 
     public func normalized() -> Vector {
         let m = magnitude
-        if m < 1e-12 {
+        if m < Self.epsilon {
             return .zero
         }
         

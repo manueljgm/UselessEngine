@@ -8,16 +8,20 @@
 
 public class GameWorldCollisionGrid {
 
-    private var collisionCellSize: Vector2d
-    private var lastKnownCellsBelowGameObject: [GameObject: Set<UnitPosition>]
-    private var gameObjectsOnCell: [UnitPosition: Set<GameObject>]
-
-    private var delegate: GameWorldCollisionDelegate
+    public private(set) var delegate: GameWorldCollisionDelegate
     
+    private var collisionCellSize: Vector2d
+    
+    private var gameObjectsOnCell: [UnitPosition: Set<GameObject>]
+    private var lastKnownCellsBelowGameObject: [GameObject: Set<UnitPosition>]
+    private var collisionChecksPerformed = [GameObject: Set<GameObject>]()
+    
+    private var updateFrame: Int = 0
+
     internal init(cellSize: Vector2d, delegate: GameWorldCollisionDelegate) {
         self.collisionCellSize = cellSize
-        self.lastKnownCellsBelowGameObject = [:]
         self.gameObjectsOnCell = [:]
+        self.lastKnownCellsBelowGameObject = [:]
         self.delegate = delegate
     }
     
@@ -109,109 +113,110 @@ public class GameWorldCollisionGrid {
         return matchFound
     }
     
-    public func hasObject(between startPosition: Position,
+    @inlinable public func hasObject(between startPosition: Position,
                           and endPosition: Position,
                           matchCriteria match: (GameObject) -> Bool = { _ in return true })
     -> Bool {
         return nextObject(between: startPosition, and: endPosition, matchCriteria: match) != nil
     }
     
-    public func isGameObject(_ gameObject: GameObject, contactableWith otherObject: GameObject) -> Bool {
+    @inlinable public func isGameObject(_ gameObject: GameObject, contactableWith otherObject: GameObject) -> Bool {
         return delegate.isGameObject(gameObject, contactableWith: otherObject)
     }
     
-    public func isGameObject(_ gameObject: GameObject, collidableWith otherObject: GameObject) -> Bool {
+    @inlinable public func isGameObject(_ gameObject: GameObject, collidableWith otherObject: GameObject) -> Bool {
         return delegate.isGameObject(gameObject, collidableWith: otherObject)
     }
     
     // MARK: - Helper Methods
     
-    func onNeighbors(of gameObject: GameObject, doAction: (GameObject) -> Void) {
-        lastKnownCellsBelowGameObject[gameObject]?.forEach { cellPosition in
-            gameObjectsOnCell[cellPosition]?.forEach { otherObject in
-                if otherObject != gameObject {
-                    doAction(otherObject)
-                }
-            }
-        }
+    internal func worldDidAdd(gameObject: GameObject) {
+        updateCellPositions(for: gameObject)
     }
     
-    func resolve(for gameObject: GameObject) {
-        // update game object's cell positions
-        updateCellPositions(for: gameObject)
+    internal func worldDidUpdate(_ dt: Float) {
+        collisionChecksPerformed = [:]
         
-        guard gameObject.isActive else {
+        updateFrame += 1
+    }
+
+    internal func resolve(for gameObject: GameObject) {
+        defer {
+            // refresh the update frame count for this collision check
+            gameObject.updateFrame.forCollision = updateFrame
+        }
+        
+        // ensure the object is not checked unnecessarily
+        guard gameObject.contains(flags: .positionDidUpdate)
+                && gameObject.updateFrame.forCollision < updateFrame else {
             return
         }
+        
+        // update game object's cell positions
+        updateCellPositions(for: gameObject)
 
-        // track hit tested objects
-        var hitTested = [GameObject: Set<GameObject>]()
-        hitTested[gameObject] = []
+        // init hit tested object tracker and seed with this object to avoid a check against the self
+        collisionChecksPerformed[gameObject] = [gameObject]
 
         // resolve any collisions
-        onNeighbors(of: gameObject) { otherObject in
-            guard gameObject.isActive
-                    && otherObject.isActive
-                    && !(hitTested[gameObject]?.contains(otherObject) ?? false)
-                    && !(hitTested[otherObject]?.contains(gameObject) ?? false)
-            else {
-                return
-            }
-
-            // check for a hit
-            if let hit = delegate.intersect(gameObject, with: otherObject) {
-                // a hit is detected so if contactable,
-                // handle the contact
-                if delegate.isGameObject(gameObject, contactableWith: otherObject) {
-                    // call event handlers
-                    gameObject.state?.handleContact(between: gameObject, and: otherObject)
-                    otherObject.state?.handleContact(between: otherObject, and: gameObject)
+        lastKnownCellsBelowGameObject[gameObject]?.forEach { cellPosition in
+            gameObjectsOnCell[cellPosition]?.forEach { neighboringObject in
+                guard collisionChecksPerformed[gameObject]?.contains(neighboringObject) ?? false == false
+                        && collisionChecksPerformed[neighboringObject]?.contains(gameObject) ?? false == false
+                else {
+                    return
                 }
-                // and if collidable, handle collision
-                if delegate.isGameObject(gameObject, collidableWith: otherObject) {
-                    // resolve the collision by correcting positions
-                    let corrections = delegate.resolveCollision(on: gameObject, against: otherObject, for: hit)
-                    // then call event handlers
-                    gameObject.state?.handleCollision(between: gameObject,
-                                                      and: otherObject,
-                                                      withCorrection: corrections.thisCorrection)
-                    otherObject.state?.handleCollision(between: otherObject,
-                                                       and: gameObject,
-                                                       withCorrection: corrections.otherCorrection)
-                    // and update the collision grid for changes
-                    if corrections.thisCorrection != .zero {
-                        updateCellPositions(for: gameObject)
+                
+                // check for a hit
+                if let hit = delegate.intersect(gameObject, with: neighboringObject) {
+                    // a hit is detected so if contactable,
+                    // handle the contact
+                    if delegate.isGameObject(gameObject, contactableWith: neighboringObject) {
+                        // call event handlers
+                        gameObject.state?.handleContact(between: gameObject, and: neighboringObject)
+                        neighboringObject.state?.handleContact(between: neighboringObject, and: gameObject)
                     }
-                    if corrections.otherCorrection != .zero {
-                        updateCellPositions(for: otherObject)
+                    // and if collidable, handle collision
+                    if delegate.isGameObject(gameObject, collidableWith: neighboringObject) {
+                        // resolve the collision by correcting positions
+                        let corrections = delegate.resolveCollision(on: gameObject, against: neighboringObject, for: hit)
+                        // then call event handlers
+                        gameObject.state?.handleCollision(between: gameObject,
+                                                          and: neighboringObject,
+                                                          withCorrection: corrections.thisCorrection)
+                        neighboringObject.state?.handleCollision(between: neighboringObject,
+                                                                 and: gameObject,
+                                                                 withCorrection: corrections.otherCorrection)
+                        // and update the collision grid for changes
+                        if corrections.thisCorrection != .zero {
+                            updateCellPositions(for: gameObject)
+                        }
+                        if corrections.otherCorrection != .zero {
+                            updateCellPositions(for: neighboringObject)
+                        }
                     }
                 }
+                
+                // track the check
+                collisionChecksPerformed[gameObject]?.insert(neighboringObject)
             }
-
-            hitTested[gameObject]?.insert(otherObject)
         }
     }
     
-    internal func remove(_ gameObject: GameObject, from cellPosition: UnitPosition? = nil) {
-        let deletePositions: Set<UnitPosition>
-        if let deletePosition = cellPosition {
-            deletePositions = [deletePosition]
-        } else {
-            deletePositions = lastKnownCellsBelowGameObject[gameObject] ?? []
-        }
-        
-        deletePositions.forEach { deletePosition in
-            gameObjectsOnCell[deletePosition] = gameObjectsOnCell[deletePosition]?.subtracting([gameObject]) ?? []
-        }
-        
-        if let updatedCellPositionsBelowGameObject = lastKnownCellsBelowGameObject[gameObject]?.subtracting(deletePositions),
-           updatedCellPositionsBelowGameObject.count > 0 {
-            lastKnownCellsBelowGameObject[gameObject] = updatedCellPositionsBelowGameObject
-        } else {
+    internal func remove(_ gameObject: GameObject, from removedPosition: UnitPosition? = nil) {
+        guard let removedPosition = removedPosition else {
+            // remove game object from collision grid altogether
+            lastKnownCellsBelowGameObject[gameObject]?.forEach { lastKnownCellPosition in
+                gameObjectsOnCell[lastKnownCellPosition]?.remove(gameObject)
+            }
             lastKnownCellsBelowGameObject.removeValue(forKey: gameObject)
+            return
         }
+        
+        lastKnownCellsBelowGameObject[gameObject]?.remove(removedPosition)
+        gameObjectsOnCell[removedPosition]?.remove(gameObject)
     }
-    
+
     private func currentCellPositions(below boundingBox: AABB) -> Set<UnitPosition> {
         // calculate bottom left grid corner contain with padding
         let bottomLeftX = Int(floor((boundingBox.center.x - boundingBox.halfwidths.dx) / collisionCellSize.dx))
@@ -239,14 +244,14 @@ public class GameWorldCollisionGrid {
         let currentPositions = currentCellPositions(below: gameObjectPhysics.collision.contactAABB)
         
         let lastKnownPositions = lastKnownCellsBelowGameObject[gameObject] ?? []
-        lastKnownPositions.subtracting(currentPositions).forEach { formerCellPosition in
-            remove(gameObject, from: formerCellPosition)
+        lastKnownPositions.subtracting(currentPositions).forEach { lastKnownCellPosition in
+            gameObjectsOnCell[lastKnownCellPosition]?.remove(gameObject)
         }
         
-        currentPositions.subtracting(lastKnownPositions).forEach { newCellPosition in
-            var gameObjects = gameObjectsOnCell[newCellPosition] ?? []
-            gameObjects.insert(gameObject)
-            gameObjectsOnCell[newCellPosition] = gameObjects
+        currentPositions.forEach { newCellPosition in
+            if gameObjectsOnCell[newCellPosition]?.insert(gameObject) == nil {
+                gameObjectsOnCell[newCellPosition] = [gameObject]
+            }
         }
         
         lastKnownCellsBelowGameObject[gameObject] = currentPositions

@@ -11,6 +11,7 @@ public struct GameObjectFlags: OptionSet {
     public let rawValue: Int
     
     public static let none = GameObjectFlags([])
+    internal static let positionDidUpdate = createFlag()
     
     private static var nextFlagIndex: Int = 0
     private static var maxFlagIndex: Int = 63

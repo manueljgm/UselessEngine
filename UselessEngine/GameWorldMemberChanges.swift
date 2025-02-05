@@ -11,9 +11,7 @@ public struct GameWorldMemberChanges: OptionSet {
     public let rawValue: Int
     
     public static let none = GameWorldMemberChanges([])
-    public static let state = GameWorldMemberChanges.createFlag()
     public static let position = GameWorldMemberChanges.createFlag()
-    public static let velocity = GameWorldMemberChanges.createFlag()
     
     private static var nextFlagIndex: Int = 0
     private static var maxFlagIndex: Int = 63

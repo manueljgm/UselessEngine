@@ -85,9 +85,7 @@ public class GameWorldTerrain {
             // update the tile
             $0.update(dt)
             // notify the tile's world of the update event
-            if let world = $0.world {
-                world.delegate?.gameWorld(world, updated: $0)
-            }
+            $0.world?.receive(event: .memberUpdate(with: .none), from: $0, payload: nil)
         }
     }
     

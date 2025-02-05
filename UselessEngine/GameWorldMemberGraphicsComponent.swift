@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-public protocol GameWorldMemberGraphicsComponent<GameWorldMember>: GameWorldMemberObserver {
+public protocol GameWorldMemberGraphicsComponent<GameWorldMember>: AnyObject {
 
     associatedtype GameWorldMember: GameWorldPositionable
     

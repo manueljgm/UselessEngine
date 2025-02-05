@@ -54,13 +54,7 @@ public class GameObject: GameWorldPositionable, GameWorldObservableSubject {
     }
         
     /// The object's velocity.
-    public var velocity: Vector = .zero {
-        didSet {
-            if velocity != oldValue {
-                velocityDidChange(from: oldValue)
-            }
-        }
-    }
+    public var velocity: Vector = .zero
     
     /// The object's children.
     public internal(set) var children: Set<GameObject> = []
@@ -77,11 +71,11 @@ public class GameObject: GameWorldPositionable, GameWorldObservableSubject {
     
     // MARK: Internal
     
+    // Represents the object's respective update iteration count.
+    internal var updateFrame: (forWorld: Int, forCollision: Int) = (0, 0)
+    
     /// The object's observers.
     internal var observers: NSHashTable<AnyObject> = NSHashTable<AnyObject>.weakObjects()
-
-    /// Represents whether the object is currently active.
-    internal var isActive: Bool = false
 
     // MARK: Private
     
@@ -89,6 +83,8 @@ public class GameObject: GameWorldPositionable, GameWorldObservableSubject {
     private var customAttributes: [GameWorldMemberCustomAttributeKey: Float] = [:]
     
     private var relativePositionValue: Position = .zero
+    
+    private var broadcastEvents: Bool = true
     
     private let id = UUID()
         
@@ -106,14 +102,6 @@ public class GameObject: GameWorldPositionable, GameWorldObservableSubject {
         physics = physicsComponent
         input = inputComponent
 
-        add(observer: graphics)
-        if physics != nil {
-            add(observer: physics!)
-        }
-
-        // set position again to result in the necessary call to the positionDidChange and to notify observers
-        position = .zero
-        
         GameObject.inited += 1
         #if DEBUG_VERBOSE
         print(String(format: "GameObject:init; %d exist", GameObject.inited))
@@ -135,8 +123,6 @@ public class GameObject: GameWorldPositionable, GameWorldObservableSubject {
         state?.willExit(with: self)
         state = newState
         state?.enter(with: self)
-        // call super to skip notification to self's state
-        broadcast(event: .memberChange(with: .state))
     }
     
     public func push(state newState: GameObjectState) {
@@ -145,16 +131,12 @@ public class GameObject: GameWorldPositionable, GameWorldObservableSubject {
         state?.willFallback(with: self)
         state = newState
         state?.enter(with: self)
-        // call super to skip notification to self's state
-        broadcast(event: .memberChange(with: .state))
     }
     
     public func exitState() {
         state?.willExit(with: self)
         state = state?.fallbackState
         state?.reenter(with: self)
-        // call super to skip notification to self's state
-        broadcast(event: .memberChange(with: .state))
     }
 
     // MARK: Relationships
@@ -225,16 +207,21 @@ public class GameObject: GameWorldPositionable, GameWorldObservableSubject {
     
     public func broadcast(event: GameWorldMemberEvent, payload: Any? = nil) {
         state?.receive(event: event, from: self, payload: payload)
-        observers.allObjects.forEach { observer in
-            (observer as? GameWorldMemberObserver)?.receive(event: event, from: self, payload: payload)
+        if broadcastEvents {
+            observers.allObjects.forEach { observer in
+                (observer as? GameWorldMemberObserver)?.receive(event: event, from: self, payload: payload)
+            }
         }
+    }
+    
+    public func mute(_ muteEvents: Bool) {
+        broadcastEvents = !muteEvents
     }
 
     // MARK: Update
     
     public func update(_ dt: Float) {
-        // update flag to represent that this member is now active
-        isActive = true
+        flags.remove(.positionDidUpdate)
         
         // update children
         children.forEach {
@@ -251,7 +238,10 @@ public class GameObject: GameWorldPositionable, GameWorldObservableSubject {
         world?.collisionGrid.resolve(for: self)
 
         // notify update to observers
-        broadcast(event: .memberUpdate)
+        broadcast(event: .memberUpdate(with: contains(flags: .positionDidUpdate) ? .position : .none))
+        
+        // increment the update frame count for this update
+        updateFrame.forWorld += 1
     }
 
     // MARK: - Internal Methods
@@ -313,6 +303,7 @@ public class GameObject: GameWorldPositionable, GameWorldObservableSubject {
     }
     
     private func positionDidChange(from oldValue: Position) {
+        // update relative position respective to any parent
         if let parent = parent, anchorToParent {
             relativePositionValue = Position(x: position.x - parent.position.x,
                                          y: position.y - parent.position.y,
@@ -320,14 +311,19 @@ public class GameObject: GameWorldPositionable, GameWorldObservableSubject {
         } else {
             relativePositionValue = position
         }
-
+        
+        // update contact box position
+        physics?.collision.contactAABB.position = position
+        
+        // update anchored childrens' positions
         children.filter(\.anchorToParent).forEach { child in
             child.position = Position(x: self.position.x + child.relativePosition.x,
                                       y: self.position.y + child.relativePosition.y,
                                       z: self.position.z + child.relativePosition.z)
         }
         
-        broadcast(event: .memberChange(with: .position), payload: oldValue)
+        // flag the position change
+        set(flags: .positionDidUpdate)
     }
     
     private func relativePositionDidChange(from oldValue: Position) {
@@ -343,10 +339,6 @@ public class GameObject: GameWorldPositionable, GameWorldObservableSubject {
         position = Position(x: anchorPosition.x + relativePosition.x,
                             y: anchorPosition.y + relativePosition.y,
                             z: anchorPosition.z + relativePosition.z)
-    }
-
-    private func velocityDidChange(from oldValue: Vector) {
-        broadcast(event: .memberChange(with: .velocity), payload: oldValue)
     }
     
 }

@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Useless Robot. All rights reserved.
 //
 
-public protocol GameObjectPhysicsComponent: GameObjectUpdateable, GameWorldMemberObserver {
+public protocol GameObjectPhysicsComponent: GameObjectUpdateable {
     
     var mass: Float { get } // in kg
     var collision: GameObjectCollisionComponent { get }

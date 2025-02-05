@@ -11,5 +11,6 @@ public protocol GameWorldObservableSubject {
     func add(observer: GameWorldMemberObserver)
     func broadcast(event: GameWorldMemberEvent, payload: Any?)
     func remove(observer: GameWorldMemberObserver)
+    func mute(_ enabled: Bool)
     
 }

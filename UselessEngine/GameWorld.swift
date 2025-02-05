@@ -75,7 +75,6 @@ public class GameWorld {
     }
     
     public func stageExit(of member: any GameWorldPositionable) {
-        (member as? GameObject)?.isActive = false
         // queue object to be removed from this world
         exitingMembers.append(member)
     }
@@ -108,12 +107,12 @@ public class GameWorld {
 
         // update inhabitants
         updatingGameObjects.forEach { gameObject in
-            guard gameObject.isActive else {
-                return
-            }
             // update the game object
             gameObject.update(dt)
         }
+        
+        // notify collision grid of the update for any preparation necessary for the next loop
+        collisionGrid.worldDidUpdate(dt)
     }
     
     // MARK: - Private Methods
@@ -147,9 +146,6 @@ public class GameWorld {
     }
     
     private func install(_ gameObject: GameObject) {
-        // notify the delegate of the pending addition
-        delegate?.gameWorld(self, willAdd: gameObject)
-        
         if !gameObject.hasParent() {
             // children are updated by the parent so add the object to the update list only if parentless
             updatingGameObjects.insert(gameObject)
@@ -165,11 +161,9 @@ public class GameWorld {
 
         // subscribe to the object's notifications
         gameObject.add(observer: self)
-        
-        // and set the object as active
-        gameObject.isActive = true
-        
-        // and notify the delegate of the add
+
+        // and notify the addition
+        collisionGrid.worldDidAdd(gameObject: gameObject)
         delegate?.gameWorld(self, added: gameObject)
     }
     

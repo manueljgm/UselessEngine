@@ -9,14 +9,7 @@
 extension GameWorld: GameWorldMemberObserver {
     
     public func receive(event: GameWorldMemberEvent, from sender: any GameWorldPositionable, payload: Any?) {
-        switch event {
-        case .memberUpdate:
-            if let gameObject = sender as? GameObject {
-                delegate?.gameWorld(self, updated: gameObject)
-            }
-        default:
-            delegate?.receive(event: event, from: sender, payload: payload)
-        }
+        delegate?.receive(event: event, from: sender, payload: payload)
     }
     
 }

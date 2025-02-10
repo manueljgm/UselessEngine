@@ -3,12 +3,10 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1A09542527BAD63E00457D59 /* UselessCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A09542427BAD62A00457D59 /* UselessCommon.framework */; };
-		1A09542627BAD63E00457D59 /* UselessCommon.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1A09542427BAD62A00457D59 /* UselessCommon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1A2010CD25B377DA00776B52 /* GameWorldCollisionGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A2010CC25B377DA00776B52 /* GameWorldCollisionGrid.swift */; };
 		1A317E2425BA8305004358E3 /* GameWorldMemberChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A317E2325BA8305004358E3 /* GameWorldMemberChanges.swift */; };
 		1A317E4125BE195B004358E3 /* GameWorldPositionable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A317E4025BE195B004358E3 /* GameWorldPositionable.swift */; };
@@ -49,6 +47,7 @@
 		1A56A1D526D9969900428F62 /* AnimationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A56A1D426D9969900428F62 /* AnimationDelegate.swift */; };
 		1A5BDF29267E88D100E96D04 /* GameObjectAudioComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5BDF28267E88D100E96D04 /* GameObjectAudioComponent.swift */; };
 		1A5FB9EF24DAE3AE0025BE93 /* AnimationFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5FB9EE24DAE3AE0025BE93 /* AnimationFrame.swift */; };
+		1A6D10BE2D5A6283000F3714 /* UselessCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 1A6D10BD2D5A6283000F3714 /* UselessCommon */; };
 		1A6E667C260045DB00081B38 /* GameWorldDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A6E667B260045DB00081B38 /* GameWorldDelegate.swift */; };
 		1A895BE929898751007E7086 /* GameObjectFlags.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A895BE829898751007E7086 /* GameObjectFlags.swift */; };
 		1A933BA82767D6FC00781E06 /* GameObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A933BA72767D6FC00781E06 /* GameObjectTests.swift */; };
@@ -68,13 +67,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		1A09542327BAD62A00457D59 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 1A09541F27BAD62A00457D59 /* UselessCommon.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1A04E86024C1D82700081D46;
-			remoteInfo = UselessCommon;
-		};
 		1A42FBBC25B67AE60040D481 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 1A32FC0F24C1E33800CE3B0F /* Project object */;
@@ -91,7 +83,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				1A09542627BAD63E00457D59 /* UselessCommon.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -99,7 +90,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		1A09541F27BAD62A00457D59 /* UselessCommon.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = UselessCommon.xcodeproj; path = ../UselessCommon/UselessCommon.xcodeproj; sourceTree = "<group>"; };
 		1A2010CC25B377DA00776B52 /* GameWorldCollisionGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldCollisionGrid.swift; sourceTree = "<group>"; };
 		1A317E2325BA8305004358E3 /* GameWorldMemberChanges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldMemberChanges.swift; sourceTree = "<group>"; };
 		1A317E4025BE195B004358E3 /* GameWorldPositionable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorldPositionable.swift; sourceTree = "<group>"; };
@@ -166,7 +156,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1A09542527BAD63E00457D59 /* UselessCommon.framework in Frameworks */,
+				1A6D10BE2D5A6283000F3714 /* UselessCommon in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -181,14 +171,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1A09542027BAD62A00457D59 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				1A09542427BAD62A00457D59 /* UselessCommon.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		1A32FC0E24C1E33800CE3B0F = {
 			isa = PBXGroup;
 			children = (
@@ -296,7 +278,6 @@
 		1A4AE29224C28D9C001E7A00 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				1A09541F27BAD62A00457D59 /* UselessCommon.xcodeproj */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -391,14 +372,11 @@
 				Base,
 			);
 			mainGroup = 1A32FC0E24C1E33800CE3B0F;
+			packageReferences = (
+				1A6D10BC2D5A6283000F3714 /* XCLocalSwiftPackageReference "../UselessCommon" */,
+			);
 			productRefGroup = 1A32FC1924C1E33800CE3B0F /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 1A09542027BAD62A00457D59 /* Products */;
-					ProjectRef = 1A09541F27BAD62A00457D59 /* UselessCommon.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				1A32FC1724C1E33800CE3B0F /* UselessEngine */,
@@ -406,16 +384,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		1A09542427BAD62A00457D59 /* UselessCommon.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = UselessCommon.framework;
-			remoteRef = 1A09542327BAD62A00457D59 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		1A32FC1624C1E33800CE3B0F /* Resources */ = {
@@ -766,6 +734,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		1A6D10BC2D5A6283000F3714 /* XCLocalSwiftPackageReference "../UselessCommon" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../UselessCommon;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1A6D10BD2D5A6283000F3714 /* UselessCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = UselessCommon;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 1A32FC0F24C1E33800CE3B0F /* Project object */;
 }

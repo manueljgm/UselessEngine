@@ -27,15 +27,4 @@ class TestObjectPhysicsComponent: GameObjectPhysicsComponent {
         self.thrust = thrust
     }
     
-    func receive(event: GameWorldMemberEvent, from sender: any GameWorldPositionable, payload: Any?) {
-        switch event {
-        case .memberChange(let changes):
-            if changes.contains(.position) {
-                collision.contactAABB.position = sender.position
-            }
-        default:
-            break
-        }
-    }
-    
 }

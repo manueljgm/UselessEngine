@@ -6,6 +6,8 @@
 //  Copyright (c) 2014 Useless Robot. All rights reserved.
 //
 
+import Foundation
+
 public class GameObject: GameWorldPositionable, GameWorldObservableSubject {
 
     // MARK: - Properties
@@ -90,7 +92,9 @@ public class GameObject: GameWorldPositionable, GameWorldObservableSubject {
         
     // MARK: - Init
     
+#if DEBUG_VERBOSE
     private static var inited: Int = 0
+#endif
     
     public init(graphics graphicsComponent: any GameWorldMemberGraphicsComponent<GameObject>,
                 audio audioComponent: GameObjectAudioComponent? = nil,
@@ -102,17 +106,17 @@ public class GameObject: GameWorldPositionable, GameWorldObservableSubject {
         physics = physicsComponent
         input = inputComponent
 
+#if DEBUG_VERBOSE
         GameObject.inited += 1
-        #if DEBUG_VERBOSE
         print(String(format: "GameObject:init; %d exist", GameObject.inited))
-        #endif
+#endif
     }
     
     deinit {
+#if DEBUG_VERBOSE
         GameObject.inited -= 1
-        #if DEBUG_VERBOSE
         print(String(format: "GameObject:deinit; %d remain", GameObject.inited))
-        #endif
+#endif
     }
     
     // MARK: - Public Methods

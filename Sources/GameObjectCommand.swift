@@ -6,6 +6,8 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
+import Foundation
+
 public enum GameObjectCommandPriority: Comparable {
     case low
     case medium

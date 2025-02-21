@@ -6,6 +6,8 @@
 //  Copyright © 2015 Useless Robot. All rights reserved.
 //
 
+import Foundation
+
 public enum GameWorldMemberEvent: Equatable {
 
     case memberUpdate(with: GameWorldMemberChanges)

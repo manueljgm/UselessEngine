@@ -6,4 +6,6 @@
 //  Copyright © 2022 Useless Robot. All rights reserved.
 //
 
+import Foundation
+
 public typealias GameWorldCustomAttributeKey = UUID

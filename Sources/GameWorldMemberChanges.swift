@@ -6,6 +6,8 @@
 //  Copyright © 2021 Useless Robot. All rights reserved.
 //
 
+import Foundation
+
 public struct GameWorldMemberChanges: OptionSet {
 
     public let rawValue: Int

@@ -6,6 +6,8 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
+import Foundation
+
 public typealias GameTileSize = (width: Float, height: Float)
 
 public class GameTile: GameWorldPositionable {
@@ -20,7 +22,9 @@ public class GameTile: GameWorldPositionable {
 
     private let id = UUID()
     
+#if DEBUG_VERBOSE
     private static var inited: Int = 0
+#endif
     
     public init(graphics graphicsComponent: any GameWorldMemberGraphicsComponent<GameTile>,
                 size: GameTileSize,
@@ -31,17 +35,17 @@ public class GameTile: GameWorldPositionable {
 
         graphics = graphicsComponent
 
+#if DEBUG_VERBOSE
         GameTile.inited += 1
-        #if DEBUG_VERBOSE
         print(String(format: "GameTile:init; %d exist", GameTile.inited))
-        #endif
+#endif
     }
     
     deinit {
+#if DEBUG_VERBOSE
         GameTile.inited -= 1
-        #if DEBUG_VERBOSE
         print(String(format: "GameTile:deinit; %d remain", GameTile.inited))
-        #endif
+#endif
     }
     
     public func update(_ dt: Float) {

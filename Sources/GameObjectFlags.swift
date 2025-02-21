@@ -6,6 +6,8 @@
 //  Copyright © 2023 Useless Robot. All rights reserved.
 //
 
+import Foundation
+
 public struct GameObjectFlags: OptionSet {
 
     public let rawValue: Int

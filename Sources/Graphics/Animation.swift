@@ -48,7 +48,10 @@ public class Animation {
     private var skipLoad = false
     
     private static let epsilon: Float = 1e-6
+    
+#if DEBUG_VERBOSE
     private static var inited = 0
+#endif
     
     public convenience init(targetSprite: SKSpriteNode, frames: [AnimationFrame], repeats isRepeating: Bool) {
         self.init(target: nil, targetSprite: targetSprite, frames: frames, repeats: isRepeating)
@@ -77,14 +80,16 @@ public class Animation {
 
         loadFrame()
 
+#if DEBUG_VERBOSE
         Animation.inited += 1
+#endif
     }
     
     deinit {
+#if DEBUG_VERBOSE
         Animation.inited -= 1
-        #if DEBUG_VERBOSE
         print(String(format: "Animation:deinit; %d remain", Animation.inited))
-        #endif
+#endif
     }
     
     public func addFrame(withTexture texture: SKTexture, rate: UInt8 = 0) {

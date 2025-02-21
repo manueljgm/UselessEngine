@@ -6,7 +6,9 @@
 //  Copyright © 2015 Useless Robot. All rights reserved.
 //
 
-open class GameObjectCommandQueueingComponent: GameObjectInputComponent {
+import Foundation
+
+public class GameObjectCommandQueueingComponent: GameObjectInputComponent {
 
     /// Queued input commands.
     public private(set) var commandQueue: [(command: GameObjectCommand, ts: TimeInterval, payload: AnyObject?)] = []
@@ -34,7 +36,7 @@ open class GameObjectCommandQueueingComponent: GameObjectInputComponent {
         }
     }
     
-    open func update(with gameObject: GameObject, dt: Float) {
+    public func update(with gameObject: GameObject, dt: Float) {
         if let tuple = commandQueue.popLast() {
             gameObject.state?.handle(command: tuple.command, on: gameObject, payload: tuple.payload)
         }

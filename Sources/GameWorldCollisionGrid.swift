@@ -6,6 +6,8 @@
 //  Copyright © 2021 Useless Robot. All rights reserved.
 //
 
+import Foundation
+
 public class GameWorldCollisionGrid {
 
     public private(set) var delegate: GameWorldCollisionDelegate

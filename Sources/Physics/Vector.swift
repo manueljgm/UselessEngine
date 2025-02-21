@@ -6,6 +6,8 @@
 //  Copyright (c) 2015 Useless Robot. All rights reserved.
 //
 
+import Foundation
+
 public struct Vector: Codable {
     
     public static let zero: Vector = Vector(dx: .zero, dy: .zero, dz: .zero)

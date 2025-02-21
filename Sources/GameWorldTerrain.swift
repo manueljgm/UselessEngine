@@ -6,6 +6,7 @@
 //  Copyright © 2021 Useless Robot. All rights reserved.
 //
 
+import Foundation
 import UselessCommon
 
 internal enum GameWorldTerrainError: Error {

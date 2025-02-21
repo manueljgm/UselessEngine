@@ -17,7 +17,7 @@ let package = Package(
             targets: ["UselessEngine"]),
     ],
     dependencies: [
-        .package(path: "../UselessCommon")
+        .package(url: "https://github.com/manueljgm/UselessCommon.git", from: "1.0.0")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.

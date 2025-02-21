@@ -1,0 +1,15 @@
+{
+  "originHash" : "7863a7f57075efb324df29e8e74832dc2ac74026c6726bc9053d2cd8646651b4",
+  "pins" : [
+    {
+      "identity" : "uselesscommon",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/manueljgm/UselessCommon.git",
+      "state" : {
+        "revision" : "0f10c9a8fb29e13ba6d6e6647a7d0629eb0105f5",
+        "version" : "1.0.0"
+      }
+    }
+  ],
+  "version" : 3
+}
